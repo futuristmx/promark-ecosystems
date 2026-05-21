@@ -1,0 +1,565 @@
+// Promark® Platform — Prisma Schema
+// Multi-tenant brand intelligence SaaS
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  ONBOARDING
+}
+
+enum PromarkRole {
+  SUPERADMIN
+  LAWYER
+  BRAND_ANALYST
+  ASSISTANT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ClientRole {
+  CLIENT_ADMIN
+  CLIENT_VIEWER
+  CLIENT_LEGAL_REP
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  REVOKED
+}
+
+enum HoldingStatus {
+  ACTIVE
+  INACTIVE
+  DISSOLVED
+}
+
+enum CompanyType {
+  PARENT
+  SUBSIDIARY
+  AFFILIATE
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+  MERGED
+  DISSOLVED
+}
+
+enum LegalStatus {
+  APPLIED
+  PUBLISHED
+  REGISTERED
+  RENEWED
+  EXPIRED
+  CANCELLED
+  OPPOSED
+  IN_LITIGATION
+}
+
+enum BrandType {
+  WORDMARK
+  FIGURATIVE
+  MIXED
+  THREE_D
+  SOUND
+  HOLOGRAM
+  TRADE_DRESS
+}
+
+enum BrandClassStatus {
+  ACTIVE
+  PENDING
+  CANCELLED
+}
+
+enum BrandEventType {
+  REGISTRATION
+  RENEWAL
+  TRANSFER
+  OPPOSITION
+  CANCELLATION
+  STATUS_CHANGE
+  MODIFICATION
+  LITIGATION_START
+  LITIGATION_END
+  ASSIGNMENT
+  LICENSE_GRANT
+}
+
+enum ActorType {
+  PROMARK
+  CLIENT
+  SYSTEM
+}
+
+enum RelationshipType {
+  PARENT_CHILD
+  COEXISTENCE
+  OPPOSITION
+  FAMILY
+  RELATED_DESIGN
+  TRANSLATION
+}
+
+enum HolderType {
+  INDIVIDUAL
+  CORPORATION
+}
+
+enum HolderRoleType {
+  OWNER
+  CO_OWNER
+  LICENSEE
+  LEGAL_REPRESENTATIVE
+  AGENT
+}
+
+enum HolderStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ContractType {
+  LICENSE_INTERNAL
+  LICENSE_EXTERNAL
+  COEXISTENCE
+  ASSIGNMENT
+  FRANCHISE
+  DISTRIBUTION
+  SETTLEMENT
+  NDA
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  RENEWED
+  UNDER_REVIEW
+}
+
+enum DocumentCategory {
+  CERTIFICATE
+  APPLICATION
+  POWER_OF_ATTORNEY
+  CONTRACT_COPY
+  CORRESPONDENCE
+  COURT_FILING
+  RENEWAL_PROOF
+  OTHER
+}
+
+enum UserTypeEnum {
+  PROMARK
+  CLIENT
+}
+
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  EXPORT
+  PUSH
+}
+
+enum VersionStatus {
+  DRAFT
+  PUSHED
+  ROLLED_BACK
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Tenant {
+  id             String       @id @default(cuid())
+  name           String
+  slug           String       @unique
+  custom_domain  String?
+  config         Json
+  active_modules Json
+  status         TenantStatus @default(ONBOARDING)
+  language       String       @default("es")
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  users_client    UserClient[]
+  holdings        Holding[]
+  companies       Company[]
+  brands          Brand[]
+  holders         Holder[]
+  contracts       Contract[]
+  documents       Document[]
+  audit_logs      AuditLog[]
+  tenant_versions TenantVersion[]
+
+  @@map("tenants")
+}
+
+model UserPromark {
+  id              String      @id @default(cuid())
+  email           String      @unique
+  full_name       String
+  role            PromarkRole
+  avatar          Json?
+  status          UserStatus  @default(ACTIVE)
+  supabase_auth_id String     @unique
+  last_login      DateTime?
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+
+  brand_history_entries BrandHistory[]
+
+  @@map("user_promarks")
+}
+
+model UserClient {
+  id               String       @id @default(cuid())
+  tenant_id        String
+  full_name        String
+  email            String
+  pin_hash         String
+  pin_generated_at DateTime
+  pin_expires_at   DateTime?
+  card_id          String       @unique
+  pin_attempts     Int          @default(0)
+  locked_at        DateTime?
+  role             ClientRole
+  avatar           Json?
+  status           ClientStatus @default(ACTIVE)
+  last_login       DateTime?
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@index([card_id, tenant_id])
+  @@map("user_clients")
+}
+
+model Holding {
+  id         String        @id @default(cuid())
+  tenant_id  String
+  name       String
+  legal_name String
+  rfc        String?
+  country    String        @default("México")
+  notes      String?
+  status     HoldingStatus @default(ACTIVE)
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+
+  tenant    Tenant    @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  companies Company[]
+
+  @@index([tenant_id])
+  @@map("holdings")
+}
+
+model Company {
+  id                String        @id @default(cuid())
+  tenant_id         String
+  holding_id        String
+  parent_company_id String?
+  name              String
+  legal_name        String
+  rfc               String?
+  company_type      CompanyType
+  incorporation_date DateTime?
+  country           String        @default("México")
+  state             String?
+  status            CompanyStatus @default(ACTIVE)
+  notes             String?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  tenant         Tenant   @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  holding        Holding  @relation(fields: [holding_id], references: [id], onDelete: Restrict)
+  parent_company Company? @relation("CompanyHierarchy", fields: [parent_company_id], references: [id], onDelete: SetNull)
+  subsidiaries   Company[] @relation("CompanyHierarchy")
+  brands         Brand[]
+
+  @@index([tenant_id])
+  @@index([holding_id])
+  @@index([parent_company_id])
+  @@map("companies")
+}
+
+model Brand {
+  id                  String      @id @default(cuid())
+  tenant_id           String
+  company_id          String
+  name                String
+  slug                String
+  logos               Json?
+  registration_number String?
+  application_number  String?
+  application_date    DateTime?
+  registration_date   DateTime?
+  expiration_date     DateTime?
+  renewal_date        DateTime?
+  legal_status        LegalStatus
+  brand_type          BrandType
+  description         String?
+  disclaimers         String?
+  priority_claim      Json?
+  metadata            Json?
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+
+  tenant  Tenant  @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [company_id], references: [id], onDelete: Restrict)
+
+  classes            BrandClass[]
+  history            BrandHistory[]
+  relationships_as_a BrandRelationship[] @relation("BrandA")
+  relationships_as_b BrandRelationship[] @relation("BrandB")
+  holders            BrandHolder[]
+  contract_brands    ContractBrand[]
+
+  @@index([tenant_id])
+  @@index([company_id])
+  @@index([expiration_date])
+  @@map("brands")
+}
+
+model BrandClass {
+  id                String           @id @default(cuid())
+  brand_id          String
+  class_number      Int
+  class_description String?
+  specification     String?
+  status            BrandClassStatus @default(PENDING)
+  created_at        DateTime         @default(now())
+
+  brand Brand @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+
+  @@map("brand_classes")
+}
+
+model BrandHistory {
+  id                 String         @id @default(cuid())
+  brand_id           String
+  event_type         BrandEventType
+  event_date         DateTime
+  previous_state     Json?
+  new_state          Json?
+  description        String?
+  documents          Json?
+  actor_type         ActorType
+  actor_id           String?
+  actor_role         String?
+  change_type        String?
+  visible_to_client  Boolean        @default(true)
+  performed_by_id    String?
+  created_at         DateTime       @default(now())
+
+  brand        Brand        @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  performed_by UserPromark? @relation(fields: [performed_by_id], references: [id], onDelete: SetNull)
+
+  @@index([brand_id, event_date])
+  @@map("brand_history")
+}
+
+model BrandRelationship {
+  id                String           @id @default(cuid())
+  brand_a_id        String
+  brand_b_id        String
+  relationship_type RelationshipType
+  description       String?
+  created_at        DateTime         @default(now())
+
+  brand_a Brand @relation("BrandA", fields: [brand_a_id], references: [id], onDelete: Cascade)
+  brand_b Brand @relation("BrandB", fields: [brand_b_id], references: [id], onDelete: Cascade)
+
+  @@index([brand_a_id])
+  @@index([brand_b_id])
+  @@map("brand_relationships")
+}
+
+model Holder {
+  id           String       @id @default(cuid())
+  tenant_id    String
+  holder_type  HolderType
+  name         String
+  rfc          String?
+  curp         String?
+  nationality  String?
+  address      Json?
+  contact_info Json?
+  notes        String?
+  status       HolderStatus @default(ACTIVE)
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  brand_holders BrandHolder[]
+
+  @@index([tenant_id])
+  @@map("holders")
+}
+
+model BrandHolder {
+  id         String         @id @default(cuid())
+  brand_id   String
+  holder_id  String
+  role       HolderRoleType
+  start_date DateTime?
+  end_date   DateTime?
+  notes      String?
+  created_at DateTime       @default(now())
+
+  brand  Brand  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  holder Holder @relation(fields: [holder_id], references: [id], onDelete: Restrict)
+
+  @@index([brand_id])
+  @@index([holder_id])
+  @@map("brand_holders")
+}
+
+model Contract {
+  id              String         @id @default(cuid())
+  tenant_id       String
+  contract_type   ContractType
+  title           String
+  description     String?
+  parties         Json?
+  effective_date  DateTime?
+  expiration_date DateTime?
+  renewal_terms   String?
+  status          ContractStatus @default(DRAFT)
+  financial_terms Json?
+  governing_law   String?
+  notes           String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  tenant          Tenant          @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  contract_brands ContractBrand[]
+
+  @@index([tenant_id])
+  @@map("contracts")
+}
+
+model ContractBrand {
+  id          String   @id @default(cuid())
+  contract_id String
+  brand_id    String
+  scope       String?
+  created_at  DateTime @default(now())
+
+  contract Contract @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  brand    Brand    @relation(fields: [brand_id], references: [id], onDelete: Restrict)
+
+  @@index([contract_id])
+  @@index([brand_id])
+  @@map("contract_brands")
+}
+
+model Document {
+  id                 String           @id @default(cuid())
+  tenant_id          String
+  entity_type        String
+  entity_id          String
+  file_name          String
+  file_type          String?
+  file_size          Int?
+  storage_path       String
+  document_category  DocumentCategory
+  description        String?
+  uploaded_by        String
+  uploaded_at        DateTime         @default(now())
+  last_edited_by     String?
+  last_edited_at     DateTime?
+  editable_remotely  Boolean          @default(false)
+  version_number     Int              @default(1)
+  created_at         DateTime         @default(now())
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@index([entity_type, entity_id])
+  @@map("documents")
+}
+
+model RolePermission {
+  id         String           @id @default(cuid())
+  role       String
+  user_type  UserTypeEnum
+  module     String
+  action     PermissionAction
+  allowed    Boolean
+  created_at DateTime         @default(now())
+
+  @@unique([role, user_type, module, action])
+  @@index([role, user_type, module, action])
+  @@map("role_permissions")
+}
+
+model PermissionOverride {
+  id         String           @id @default(cuid())
+  user_id    String
+  user_type  UserTypeEnum
+  module     String
+  action     PermissionAction
+  granted    Boolean
+  created_by String
+  reason     String
+  expires_at DateTime?
+  created_at DateTime         @default(now())
+
+  @@index([user_id, user_type, module, action])
+  @@map("permission_overrides")
+}
+
+model AuditLog {
+  id          String       @id @default(cuid())
+  tenant_id   String?
+  user_id     String
+  user_type   UserTypeEnum
+  action      String
+  entity_type String
+  entity_id   String
+  changes     Json?
+  ip_address  String?
+  created_at  DateTime     @default(now())
+
+  tenant Tenant? @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
+
+  @@index([tenant_id, created_at])
+  @@map("audit_logs")
+}
+
+model TenantVersion {
+  id               String        @id @default(cuid())
+  tenant_id        String
+  version_number   Int
+  config_snapshot  Json
+  modules_snapshot Json
+  status           VersionStatus @default(DRAFT)
+  pushed_at        DateTime?
+  pushed_by        String?
+  created_at       DateTime      @default(now())
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@map("tenant_versions")
+}
