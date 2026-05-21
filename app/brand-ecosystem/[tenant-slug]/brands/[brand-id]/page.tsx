@@ -14,12 +14,12 @@ import {
   ArrowLeft,
   Calendar,
   Building2,
-  FileText,
   ScrollText,
   Clock,
   Hash,
   Type,
 } from 'lucide-react';
+import { DocumentsPanel } from '@/components/documents-panel';
 
 interface BrandDetailPageProps {
   params: Promise<{ 'tenant-slug': string; 'brand-id': string }>;
@@ -148,31 +148,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
   const showDocuments = !isViewer && (features.show_documents ?? false);
   const showContracts = !isViewer && (features.show_contracts ?? false);
 
-  // Fetch documents for this brand if enabled
-  let documents: Array<{
-    id: string;
-    file_name: string;
-    document_category: string;
-    uploaded_at: Date;
-    description: string | null;
-  }> = [];
-  if (showDocuments) {
-    documents = await prisma.document.findMany({
-      where: {
-        tenant_id: session.tenant_id,
-        entity_type: 'brand',
-        entity_id: brandId,
-      },
-      select: {
-        id: true,
-        file_name: true,
-        document_category: true,
-        uploaded_at: true,
-        description: true,
-      },
-      orderBy: { uploaded_at: 'desc' },
-    });
-  }
+  const allowDownload = features.allow_document_download ?? false;
 
   const vigencyInfo = getVigencyInfo(brand.expiration_date, brand.legal_status);
   const basePath = `/brand-ecosystem/${tenantSlug}/brands`;
@@ -373,40 +349,17 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
       )}
 
       {/* Documents */}
-      {showDocuments && documents.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="size-4" />
-              Documentos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      {doc.file_name}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {formatDocCategory(doc.document_category)} &middot;{' '}
-                      {formatDate(doc.uploaded_at)}
-                    </p>
-                    {doc.description && (
-                      <p className="mt-0.5 text-xs text-slate-400">
-                        {doc.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {showDocuments && (
+        <div className="mb-6">
+          <DocumentsPanel
+            tenantId={session.tenant_id}
+            entityType="BRAND"
+            entityId={brandId}
+            canUpload={false}
+            canDelete={false}
+            canDownload={allowDownload}
+          />
+        </div>
       )}
 
       {/* Contracts */}
@@ -489,20 +442,6 @@ function formatHolderRole(role: string): string {
     AGENT: 'Agente',
   };
   return map[role] ?? role;
-}
-
-function formatDocCategory(cat: string): string {
-  const map: Record<string, string> = {
-    CERTIFICATE: 'Certificado',
-    APPLICATION: 'Solicitud',
-    POWER_OF_ATTORNEY: 'Poder Notarial',
-    CONTRACT_COPY: 'Copia de contrato',
-    CORRESPONDENCE: 'Correspondencia',
-    COURT_FILING: 'Documento judicial',
-    RENEWAL_PROOF: 'Comprobante de renovacion',
-    OTHER: 'Otro',
-  };
-  return map[cat] ?? cat;
 }
 
 function formatContractType(type: string): string {

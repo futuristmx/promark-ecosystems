@@ -12,9 +12,9 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardAction,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { DocumentsPanel } from '@/components/documents-panel';
 
 interface BrandDetailPageProps {
   params: Promise<{ 'tenant-id': string; 'brand-id': string }>;
@@ -267,6 +267,16 @@ export default async function BrandDetailPage({
               </CardContent>
             </Card>
           )}
+
+          {/* Documents */}
+          <DocumentsPanel
+            tenantId={tenantId}
+            entityType="BRAND"
+            entityId={brand.id}
+            canUpload={canEdit}
+            canDelete={canEdit}
+            canDownload={true}
+          />
 
           {/* History Timeline */}
           <Card>

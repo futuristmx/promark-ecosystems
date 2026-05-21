@@ -209,6 +209,8 @@ model Tenant {
   audit_logs      AuditLog[]
   tenant_versions     TenantVersion[]
   user_client_holders UserClientHolder[]
+  alert_rules         AlertRule[]
+  alerts              Alert[]
 
   @@map("tenants")
 }
@@ -477,29 +479,82 @@ model ContractBrand {
 }
 
 model Document {
-  id                 String           @id @default(cuid())
-  tenant_id          String
-  entity_type        String
-  entity_id          String
-  file_name          String
-  file_type          String?
-  file_size          Int?
-  storage_path       String
-  document_category  DocumentCategory
-  description        String?
-  uploaded_by        String
-  uploaded_at        DateTime         @default(now())
-  last_edited_by     String?
-  last_edited_at     DateTime?
-  editable_remotely  Boolean          @default(false)
-  version_number     Int              @default(1)
-  created_at         DateTime         @default(now())
+  id                  String           @id @default(cuid())
+  tenant_id           String
+  entity_type         String
+  entity_id           String
+  file_name           String
+  file_type           String?
+  file_size           Int?
+  storage_path        String
+  storage_url         String?
+  document_category   DocumentCategory @default(OTHER)
+  description         String?
+  uploaded_by         String
+  uploaded_at         DateTime         @default(now())
+  last_edited_by      String?
+  last_edited_at      DateTime?
+  editable_remotely   Boolean          @default(false)
+  version_number      Int              @default(1)
+  previous_version_id String?
+  is_latest_version   Boolean          @default(true)
+  expires_at          DateTime?
+  deleted_at          DateTime?
+  created_at          DateTime         @default(now())
 
-  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  tenant           Tenant     @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  previous_version Document?  @relation("DocumentVersion", fields: [previous_version_id], references: [id], onDelete: SetNull)
+  next_versions    Document[] @relation("DocumentVersion")
 
   @@index([tenant_id])
   @@index([entity_type, entity_id])
+  @@index([tenant_id, deleted_at])
   @@map("documents")
+}
+
+model AlertRule {
+  id            String   @id @default(cuid())
+  tenant_id     String
+  name          String
+  entity_type   String
+  trigger_days  Int
+  is_active     Boolean  @default(true)
+  notify_email  Boolean  @default(true)
+  notify_in_app Boolean  @default(true)
+  created_at    DateTime @default(now())
+
+  tenant Tenant  @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  alerts Alert[]
+
+  @@index([tenant_id])
+  @@map("alert_rules")
+}
+
+model Alert {
+  id            String    @id @default(cuid())
+  tenant_id     String
+  alert_rule_id String?
+  entity_type   String
+  entity_id     String
+  entity_name   String
+  alert_type    String
+  trigger_days  Int?
+  expiry_date   DateTime
+  status        String    @default("PENDING")
+  sent_at       DateTime?
+  dismissed_at  DateTime?
+  dismissed_by  String?
+  resolved_at   DateTime?
+  resolved_by   String?
+  created_at    DateTime  @default(now())
+
+  tenant     Tenant     @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  alert_rule AlertRule? @relation(fields: [alert_rule_id], references: [id], onDelete: SetNull)
+
+  @@index([tenant_id])
+  @@index([tenant_id, status])
+  @@index([entity_type, entity_id])
+  @@map("alerts")
 }
 
 model RolePermission {
