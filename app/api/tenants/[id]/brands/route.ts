@@ -68,6 +68,27 @@ export async function GET(
     // Build where clause
     const where: Prisma.BrandWhereInput = { tenant_id: tenantId };
 
+    // LEGAL_REP filtering: only show brands where the user is linked as a holder
+    if (session.userType === 'CLIENT' && getSessionRole(session) === 'CLIENT_LEGAL_REP') {
+      const userId = getSessionUserId(session);
+      // Get holder IDs linked to this user
+      const assignments = await prisma.userClientHolder.findMany({
+        where: { user_client_id: userId, tenant_id: tenantId, removed_at: null },
+        select: { holder_id: true },
+      });
+      const holderIds = assignments.map((a) => a.holder_id);
+
+      if (holderIds.length === 0) {
+        // No assignments — return empty
+        return NextResponse.json({ brands: [] });
+      }
+
+      // Filter brands that have at least one BrandHolder with these holder IDs
+      where.holders = {
+        some: { holder_id: { in: holderIds } },
+      };
+    }
+
     if (companyId) {
       where.company_id = companyId;
     }

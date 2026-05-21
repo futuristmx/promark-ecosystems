@@ -141,6 +141,22 @@ async function main() {
         status: 'ACTIVE',
       },
     });
+
+    // LEGAL_REP user
+    await prisma.userClient.upsert({
+      where: { card_id: `${prefix}-003` },
+      update: {},
+      create: {
+        tenant_id: tenant.id,
+        full_name: `Legal Rep ${tenant.name.split(' ')[0]}`,
+        email: `legalrep@${tenant.slug.replace(/-/g, '')}.mx`,
+        pin_hash: pinHash,
+        pin_generated_at: new Date(),
+        card_id: `${prefix}-003`,
+        role: 'CLIENT_LEGAL_REP',
+        status: 'ACTIVE',
+      },
+    });
   }
 
   console.log('✅ Client users created (PIN: 123456 for all)');
@@ -211,6 +227,63 @@ async function main() {
   }
 
   console.log('✅ Holdings, Companies, and Brands created');
+
+  // ─── 4b. Holders + BrandHolder + UserClientHolder ──
+  for (const tenant of [tenant1, tenant2]) {
+    const isT1 = tenant.slug === 'grupo-test-norte';
+    const prefix = isT1 ? 'GTN' : 'ADS';
+
+    // Create a holder (representative)
+    const holder = await prisma.holder.create({
+      data: {
+        tenant_id: tenant.id,
+        holder_type: 'INDIVIDUAL',
+        name: isT1 ? 'Lic. Roberto Garza' : 'Lic. María López',
+        rfc: isT1 ? 'GARO800101XX1' : 'LOMA850515YY2',
+        nationality: 'Mexicana',
+        status: 'ACTIVE',
+        contact_info: {
+          email: isT1 ? 'rgarza@despacho.mx' : 'mlopez@despacho.mx',
+          phone: isT1 ? '+52 81 1234 5678' : '+52 55 9876 5432',
+        },
+      },
+    });
+
+    // Get the first 3 brands of this tenant to link to the holder
+    const tenantBrands = await prisma.brand.findMany({
+      where: { tenant_id: tenant.id },
+      take: 3,
+      orderBy: { name: 'asc' },
+    });
+
+    for (const brand of tenantBrands) {
+      await prisma.brandHolder.create({
+        data: {
+          brand_id: brand.id,
+          holder_id: holder.id,
+          role: 'LEGAL_REPRESENTATIVE',
+        },
+      });
+    }
+
+    // Link the LEGAL_REP user to this holder
+    const legalRepUser = await prisma.userClient.findUnique({
+      where: { card_id: `${prefix}-003` },
+    });
+
+    if (legalRepUser) {
+      await prisma.userClientHolder.create({
+        data: {
+          user_client_id: legalRepUser.id,
+          holder_id: holder.id,
+          tenant_id: tenant.id,
+          assigned_by: superadmin.id,
+        },
+      });
+    }
+  }
+
+  console.log('✅ Holders, BrandHolders, and UserClientHolder assignments created');
 
   // ─── 5. Role Permissions ────────────────────────────
   // Define all modules
@@ -329,7 +402,8 @@ async function main() {
   console.log('Promark Admin: admin@promark.mx');
   console.log('Tenant 1: grupo-test-norte');
   console.log('Tenant 2: alimentos-demo-sa');
-  console.log('Client users: GTN-001/002, ADS-001/002 (PIN: 123456)');
+  console.log('Client users: GTN-001/002/003, ADS-001/002/003 (PIN: 123456)');
+  console.log('  -001: CLIENT_ADMIN, -002: CLIENT_VIEWER, -003: CLIENT_LEGAL_REP');
 }
 
 main()

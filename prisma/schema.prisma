@@ -207,7 +207,8 @@ model Tenant {
   contracts       Contract[]
   documents       Document[]
   audit_logs      AuditLog[]
-  tenant_versions TenantVersion[]
+  tenant_versions     TenantVersion[]
+  user_client_holders UserClientHolder[]
 
   @@map("tenants")
 }
@@ -247,7 +248,8 @@ model UserClient {
   created_at       DateTime     @default(now())
   updated_at       DateTime     @updatedAt
 
-  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  tenant               Tenant                    @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  holder_assignments   UserClientHolder[]
 
   @@index([tenant_id])
   @@index([card_id, tenant_id])
@@ -409,8 +411,9 @@ model Holder {
   created_at   DateTime     @default(now())
   updated_at   DateTime     @updatedAt
 
-  tenant       Tenant        @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  tenant        Tenant              @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   brand_holders BrandHolder[]
+  assigned_users UserClientHolder[]
 
   @@index([tenant_id])
   @@map("holders")
@@ -562,4 +565,23 @@ model TenantVersion {
 
   @@index([tenant_id])
   @@map("tenant_versions")
+}
+
+model UserClientHolder {
+  id             String    @id @default(cuid())
+  user_client_id String
+  holder_id      String
+  tenant_id      String
+  assigned_at    DateTime  @default(now())
+  assigned_by    String
+  removed_at     DateTime?
+
+  user_client UserClient @relation(fields: [user_client_id], references: [id], onDelete: Cascade)
+  holder      Holder     @relation(fields: [holder_id], references: [id], onDelete: Restrict)
+  tenant      Tenant     @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_client_id, holder_id])
+  @@index([tenant_id])
+  @@index([user_client_id])
+  @@map("user_client_holders")
 }

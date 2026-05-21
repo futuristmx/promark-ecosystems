@@ -61,12 +61,31 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
   const filters = await searchParams;
 
   // Build where clause based on role
-  // TODO: For CLIENT_LEGAL_REP, filter by brands where the user is linked
-  // as a holder with role LEGAL_REPRESENTATIVE. Currently showing all brands
-  // until the user-to-holder linking mechanism is built.
   const where: Record<string, unknown> = {
     tenant_id: session.tenant_id,
   };
+
+  // LEGAL_REP: only show brands where the user is linked to a holder
+  if (session.role === 'CLIENT_LEGAL_REP') {
+    const assignments = await prisma.userClientHolder.findMany({
+      where: {
+        user_client_id: session.user_id,
+        tenant_id: session.tenant_id,
+        removed_at: null,
+      },
+      select: { holder_id: true },
+    });
+    const holderIds = assignments.map((a) => a.holder_id);
+
+    if (holderIds.length === 0) {
+      // No assignments — will show empty state
+      where.id = '__no_match__';
+    } else {
+      where.holders = {
+        some: { holder_id: { in: holderIds } },
+      };
+    }
+  }
 
   // Apply search filter
   if (filters.search) {
