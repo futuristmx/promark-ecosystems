@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 import { hash } from 'bcryptjs';
 
 const connectionString = process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL!;
-const adapter = new PrismaPg({ connectionString });
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -11,14 +13,14 @@ async function main() {
 
   // ─── 1. Promark Superadmin ─────────────────────────
   const superadmin = await prisma.userPromark.upsert({
-    where: { email: 'admin@promark.mx' },
+    where: { email: 'mcadena@promark.mx' },
     update: {},
     create: {
-      email: 'admin@promark.mx',
-      full_name: 'Admin Promark',
+      email: 'mcadena@promark.mx',
+      full_name: 'M. Cadena',
       role: 'SUPERADMIN',
       status: 'ACTIVE',
-      supabase_auth_id: 'pending-supabase-link', // Will be updated after first Supabase login
+      supabase_auth_id: '55fde3a5-da36-4112-86f5-f61fb9a52dae',
     },
   });
   console.log('✅ Superadmin created:', superadmin.email);
