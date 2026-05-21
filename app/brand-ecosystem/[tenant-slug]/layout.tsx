@@ -1,13 +1,33 @@
+import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma/client';
+import { verifyClientJWT } from '@/lib/auth/client-pin';
+import { ClientSidebar } from './client-sidebar';
 
 interface TenantConfig {
   branding?: {
+    logo_url?: string;
     primary_color?: string;
     company_display_name?: string;
-    [key: string]: unknown;
+    favicon_url?: string;
   };
-  [key: string]: unknown;
+  features?: {
+    show_brand_history?: boolean;
+    show_contracts?: boolean;
+    show_graph_view?: boolean;
+    show_documents?: boolean;
+    allow_document_download?: boolean;
+  };
+  notifications?: {
+    expiry_alert_days?: number;
+    notify_email?: boolean;
+  };
+  localization?: {
+    language?: string;
+    timezone?: string;
+  };
 }
+
+export { type TenantConfig };
 
 export default async function BrandEcosystemLayout({
   children,
@@ -45,23 +65,54 @@ export default async function BrandEcosystemLayout({
   const config = tenant.config as TenantConfig;
   const primaryColor = config?.branding?.primary_color ?? '#2563eb';
   const displayName = config?.branding?.company_display_name ?? tenant.name;
+  const logoUrl = config?.branding?.logo_url ?? null;
+
+  // Try to get user info from JWT (non-blocking; layout works even if not logged in)
+  let userName: string | null = null;
+  let userRole: string | null = null;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('promark-client-token')?.value;
+  if (token) {
+    try {
+      const payload = await verifyClientJWT(token);
+      if (payload.tenant_slug === tenantSlug) {
+        // Fetch user name from DB
+        const user = await prisma.userClient.findUnique({
+          where: { id: payload.user_id },
+          select: { full_name: true },
+        });
+        userName = user?.full_name ?? null;
+        userRole = payload.role;
+      }
+    } catch {
+      // Token invalid — user will be redirected on protected pages
+    }
+  }
+
+  const roleLabels: Record<string, string> = {
+    CLIENT_ADMIN: 'Administrador',
+    CLIENT_VIEWER: 'Consultor',
+    CLIENT_LEGAL_REP: 'Representante Legal',
+  };
 
   return (
     <div
-      className="flex min-h-screen flex-col"
+      className="flex min-h-screen"
       style={{ '--tenant-primary': primaryColor } as React.CSSProperties}
     >
-      {/* Header */}
-      <header
-        className="flex h-14 items-center border-b px-6"
-        style={{ borderColor: primaryColor }}
-      >
-        <span className="text-lg font-semibold" style={{ color: primaryColor }}>
-          {displayName}
-        </span>
-      </header>
+      {/* Sidebar */}
+      {userName && (
+        <ClientSidebar
+          tenantSlug={tenantSlug}
+          displayName={displayName}
+          logoUrl={logoUrl}
+          primaryColor={primaryColor}
+          userName={userName}
+          userRoleLabel={userRole ? (roleLabels[userRole] ?? userRole) : null}
+        />
+      )}
 
-      {/* Content */}
+      {/* Main content */}
       <main className="flex flex-1 flex-col bg-slate-50">{children}</main>
     </div>
   );
