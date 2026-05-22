@@ -86,6 +86,50 @@ export async function runAlertDetector(): Promise<DetectorResult> {
             expiry: b.expiration_date as Date,
             alertType: triggerDays === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
           }));
+      } else if (rule.entity_type === 'CONTRACT') {
+        const where: Prisma.ContractWhereInput = {
+          tenant_id: rule.tenant_id,
+          deleted_at: null,
+          status: { in: ['ACTIVE', 'UNDER_REVIEW'] },
+        };
+        if (triggerDays === 0) {
+          where.expiration_date = { lt: now };
+        } else {
+          where.expiration_date = { gte: now, lte: upperDate };
+        }
+        const contracts = await prisma.contract.findMany({
+          where, select: { id: true, title: true, expiration_date: true },
+        });
+        candidates = contracts
+          .filter((c) => c.expiration_date)
+          .map((c) => ({
+            id: c.id,
+            name: c.title,
+            expiry: c.expiration_date as Date,
+            alertType: triggerDays === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
+          }));
+      } else if (rule.entity_type === 'LICENSE') {
+        const where: Prisma.LicenseWhereInput = {
+          tenant_id: rule.tenant_id,
+          deleted_at: null,
+          status: 'ACTIVE',
+        };
+        if (triggerDays === 0) {
+          where.expiration_date = { lt: now };
+        } else {
+          where.expiration_date = { gte: now, lte: upperDate };
+        }
+        const licenses = await prisma.license.findMany({
+          where, select: { id: true, licensee_name: true, expiration_date: true },
+        });
+        candidates = licenses
+          .filter((l) => l.expiration_date)
+          .map((l) => ({
+            id: l.id,
+            name: l.licensee_name,
+            expiry: l.expiration_date as Date,
+            alertType: triggerDays === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
+          }));
       } else if (rule.entity_type === 'DOCUMENT') {
         const where: Prisma.DocumentWhereInput = {
           tenant_id: rule.tenant_id,
