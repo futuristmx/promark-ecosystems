@@ -36,7 +36,7 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
   ]);
 
   const countByStatus = Object.fromEntries(
-    counts.map((c) => [c.status, c._count])
+    counts.map((c: { status: string; _count: number }) => [c.status, c._count])
   ) as Record<string, number>;
 
   return (
