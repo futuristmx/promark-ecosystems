@@ -75,7 +75,9 @@ Deben aparecer:
 | Path | Schedule | Última ejecución |
 |---|---|---|
 | `/api/cron/check-alerts` | `0 14 * * *` (diario 14:00 UTC) | revisar logs |
-| `/api/health` | `0 * * * *` (hourly) | revisar logs |
+| `/api/health` | `0 13 * * *` (diario 13:00 UTC) | revisar logs |
+
+> ⚠️ Vercel plan Hobby limita crons a 1 ejecución/día. Para `/api/health` horario, migrar a Pro o agregar un monitor externo (UptimeRobot, BetterUptime) apuntando al endpoint.
 
 Ambos requieren `Authorization: Bearer $CRON_SECRET`. Vercel lo inyecta automáticamente.
 
