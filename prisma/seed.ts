@@ -12,9 +12,24 @@ async function main() {
   console.log('🌱 Seeding Promark® database...');
 
   // ─── 0. Clean test data (idempotent re-seed) ──────
-  // Tenants, UserPromark, UserClient are upserted (kept). Old test slugs
-  // ('grupo-norteno', 'alimentos-pacifico') will be deleted before recreating
-  // with the new demo slugs ('grupo-norteno', 'alimentos-pacifico').
+  // Limpia BOTH slugs viejos (grupo-test-norte, alimentos-demo-sa) y nuevos
+  // (grupo-norteno, alimentos-pacifico) para que el seed sea idempotente
+  // arrancando desde cualquier estado anterior.
+  //
+  // NOTA: borrar Tenant requiere primero borrar TODOS sus child rows
+  // (UserClient, RolePermission, etc.) por FK constraints. El orden importa.
+  const DEMO_SLUGS = [
+    'grupo-norteno',
+    'alimentos-pacifico',
+    'grupo-test-norte',
+    'alimentos-demo-sa',
+  ];
+  const demoTenants = await prisma.tenant.findMany({
+    where: { slug: { in: DEMO_SLUGS } },
+    select: { id: true },
+  });
+  const demoTenantIds = demoTenants.map((t) => t.id);
+
   await prisma.alert.deleteMany({});
   await prisma.alertRule.deleteMany({});
   await prisma.contractHistory.deleteMany({});
@@ -32,16 +47,17 @@ async function main() {
   await prisma.company.deleteMany({});
   await prisma.holding.deleteMany({});
 
-  // Remove old demo tenants and their UserClient (if upserted by previous seed).
-  await prisma.userClient.deleteMany({
-    where: {
-      tenant: { slug: { in: ['grupo-norteno', 'alimentos-pacifico'] } },
-    },
-  });
-  await prisma.tenant.deleteMany({
-    where: { slug: { in: ['grupo-norteno', 'alimentos-pacifico'] } },
-  });
-  console.log('🧹 Cleared test data');
+  // UserClient + tenants demo: borrar por tenant_id (más confiable que filtro
+  // por relación). Usar lista de IDs prevenidos arriba.
+  if (demoTenantIds.length > 0) {
+    await prisma.userClient.deleteMany({
+      where: { tenant_id: { in: demoTenantIds } },
+    });
+    await prisma.tenant.deleteMany({
+      where: { id: { in: demoTenantIds } },
+    });
+  }
+  console.log('🧹 Cleared test data (', demoTenantIds.length, 'tenants demo borrados)');
 
   // ─── 1. Promark Superadmin ─────────────────────────
   const superadmin = await prisma.userPromark.upsert({
@@ -156,7 +172,9 @@ async function main() {
 
     await prisma.userClient.upsert({
       where: { card_id: cardId },
-      update: { pin_hash: pinHash, role: spec.role, full_name: spec.name },
+      // Re-set tenant_id en update para que un seed re-run repinte usuarios
+      // a tenants demo nuevos aunque el cleanup haya dejado tenants viejos.
+      update: { pin_hash: pinHash, role: spec.role, full_name: spec.name, tenant_id: tenant.id },
       create: {
         tenant_id: tenant.id,
         full_name: spec.name,
