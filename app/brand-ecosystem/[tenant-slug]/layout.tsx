@@ -110,6 +110,7 @@ export default async function BrandEcosystemLayout({
           primaryColor={primaryColor}
           userName={userName}
           userRoleLabel={userRole ? (roleLabels[userRole] ?? userRole) : null}
+          showContracts={config?.features?.show_contracts === true && userRole !== 'CLIENT_VIEWER'}
         />
       )}
 

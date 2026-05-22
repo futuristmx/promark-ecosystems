@@ -154,6 +154,31 @@ enum ContractStatus {
   UNDER_REVIEW
 }
 
+enum LicenseType {
+  EXCLUSIVE
+  NON_EXCLUSIVE
+  SUBLICENSE
+}
+
+enum LicenseStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  SUSPENDED
+}
+
+enum ContractChangeType {
+  CREATED
+  UPDATED
+  TERMINATED
+  RENEWED
+  BRAND_LINKED
+  BRAND_UNLINKED
+  LICENSE_DERIVED
+  DOCUMENT_ATTACHED
+}
+
 enum DocumentCategory {
   CERTIFICATE
   APPLICATION
@@ -205,6 +230,7 @@ model Tenant {
   brands          Brand[]
   holders         Holder[]
   contracts       Contract[]
+  licenses        License[]
   documents       Document[]
   audit_logs      AuditLog[]
   tenant_versions     TenantVersion[]
@@ -337,6 +363,7 @@ model Brand {
   relationships_as_b BrandRelationship[] @relation("BrandB")
   holders            BrandHolder[]
   contract_brands    ContractBrand[]
+  licenses           License[]
 
   @@index([tenant_id])
   @@index([company_id])
@@ -453,14 +480,68 @@ model Contract {
   financial_terms Json?
   governing_law   String?
   notes           String?
+  terminated_at   DateTime?
+  deleted_at      DateTime?
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
 
-  tenant          Tenant          @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  tenant          Tenant            @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   contract_brands ContractBrand[]
+  licenses        License[]
+  history         ContractHistory[]
 
   @@index([tenant_id])
+  @@index([tenant_id, deleted_at])
   @@map("contracts")
+}
+
+model License {
+  id              String        @id @default(cuid())
+  tenant_id       String
+  contract_id     String?
+  brand_id        String
+  license_type    LicenseType
+  licensee_name   String
+  licensee_rfc    String?
+  territory       String[]
+  permitted_uses  String?
+  prohibited_uses String?
+  effective_date  DateTime?
+  expiration_date DateTime?
+  status          LicenseStatus @default(DRAFT)
+  royalty_rate    Decimal?      @db.Decimal(7, 4)
+  royalty_terms   String?
+  notes           String?
+  deleted_at      DateTime?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  contract Contract? @relation(fields: [contract_id], references: [id], onDelete: SetNull)
+  brand    Brand     @relation(fields: [brand_id], references: [id], onDelete: Restrict)
+
+  @@index([tenant_id])
+  @@index([brand_id])
+  @@index([contract_id])
+  @@index([tenant_id, deleted_at])
+  @@map("licenses")
+}
+
+model ContractHistory {
+  id                    String             @id @default(cuid())
+  contract_id           String
+  change_type           ContractChangeType
+  changed_by_user_id    String?
+  changed_by_user_type  UserTypeEnum
+  summary               String
+  previous_value        Json?
+  new_value             Json?
+  created_at            DateTime           @default(now())
+
+  contract Contract @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+
+  @@index([contract_id, created_at])
+  @@map("contract_history")
 }
 
 model ContractBrand {

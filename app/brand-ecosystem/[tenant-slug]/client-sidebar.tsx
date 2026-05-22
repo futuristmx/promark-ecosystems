@@ -13,6 +13,7 @@ interface ClientSidebarProps {
   primaryColor: string;
   userName: string;
   userRoleLabel: string | null;
+  showContracts?: boolean;
 }
 
 interface NavItem {
@@ -29,6 +30,7 @@ export function ClientSidebar({
   primaryColor,
   userName,
   userRoleLabel,
+  showContracts = false,
 }: ClientSidebarProps) {
   const pathname = usePathname();
   const basePath = `/brand-ecosystem/${tenantSlug}`;
@@ -52,7 +54,7 @@ export function ClientSidebar({
     { label: 'Marcas', href: `${basePath}/brands`, icon: Tag },
     { label: 'Alertas', href: `${basePath}/alerts`, icon: Bell },
     { label: 'Documentos', href: `${basePath}/documents`, icon: FileText },
-    { label: 'Contratos', href: `${basePath}/contracts`, icon: ScrollText },
+    ...(showContracts ? [{ label: 'Contratos', href: `${basePath}/contratos`, icon: ScrollText }] : []),
   ];
 
   function isActive(href: string) {

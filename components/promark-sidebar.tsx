@@ -11,6 +11,8 @@ import {
   ChevronRight,
   Network,
   Bell,
+  Scroll,
+  KeyRound,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -80,6 +82,16 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           href: `/tenants/${tenantId}/holders`,
           label: 'Titulares',
           icon: <Users className="h-4 w-4" />,
+        },
+        {
+          href: `/tenants/${tenantId}/contratos`,
+          label: 'Contratos',
+          icon: <Scroll className="h-4 w-4" />,
+        },
+        {
+          href: `/tenants/${tenantId}/licencias`,
+          label: 'Licencias',
+          icon: <KeyRound className="h-4 w-4" />,
         },
         {
           href: `/tenants/${tenantId}/alerts`,

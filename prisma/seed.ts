@@ -16,6 +16,10 @@ async function main() {
   // Holdings/Brands/Holders use create() so we wipe them first.
   await prisma.alert.deleteMany({});
   await prisma.alertRule.deleteMany({});
+  await prisma.contractHistory.deleteMany({});
+  await prisma.license.deleteMany({});
+  await prisma.contractBrand.deleteMany({});
+  await prisma.contract.deleteMany({});
   await prisma.userClientHolder.deleteMany({});
   await prisma.brandHolder.deleteMany({});
   await prisma.document.deleteMany({});
@@ -326,6 +330,11 @@ async function main() {
     { name: 'Marca vencida',                  entity_type: 'BRAND',    trigger_days: 0  },
     { name: 'Documento por vencer — 30 días', entity_type: 'DOCUMENT', trigger_days: 30 },
     { name: 'Documento vencido',              entity_type: 'DOCUMENT', trigger_days: 0  },
+    { name: 'Contrato por vencer — 90 días',  entity_type: 'CONTRACT', trigger_days: 90 },
+    { name: 'Contrato por vencer — 30 días',  entity_type: 'CONTRACT', trigger_days: 30 },
+    { name: 'Contrato vencido',               entity_type: 'CONTRACT', trigger_days: 0  },
+    { name: 'Licencia por vencer — 30 días',  entity_type: 'LICENSE',  trigger_days: 30 },
+    { name: 'Licencia vencida',               entity_type: 'LICENSE',  trigger_days: 0  },
   ];
 
   for (const tenant of [tenant1, tenant2]) {
@@ -496,6 +505,104 @@ async function main() {
   }
 
   console.log('✅ Role permissions seeded');
+
+  // ─── 5b. Contracts + Licenses for grupo-test-norte ──
+  const t1Brands = await prisma.brand.findMany({
+    where: { tenant_id: tenant1.id },
+    orderBy: { name: 'asc' },
+    take: 2,
+  });
+  if (t1Brands.length >= 2) {
+    const seedNow = new Date();
+    const in200 = new Date(seedNow); in200.setDate(in200.getDate() + 200);
+    const in20 = new Date(seedNow); in20.setDate(in20.getDate() + 20);
+    const in365 = new Date(seedNow); in365.setDate(in365.getDate() + 365);
+
+    const internal1 = await prisma.contract.create({
+      data: {
+        tenant_id: tenant1.id,
+        contract_type: 'LICENSE_INTERNAL',
+        title: 'Licencia interna Holding Norte → Distribuidora',
+        description: 'Licencia de uso entre holding y subsidiaria.',
+        parties: { otorgante: 'Holding Norte S.A. de C.V.', receptor: 'Distribuidora Norte S.A. de C.V.' },
+        effective_date: new Date(2025, 0, 1),
+        expiration_date: in200,
+        status: 'ACTIVE',
+        financial_terms: { royalty_rate: 5 },
+        governing_law: 'México',
+      },
+    });
+    await prisma.contractBrand.create({ data: { contract_id: internal1.id, brand_id: t1Brands[0].id } });
+    await prisma.contractHistory.create({
+      data: {
+        contract_id: internal1.id, change_type: 'CREATED', changed_by_user_type: 'PROMARK',
+        summary: 'Contrato creado en seed', changed_by_user_id: superadmin.id,
+      },
+    });
+
+    const internal2 = await prisma.contract.create({
+      data: {
+        tenant_id: tenant1.id,
+        contract_type: 'LICENSE_INTERNAL',
+        title: 'Licencia interna - Logística',
+        parties: { otorgante: 'Holding Norte S.A. de C.V.', receptor: 'Logística Norte Express S.A. de C.V.' },
+        effective_date: new Date(2024, 5, 1),
+        expiration_date: in20,
+        status: 'ACTIVE',
+        governing_law: 'México',
+      },
+    });
+    await prisma.contractBrand.create({ data: { contract_id: internal2.id, brand_id: t1Brands[1].id } });
+    await prisma.contractHistory.create({
+      data: {
+        contract_id: internal2.id, change_type: 'CREATED', changed_by_user_type: 'PROMARK',
+        summary: 'Contrato creado en seed', changed_by_user_id: superadmin.id,
+      },
+    });
+
+    const external = await prisma.contract.create({
+      data: {
+        tenant_id: tenant1.id,
+        contract_type: 'LICENSE_EXTERNAL',
+        title: 'Licencia externa con Tercero',
+        parties: { otorgante: 'Distribuidora Norte S.A. de C.V.', receptor: 'Tercero Comercial S.A.' },
+        effective_date: new Date(2025, 1, 1),
+        expiration_date: in365,
+        status: 'ACTIVE',
+        financial_terms: { royalty_rate: 8, royalty_terms: 'Pago trimestral' },
+        governing_law: 'México',
+      },
+    });
+    await prisma.contractBrand.create({ data: { contract_id: external.id, brand_id: t1Brands[0].id } });
+    await prisma.contractHistory.create({
+      data: {
+        contract_id: external.id, change_type: 'CREATED', changed_by_user_type: 'PROMARK',
+        summary: 'Contrato creado en seed', changed_by_user_id: superadmin.id,
+      },
+    });
+
+    // Exclusive License derived from the external contract
+    await prisma.license.create({
+      data: {
+        tenant_id: tenant1.id,
+        contract_id: external.id,
+        brand_id: t1Brands[0].id,
+        license_type: 'EXCLUSIVE',
+        licensee_name: 'Tercero Comercial S.A.',
+        licensee_rfc: 'TER010101AAA',
+        territory: ['México', 'Centroamérica'],
+        permitted_uses: 'Uso comercial en empaques y publicidad.',
+        prohibited_uses: 'Sub-licenciamiento sin autorización.',
+        effective_date: new Date(2025, 1, 1),
+        expiration_date: in365,
+        status: 'ACTIVE',
+        royalty_rate: '8.0000',
+        royalty_terms: 'Pago trimestral sobre ventas netas.',
+      },
+    });
+  }
+  console.log('✅ Contracts + License seeded');
+
   console.log('\n🎉 Seed completed successfully!');
   console.log('────────────────────────────────────');
   console.log('Promark Admin: admin@promark.mx');
@@ -550,6 +657,28 @@ async function main() {
           expiry: b.expiration_date as Date,
           alertType: rule.trigger_days === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
         }));
+    } else if (rule.entity_type === 'CONTRACT') {
+      const contracts = await prisma.contract.findMany({
+        where: rule.trigger_days === 0
+          ? { tenant_id: rule.tenant_id, deleted_at: null, status: { in: ['ACTIVE','UNDER_REVIEW'] }, expiration_date: { lt: detectorNow } }
+          : { tenant_id: rule.tenant_id, deleted_at: null, status: { in: ['ACTIVE','UNDER_REVIEW'] }, expiration_date: { gte: detectorNow, lte: upperDate } },
+        select: { id: true, title: true, expiration_date: true },
+      });
+      candidates = contracts.filter((c) => c.expiration_date).map((c) => ({
+        id: c.id, name: c.title, expiry: c.expiration_date as Date,
+        alertType: rule.trigger_days === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
+      }));
+    } else if (rule.entity_type === 'LICENSE') {
+      const licenses = await prisma.license.findMany({
+        where: rule.trigger_days === 0
+          ? { tenant_id: rule.tenant_id, deleted_at: null, status: 'ACTIVE', expiration_date: { lt: detectorNow } }
+          : { tenant_id: rule.tenant_id, deleted_at: null, status: 'ACTIVE', expiration_date: { gte: detectorNow, lte: upperDate } },
+        select: { id: true, licensee_name: true, expiration_date: true },
+      });
+      candidates = licenses.filter((l) => l.expiration_date).map((l) => ({
+        id: l.id, name: l.licensee_name, expiry: l.expiration_date as Date,
+        alertType: rule.trigger_days === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
+      }));
     } else if (rule.entity_type === 'DOCUMENT') {
       const docs = await prisma.document.findMany({
         where:
