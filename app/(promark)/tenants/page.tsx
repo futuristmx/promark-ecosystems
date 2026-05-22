@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import prisma from '@/lib/prisma/client';
 import { ChevronRight } from 'lucide-react';
+import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
 
 export default async function TenantsPage() {
   await requirePromarkAuth();
@@ -70,7 +71,7 @@ export default async function TenantsPage() {
                             : 'bg-yellow-100 text-yellow-800'
                       }`}
                     >
-                      {tenant.status}
+                      {TENANT_STATUS_LABELS[tenant.status] ?? tenant.status}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">

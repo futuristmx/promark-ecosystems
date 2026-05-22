@@ -7,6 +7,10 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
+  HOLDING_STATUS_LABELS,
+  COMPANY_STATUS_LABELS,
+} from '@/lib/i18n/status-labels';
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -94,7 +98,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
                 <div className="flex items-center gap-2">
                   <Network className="h-4 w-4 text-slate-400" />
                   <CardTitle>{holding.name}</CardTitle>
-                  <Badge variant="secondary">{holding.status}</Badge>
+                  <Badge variant="secondary">{HOLDING_STATUS_LABELS[holding.status] ?? holding.status}</Badge>
                 </div>
                 {canEdit && (
                   <CardAction>
@@ -152,7 +156,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
                             {company._count.brands}{' '}
                             {company._count.brands === 1 ? 'marca' : 'marcas'}
                           </Badge>
-                          <Badge variant="secondary">{company.status}</Badge>
+                          <Badge variant="secondary">{COMPANY_STATUS_LABELS[company.status] ?? company.status}</Badge>
                           {canEdit && (
                             <Link
                                 href={`/tenants/${tenantId}/structure?action=edit-company&id=${company.id}`}

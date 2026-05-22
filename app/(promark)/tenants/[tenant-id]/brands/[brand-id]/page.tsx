@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { DocumentsPanel } from '@/components/documents-panel';
+import { BRAND_CLASS_STATUS_LABELS } from '@/lib/i18n/status-labels';
 
 interface BrandDetailPageProps {
   params: Promise<{ 'tenant-id': string; 'brand-id': string }>;
@@ -260,7 +261,7 @@ export default async function BrandDetailPage({
                           </p>
                         )}
                       </div>
-                      <Badge variant="outline">{cls.status}</Badge>
+                      <Badge variant="outline">{BRAND_CLASS_STATUS_LABELS[cls.status] ?? cls.status}</Badge>
                     </div>
                   ))}
                 </div>

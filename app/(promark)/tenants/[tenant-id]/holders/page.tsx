@@ -8,6 +8,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { HOLDER_STATUS_LABELS } from '@/lib/i18n/status-labels';
 import {
   Table,
   TableHeader,
@@ -163,7 +164,7 @@ export default function HoldersPage({ params }: HoldersPageProps) {
                           : 'bg-slate-100 text-slate-600'
                       }`}
                     >
-                      {holder.status}
+                      {HOLDER_STATUS_LABELS[holder.status] ?? holder.status}
                     </span>
                   </TableCell>
                 </TableRow>

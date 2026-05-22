@@ -7,6 +7,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { HOLDER_STATUS_LABELS } from '@/lib/i18n/status-labels';
 import {
   Card,
   CardHeader,
@@ -77,7 +78,7 @@ export default async function HolderDetailPage({
                   : 'bg-slate-100 text-slate-600'
               }`}
             >
-              {holder.status}
+              {HOLDER_STATUS_LABELS[holder.status] ?? holder.status}
             </span>
           </div>
         </div>
