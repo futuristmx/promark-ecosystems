@@ -28,12 +28,12 @@ interface NavItem {
 const mainNav: NavItem[] = [
   {
     href: '/dashboard',
-    label: 'Dashboard',
+    label: 'Panel',
     icon: <LayoutDashboard className="h-4 w-4" />,
   },
   {
     href: '/tenants',
-    label: 'Tenants',
+    label: 'Clientes',
     icon: <Building2 className="h-4 w-4" />,
   },
 ];
@@ -68,17 +68,17 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
     ? [
         {
           href: `/tenants/${tenantId}/structure`,
-          label: 'Structure',
+          label: 'Estructura Corporativa',
           icon: <Network className="h-4 w-4" />,
         },
         {
           href: `/tenants/${tenantId}/brands`,
-          label: 'Brands',
+          label: 'Marcas',
           icon: <Tag className="h-4 w-4" />,
         },
         {
           href: `/tenants/${tenantId}/holders`,
-          label: 'Holders',
+          label: 'Titulares',
           icon: <Users className="h-4 w-4" />,
         },
         {
@@ -100,9 +100,6 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
 
       {/* Main Navigation */}
       <nav className="flex flex-1 flex-col gap-1 p-4">
-        <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-          Main
-        </p>
         {mainNav.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + '/');
@@ -129,7 +126,7 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
             <div className="my-3 border-t border-slate-700" />
             <p className="mb-1 flex items-center gap-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
               <ChevronRight className="h-3 w-3" />
-              Tenant
+              Cliente
             </p>
             {tenantSubNav.map((item) => {
               const isActive = pathname.startsWith(item.href);

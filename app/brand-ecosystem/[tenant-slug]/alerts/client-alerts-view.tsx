@@ -110,7 +110,13 @@ export function ClientAlertsView({ tenantId, alerts: initial }: ClientAlertsView
                 key={alert.id}
                 className="flex items-center gap-3 rounded-lg border border-slate-100 p-3"
               >
-                <Badge variant="outline">{alert.status}</Badge>
+                <Badge variant="outline">{
+                  alert.status === 'DISMISSED' ? 'Descartado'
+                  : alert.status === 'RESOLVED' ? 'Resuelto'
+                  : alert.status === 'SENT' ? 'Enviado'
+                  : alert.status === 'PENDING' ? 'Pendiente'
+                  : alert.status
+                }</Badge>
                 <div className="flex-1">
                   <p className="text-sm text-slate-900">{alert.entity_name}</p>
                   <p className="text-xs text-slate-500">{alert.entity_type}</p>

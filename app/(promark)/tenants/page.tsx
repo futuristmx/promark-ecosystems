@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import prisma from '@/lib/prisma/client';
 import { ChevronRight } from 'lucide-react';
+import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
 
 export default async function TenantsPage() {
   await requirePromarkAuth();
@@ -20,13 +21,13 @@ export default async function TenantsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Tenants</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Clientes</h1>
       </div>
 
       {tenants.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
           <p className="text-sm text-slate-500">
-            No hay tenants registrados todavia.
+            No hay clientes registrados todavía.
           </p>
         </div>
       ) : (
@@ -41,7 +42,7 @@ export default async function TenantsPage() {
                   Slug
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
-                  Status
+                  Estado
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                   Creado
@@ -70,7 +71,7 @@ export default async function TenantsPage() {
                             : 'bg-yellow-100 text-yellow-800'
                       }`}
                     >
-                      {tenant.status}
+                      {TENANT_STATUS_LABELS[tenant.status] ?? tenant.status}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
@@ -81,7 +82,7 @@ export default async function TenantsPage() {
                       href={`/tenants/${tenant.id}/structure`}
                       className="inline-flex items-center gap-1 text-sm font-medium text-[#3E6AE1] transition-colors hover:text-[#3E6AE1]/80"
                     >
-                      Manage
+                      Gestionar
                       <ChevronRight className="h-3.5 w-3.5" />
                     </Link>
                   </td>

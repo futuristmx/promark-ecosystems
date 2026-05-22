@@ -44,14 +44,14 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: tenant.name, href: `/tenants/${tenantId}/structure` },
           { label: 'Alertas' },
         ]}
       />
 
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Centro de alertas</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Centro de Alertas</h1>
         <p className="mt-1 text-sm text-slate-500">
           Vigencias, vencimientos y eventos detectados automáticamente.
         </p>

@@ -7,6 +7,10 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import {
+  HOLDING_STATUS_LABELS,
+  COMPANY_STATUS_LABELS,
+} from '@/lib/i18n/status-labels';
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -50,19 +54,19 @@ export default async function StructurePage({ params }: StructurePageProps) {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: tenant.name, href: `/tenants/${tenantId}/structure` },
-          { label: 'Structure' },
+          { label: 'Estructura Corporativa' },
         ]}
       />
 
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Corporate Structure
+            Estructura Corporativa
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Holdings, companies, and brand distribution for {tenant.name}
+            Holdings, empresas y distribución de marcas de {tenant.name}
           </p>
         </div>
         {canEdit && (
@@ -71,7 +75,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
               className={buttonVariants()}
             >
               <Plus className="h-4 w-4" />
-              New Holding
+              Nuevo Holding
           </Link>
         )}
       </div>
@@ -80,10 +84,10 @@ export default async function StructurePage({ params }: StructurePageProps) {
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
           <Network className="mx-auto mb-3 h-10 w-10 text-slate-300" />
           <p className="text-sm font-medium text-slate-600">
-            No holdings registered yet
+            Aún no hay holdings registrados
           </p>
           <p className="mt-1 text-sm text-slate-400">
-            Create a holding to start building the corporate structure.
+            Crea un holding para comenzar a construir la estructura corporativa.
           </p>
         </div>
       ) : (
@@ -94,7 +98,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
                 <div className="flex items-center gap-2">
                   <Network className="h-4 w-4 text-slate-400" />
                   <CardTitle>{holding.name}</CardTitle>
-                  <Badge variant="secondary">{holding.status}</Badge>
+                  <Badge variant="secondary">{HOLDING_STATUS_LABELS[holding.status] ?? holding.status}</Badge>
                 </div>
                 {canEdit && (
                   <CardAction>
@@ -103,7 +107,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
                         className={buttonVariants({ variant: "ghost", size: "sm" })}
                       >
                         <Pencil className="h-3.5 w-3.5" />
-                        Edit
+                        Editar
                     </Link>
                   </CardAction>
                 )}
@@ -111,7 +115,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
               <CardContent>
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Companies
+                    Empresas
                   </p>
                   {canEdit && (
                     <Link
@@ -119,14 +123,14 @@ export default async function StructurePage({ params }: StructurePageProps) {
                         className={buttonVariants({ variant: "ghost", size: "xs" })}
                       >
                         <Plus className="h-3 w-3" />
-                        New Company
+                        Nueva Empresa
                     </Link>
                   )}
                 </div>
 
                 {holding.companies.length === 0 ? (
                   <p className="py-4 text-center text-sm text-slate-400">
-                    No companies in this holding
+                    No hay empresas en este holding
                   </p>
                 ) : (
                   <div className="divide-y divide-slate-100 rounded-lg border border-slate-200">
@@ -150,9 +154,9 @@ export default async function StructurePage({ params }: StructurePageProps) {
                         <div className="flex items-center gap-3">
                           <Badge variant="outline">
                             {company._count.brands}{' '}
-                            {company._count.brands === 1 ? 'brand' : 'brands'}
+                            {company._count.brands === 1 ? 'marca' : 'marcas'}
                           </Badge>
-                          <Badge variant="secondary">{company.status}</Badge>
+                          <Badge variant="secondary">{COMPANY_STATUS_LABELS[company.status] ?? company.status}</Badge>
                           {canEdit && (
                             <Link
                                 href={`/tenants/${tenantId}/structure?action=edit-company&id=${company.id}`}

@@ -40,7 +40,7 @@ const brandClassSchema = z.object({
 });
 
 const brandFormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Campo requerido'),
   registration_number: z.string().optional(),
   application_number: z.string().optional(),
   application_date: z.string().optional(),
@@ -49,7 +49,7 @@ const brandFormSchema = z.object({
   renewal_date: z.string().optional(),
   legal_status: z.enum(LEGAL_STATUSES),
   brand_type: z.enum(BRAND_TYPES),
-  company_id: z.string().min(1, 'Company is required'),
+  company_id: z.string().min(1, 'Campo requerido'),
   description: z.string().optional(),
   disclaimers: z.string().optional(),
   classes: z.array(brandClassSchema),
@@ -171,7 +171,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
   }
 
   async function handleDelete() {
-    if (!confirm('Are you sure you want to delete this brand? This action cannot be undone.')) {
+    if (!confirm('¿Estás seguro? Esta acción no se puede deshacer.')) {
       return;
     }
     setDeleting(true);
@@ -208,21 +208,21 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
     <div className="mx-auto max-w-3xl">
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: '...', href: `/tenants/${tenantId}/structure` },
-          { label: 'Brands', href: `/tenants/${tenantId}/brands` },
-          { label: 'Edit Brand' },
+          { label: 'Marcas', href: `/tenants/${tenantId}/brands` },
+          { label: 'Editar marca' },
         ]}
       />
 
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Edit Brand</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Editar marca</h1>
         <Button
           variant="destructive"
           onClick={handleDelete}
           disabled={deleting}
         >
-          {deleting ? 'Deleting...' : 'Delete Brand'}
+          {deleting ? 'Eliminando...' : 'Eliminar marca'}
         </Button>
       </div>
 
@@ -236,12 +236,12 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
         {/* Basic Info */}
         <Card>
           <CardHeader className="border-b">
-            <CardTitle>Basic Information</CardTitle>
+            <CardTitle>Información básica</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <Label htmlFor="name">Brand Name *</Label>
+                <Label htmlFor="name">Nombre de la marca *</Label>
                 <Input
                   id="name"
                   {...register('name')}
@@ -256,7 +256,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
               </div>
 
               <div>
-                <Label htmlFor="legal_status">Legal Status *</Label>
+                <Label htmlFor="legal_status">Estado legal *</Label>
                 <select
                   id="legal_status"
                   {...register('legal_status')}
@@ -271,7 +271,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
               </div>
 
               <div>
-                <Label htmlFor="brand_type">Brand Type *</Label>
+                <Label htmlFor="brand_type">Tipo de marca *</Label>
                 <select
                   id="brand_type"
                   {...register('brand_type')}
@@ -286,14 +286,14 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
               </div>
 
               <div className="col-span-2">
-                <Label htmlFor="company_id">Company *</Label>
+                <Label htmlFor="company_id">Empresa *</Label>
                 <select
                   id="company_id"
                   {...register('company_id')}
                   className={`mt-1 ${selectClasses}`}
                   aria-invalid={!!errors.company_id}
                 >
-                  <option value="">Select a company...</option>
+                  <option value="">Selecciona una empresa...</option>
                   {companies.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -313,12 +313,12 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
         {/* Registration Details */}
         <Card>
           <CardHeader className="border-b">
-            <CardTitle>Registration Details</CardTitle>
+            <CardTitle>Datos de registro</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="registration_number">Registration #</Label>
+                <Label htmlFor="registration_number">Número de registro</Label>
                 <Input
                   id="registration_number"
                   {...register('registration_number')}
@@ -326,7 +326,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="application_number">Application #</Label>
+                <Label htmlFor="application_number">Número de solicitud</Label>
                 <Input
                   id="application_number"
                   {...register('application_number')}
@@ -334,7 +334,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="application_date">Application Date</Label>
+                <Label htmlFor="application_date">Fecha de solicitud</Label>
                 <Input
                   id="application_date"
                   type="date"
@@ -343,7 +343,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="registration_date">Registration Date</Label>
+                <Label htmlFor="registration_date">Fecha de registro</Label>
                 <Input
                   id="registration_date"
                   type="date"
@@ -352,7 +352,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="expiration_date">Expiration Date</Label>
+                <Label htmlFor="expiration_date">Fecha de vencimiento</Label>
                 <Input
                   id="expiration_date"
                   type="date"
@@ -361,7 +361,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="renewal_date">Renewal Date</Label>
+                <Label htmlFor="renewal_date">Fecha de renovación</Label>
                 <Input
                   id="renewal_date"
                   type="date"
@@ -376,12 +376,12 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
         {/* Description */}
         <Card>
           <CardHeader className="border-b">
-            <CardTitle>Additional Details</CardTitle>
+            <CardTitle>Detalles adicionales</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Descripción</Label>
                 <Textarea
                   id="description"
                   {...register('description')}
@@ -390,7 +390,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                 />
               </div>
               <div>
-                <Label htmlFor="disclaimers">Disclaimers</Label>
+                <Label htmlFor="disclaimers">Reservas</Label>
                 <Textarea
                   id="disclaimers"
                   {...register('disclaimers')}
@@ -405,12 +405,12 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
         {/* Brand Classes */}
         <Card>
           <CardHeader className="border-b">
-            <CardTitle>Nice Classes</CardTitle>
+            <CardTitle>Clases de Niza</CardTitle>
           </CardHeader>
           <CardContent>
             {fields.length === 0 && (
               <p className="mb-4 text-sm text-slate-400">
-                No classes added yet.
+                Aún no hay clases agregadas.
               </p>
             )}
 
@@ -421,7 +421,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                   className="flex items-start gap-3 rounded-lg border border-slate-200 p-3"
                 >
                   <div className="w-24">
-                    <Label>Class #</Label>
+                    <Label>Clase</Label>
                     <select
                       {...register(`classes.${index}.class_number`)}
                       className={`mt-1 ${selectClasses}`}
@@ -436,11 +436,11 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <Label>Description</Label>
+                    <Label>Descripción</Label>
                     <Input
                       {...register(`classes.${index}.class_description`)}
                       className="mt-1"
-                      placeholder="Class description..."
+                      placeholder="Descripción de la clase..."
                     />
                   </div>
                   <Button
@@ -466,7 +466,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
               }
             >
               <Plus className="h-3.5 w-3.5" />
-              Add Class
+              Agregar clase
             </Button>
           </CardContent>
         </Card>
@@ -480,10 +480,10 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
               router.push(`/tenants/${tenantId}/brands/${brandId}`)
             }
           >
-            Cancel
+            Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            {submitting ? 'Saving...' : 'Save Changes'}
+            {submitting ? 'Guardando...' : 'Guardar cambios'}
           </Button>
         </div>
       </form>

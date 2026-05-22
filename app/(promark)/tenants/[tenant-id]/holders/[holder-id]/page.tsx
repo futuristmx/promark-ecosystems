@@ -7,6 +7,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { HOLDER_STATUS_LABELS } from '@/lib/i18n/status-labels';
 import {
   Card,
   CardHeader,
@@ -55,9 +56,9 @@ export default async function HolderDetailPage({
     <div>
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: '...', href: `/tenants/${tenantId}/structure` },
-          { label: 'Holders', href: `/tenants/${tenantId}/holders` },
+          { label: 'Titulares', href: `/tenants/${tenantId}/holders` },
           { label: holder.name },
         ]}
       />
@@ -77,7 +78,7 @@ export default async function HolderDetailPage({
                   : 'bg-slate-100 text-slate-600'
               }`}
             >
-              {holder.status}
+              {HOLDER_STATUS_LABELS[holder.status] ?? holder.status}
             </span>
           </div>
         </div>
@@ -87,7 +88,7 @@ export default async function HolderDetailPage({
               className={buttonVariants({ variant: "outline" })}
             >
               <Pencil className="h-4 w-4" />
-              Edit
+              Editar
           </Link>
         )}
       </div>
@@ -97,13 +98,13 @@ export default async function HolderDetailPage({
         <div className="lg:col-span-1">
           <Card>
             <CardHeader className="border-b">
-              <CardTitle>Details</CardTitle>
+              <CardTitle>Detalles</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Type
+                    Tipo
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {holder.holder_type}
@@ -131,7 +132,7 @@ export default async function HolderDetailPage({
                 {holder.nationality && (
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                      Nationality
+                      Nacionalidad
                     </p>
                     <p className="mt-1 text-sm text-slate-900">
                       {holder.nationality}
@@ -142,7 +143,7 @@ export default async function HolderDetailPage({
                 {contactInfo?.email && (
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                      Email
+                      Correo electrónico
                     </p>
                     <p className="mt-1 text-sm text-slate-900">
                       {contactInfo.email}
@@ -153,7 +154,7 @@ export default async function HolderDetailPage({
                 {contactInfo?.phone && (
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                      Phone
+                      Teléfono
                     </p>
                     <p className="mt-1 text-sm text-slate-900">
                       {contactInfo.phone}
@@ -166,7 +167,7 @@ export default async function HolderDetailPage({
                     <Separator />
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                        Notes
+                        Notas internas
                       </p>
                       <p className="mt-1 text-sm text-slate-700">
                         {holder.notes}
@@ -185,11 +186,11 @@ export default async function HolderDetailPage({
             <CardHeader className="border-b">
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4 text-slate-400" />
-                <CardTitle>Linked Brands</CardTitle>
+                <CardTitle>Marcas vinculadas</CardTitle>
               </div>
               <CardAction>
                 <Badge variant="outline">
-                  {holder.brand_holders.length} brand
+                  {holder.brand_holders.length} marca
                   {holder.brand_holders.length !== 1 && 's'}
                 </Badge>
               </CardAction>
@@ -197,7 +198,7 @@ export default async function HolderDetailPage({
             <CardContent>
               {holder.brand_holders.length === 0 ? (
                 <p className="py-8 text-center text-sm text-slate-400">
-                  No brands linked to this holder
+                  No hay marcas vinculadas a este titular
                 </p>
               ) : (
                 <div className="divide-y divide-slate-100">

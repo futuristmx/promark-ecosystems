@@ -21,10 +21,10 @@ function getVigencyInfo(
       dotColor: 'bg-slate-400',
       label:
         legalStatus === 'CANCELLED'
-          ? 'Cancelled'
+          ? 'Cancelado'
           : legalStatus === 'OPPOSED'
-            ? 'Opposed'
-            : 'Pending',
+            ? 'Opuesta'
+            : 'Pendiente',
     };
   }
 
@@ -32,7 +32,7 @@ function getVigencyInfo(
     return {
       color: 'bg-slate-100 text-slate-600',
       dotColor: 'bg-slate-400',
-      label: 'No date',
+      label: 'Sin fecha',
     };
   }
 
@@ -45,7 +45,7 @@ function getVigencyInfo(
     return {
       color: 'bg-red-50 text-red-700',
       dotColor: 'bg-red-500',
-      label: 'Expired',
+      label: 'Vencido',
     };
   }
 
@@ -53,7 +53,7 @@ function getVigencyInfo(
     return {
       color: 'bg-orange-50 text-orange-700',
       dotColor: 'bg-orange-500',
-      label: `${diffDays}d left`,
+      label: `Vence en ${diffDays} días`,
     };
   }
 
@@ -61,14 +61,14 @@ function getVigencyInfo(
     return {
       color: 'bg-yellow-50 text-yellow-700',
       dotColor: 'bg-yellow-500',
-      label: `${diffDays}d left`,
+      label: `Vence en ${diffDays} días`,
     };
   }
 
   return {
     color: 'bg-green-50 text-green-700',
     dotColor: 'bg-green-500',
-    label: 'Active',
+    label: 'Vigente',
   };
 }
 
