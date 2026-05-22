@@ -240,9 +240,24 @@ export function DocumentsPanel({
         {loading ? (
           <p className="py-6 text-center text-sm text-slate-400">Cargando…</p>
         ) : documents.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-400">
-            No hay documentos adjuntos
-          </p>
+          <div className="py-8 text-center">
+            <FileText className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+            <p className="text-sm font-medium text-slate-600">Sin documentos adjuntos</p>
+            {canUpload && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                onClick={() => {
+                  resetUpload();
+                  setUploadOpen(true);
+                }}
+              >
+                <Upload className="h-4 w-4" />
+                Subir documento
+              </Button>
+            )}
+          </div>
         ) : (
           <div className="space-y-2">
             {documents.map((doc) => {

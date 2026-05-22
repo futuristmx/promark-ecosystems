@@ -37,7 +37,7 @@ export async function requirePromarkAuth(): Promise<PromarkSession> {
   const session = await getPromarkSession();
 
   if (!session) {
-    redirect('/login');
+    redirect('/login?message=session_expired');
   }
 
   return session;

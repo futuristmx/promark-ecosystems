@@ -115,7 +115,12 @@ export default async function BrandEcosystemLayout({
       )}
 
       {/* Main content */}
-      <main className="flex flex-1 flex-col bg-slate-50">{children}</main>
+      <main className="flex flex-1 flex-col bg-slate-50">
+        <div className="flex-1">{children}</div>
+        <footer className="border-t border-slate-200 bg-white px-6 py-4 text-center text-xs text-slate-500">
+          Promark® — Inteligencia Marcaria {new Date().getFullYear()}
+        </footer>
+      </main>
     </div>
   );
 }

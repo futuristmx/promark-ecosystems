@@ -1,4 +1,3 @@
-Loaded Prisma config from prisma.config.ts.
 
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
@@ -59,6 +58,15 @@ CREATE TYPE "ContractType" AS ENUM ('LICENSE_INTERNAL', 'LICENSE_EXTERNAL', 'COE
 
 -- CreateEnum
 CREATE TYPE "ContractStatus" AS ENUM ('DRAFT', 'ACTIVE', 'EXPIRED', 'TERMINATED', 'RENEWED', 'UNDER_REVIEW');
+
+-- CreateEnum
+CREATE TYPE "LicenseType" AS ENUM ('EXCLUSIVE', 'NON_EXCLUSIVE', 'SUBLICENSE');
+
+-- CreateEnum
+CREATE TYPE "LicenseStatus" AS ENUM ('DRAFT', 'ACTIVE', 'EXPIRED', 'TERMINATED', 'SUSPENDED');
+
+-- CreateEnum
+CREATE TYPE "ContractChangeType" AS ENUM ('CREATED', 'UPDATED', 'TERMINATED', 'RENEWED', 'BRAND_LINKED', 'BRAND_UNLINKED', 'LICENSE_DERIVED', 'DOCUMENT_ATTACHED');
 
 -- CreateEnum
 CREATE TYPE "DocumentCategory" AS ENUM ('CERTIFICATE', 'APPLICATION', 'POWER_OF_ATTORNEY', 'CONTRACT_COPY', 'CORRESPONDENCE', 'COURT_FILING', 'RENEWAL_PROOF', 'OTHER');
@@ -283,10 +291,52 @@ CREATE TABLE "contracts" (
     "financial_terms" JSONB,
     "governing_law" TEXT,
     "notes" TEXT,
+    "terminated_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "contracts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "licenses" (
+    "id" TEXT NOT NULL,
+    "tenant_id" TEXT NOT NULL,
+    "contract_id" TEXT,
+    "brand_id" TEXT NOT NULL,
+    "license_type" "LicenseType" NOT NULL,
+    "licensee_name" TEXT NOT NULL,
+    "licensee_rfc" TEXT,
+    "territory" TEXT[],
+    "permitted_uses" TEXT,
+    "prohibited_uses" TEXT,
+    "effective_date" TIMESTAMP(3),
+    "expiration_date" TIMESTAMP(3),
+    "status" "LicenseStatus" NOT NULL DEFAULT 'DRAFT',
+    "royalty_rate" DECIMAL(7,4),
+    "royalty_terms" TEXT,
+    "notes" TEXT,
+    "deleted_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "licenses_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "contract_history" (
+    "id" TEXT NOT NULL,
+    "contract_id" TEXT NOT NULL,
+    "change_type" "ContractChangeType" NOT NULL,
+    "changed_by_user_id" TEXT,
+    "changed_by_user_type" "UserTypeEnum" NOT NULL,
+    "summary" TEXT NOT NULL,
+    "previous_value" JSONB,
+    "new_value" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "contract_history_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -310,7 +360,8 @@ CREATE TABLE "documents" (
     "file_type" TEXT,
     "file_size" INTEGER,
     "storage_path" TEXT NOT NULL,
-    "document_category" "DocumentCategory" NOT NULL,
+    "storage_url" TEXT,
+    "document_category" "DocumentCategory" NOT NULL DEFAULT 'OTHER',
     "description" TEXT,
     "uploaded_by" TEXT NOT NULL,
     "uploaded_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -318,9 +369,50 @@ CREATE TABLE "documents" (
     "last_edited_at" TIMESTAMP(3),
     "editable_remotely" BOOLEAN NOT NULL DEFAULT false,
     "version_number" INTEGER NOT NULL DEFAULT 1,
+    "previous_version_id" TEXT,
+    "is_latest_version" BOOLEAN NOT NULL DEFAULT true,
+    "expires_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "documents_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "alert_rules" (
+    "id" TEXT NOT NULL,
+    "tenant_id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "entity_type" TEXT NOT NULL,
+    "trigger_days" INTEGER NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "notify_email" BOOLEAN NOT NULL DEFAULT true,
+    "notify_in_app" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "alert_rules_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "alerts" (
+    "id" TEXT NOT NULL,
+    "tenant_id" TEXT NOT NULL,
+    "alert_rule_id" TEXT,
+    "entity_type" TEXT NOT NULL,
+    "entity_id" TEXT NOT NULL,
+    "entity_name" TEXT NOT NULL,
+    "alert_type" TEXT NOT NULL,
+    "trigger_days" INTEGER,
+    "expiry_date" TIMESTAMP(3) NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "sent_at" TIMESTAMP(3),
+    "dismissed_at" TIMESTAMP(3),
+    "dismissed_by" TEXT,
+    "resolved_at" TIMESTAMP(3),
+    "resolved_by" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "alerts_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -381,6 +473,19 @@ CREATE TABLE "tenant_versions" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "tenant_versions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_client_holders" (
+    "id" TEXT NOT NULL,
+    "user_client_id" TEXT NOT NULL,
+    "holder_id" TEXT NOT NULL,
+    "tenant_id" TEXT NOT NULL,
+    "assigned_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "assigned_by" TEXT NOT NULL,
+    "removed_at" TIMESTAMP(3),
+
+    CONSTRAINT "user_client_holders_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -444,6 +549,24 @@ CREATE INDEX "brand_holders_holder_id_idx" ON "brand_holders"("holder_id");
 CREATE INDEX "contracts_tenant_id_idx" ON "contracts"("tenant_id");
 
 -- CreateIndex
+CREATE INDEX "contracts_tenant_id_deleted_at_idx" ON "contracts"("tenant_id", "deleted_at");
+
+-- CreateIndex
+CREATE INDEX "licenses_tenant_id_idx" ON "licenses"("tenant_id");
+
+-- CreateIndex
+CREATE INDEX "licenses_brand_id_idx" ON "licenses"("brand_id");
+
+-- CreateIndex
+CREATE INDEX "licenses_contract_id_idx" ON "licenses"("contract_id");
+
+-- CreateIndex
+CREATE INDEX "licenses_tenant_id_deleted_at_idx" ON "licenses"("tenant_id", "deleted_at");
+
+-- CreateIndex
+CREATE INDEX "contract_history_contract_id_created_at_idx" ON "contract_history"("contract_id", "created_at");
+
+-- CreateIndex
 CREATE INDEX "contract_brands_contract_id_idx" ON "contract_brands"("contract_id");
 
 -- CreateIndex
@@ -454,6 +577,21 @@ CREATE INDEX "documents_tenant_id_idx" ON "documents"("tenant_id");
 
 -- CreateIndex
 CREATE INDEX "documents_entity_type_entity_id_idx" ON "documents"("entity_type", "entity_id");
+
+-- CreateIndex
+CREATE INDEX "documents_tenant_id_deleted_at_idx" ON "documents"("tenant_id", "deleted_at");
+
+-- CreateIndex
+CREATE INDEX "alert_rules_tenant_id_idx" ON "alert_rules"("tenant_id");
+
+-- CreateIndex
+CREATE INDEX "alerts_tenant_id_idx" ON "alerts"("tenant_id");
+
+-- CreateIndex
+CREATE INDEX "alerts_tenant_id_status_idx" ON "alerts"("tenant_id", "status");
+
+-- CreateIndex
+CREATE INDEX "alerts_entity_type_entity_id_idx" ON "alerts"("entity_type", "entity_id");
 
 -- CreateIndex
 CREATE INDEX "role_permissions_role_user_type_module_action_idx" ON "role_permissions"("role", "user_type", "module", "action");
@@ -469,6 +607,15 @@ CREATE INDEX "audit_logs_tenant_id_created_at_idx" ON "audit_logs"("tenant_id", 
 
 -- CreateIndex
 CREATE INDEX "tenant_versions_tenant_id_idx" ON "tenant_versions"("tenant_id");
+
+-- CreateIndex
+CREATE INDEX "user_client_holders_tenant_id_idx" ON "user_client_holders"("tenant_id");
+
+-- CreateIndex
+CREATE INDEX "user_client_holders_user_client_id_idx" ON "user_client_holders"("user_client_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_client_holders_user_client_id_holder_id_key" ON "user_client_holders"("user_client_id", "holder_id");
 
 -- AddForeignKey
 ALTER TABLE "user_clients" ADD CONSTRAINT "user_clients_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -519,6 +666,18 @@ ALTER TABLE "brand_holders" ADD CONSTRAINT "brand_holders_holder_id_fkey" FOREIG
 ALTER TABLE "contracts" ADD CONSTRAINT "contracts_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "licenses" ADD CONSTRAINT "licenses_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "licenses" ADD CONSTRAINT "licenses_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contracts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "licenses" ADD CONSTRAINT "licenses_brand_id_fkey" FOREIGN KEY ("brand_id") REFERENCES "brands"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "contract_history" ADD CONSTRAINT "contract_history_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contracts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "contract_brands" ADD CONSTRAINT "contract_brands_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contracts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -528,8 +687,29 @@ ALTER TABLE "contract_brands" ADD CONSTRAINT "contract_brands_brand_id_fkey" FOR
 ALTER TABLE "documents" ADD CONSTRAINT "documents_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "documents" ADD CONSTRAINT "documents_previous_version_id_fkey" FOREIGN KEY ("previous_version_id") REFERENCES "documents"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "alert_rules" ADD CONSTRAINT "alert_rules_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "alerts" ADD CONSTRAINT "alerts_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "alerts" ADD CONSTRAINT "alerts_alert_rule_id_fkey" FOREIGN KEY ("alert_rule_id") REFERENCES "alert_rules"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "tenant_versions" ADD CONSTRAINT "tenant_versions_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_client_holders" ADD CONSTRAINT "user_client_holders_user_client_id_fkey" FOREIGN KEY ("user_client_id") REFERENCES "user_clients"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_client_holders" ADD CONSTRAINT "user_client_holders_holder_id_fkey" FOREIGN KEY ("holder_id") REFERENCES "holders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_client_holders" ADD CONSTRAINT "user_client_holders_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

@@ -243,11 +243,24 @@ export default function BrandsPage({ params }: BrandsPageProps) {
           <div className="py-20 text-center">
             <Tag className="mx-auto mb-3 h-10 w-10 text-slate-300" />
             <p className="text-sm font-medium text-slate-600">
-              Sin marcas registradas
+              {brands.length === 0
+                ? 'Este cliente no tiene marcas registradas'
+                : 'Sin resultados para los filtros aplicados'}
             </p>
             <p className="mt-1 text-sm text-slate-400">
-              Ajusta los filtros o crea una nueva marca.
+              {brands.length === 0
+                ? 'Registra la primera marca para comenzar.'
+                : 'Ajusta los filtros para ver más resultados.'}
             </p>
+            {brands.length === 0 && canCreate && (
+              <Link
+                href={`/tenants/${tenantId}/brands/new`}
+                className={`${buttonVariants()} mt-4 inline-flex`}
+              >
+                <Plus className="h-4 w-4" />
+                Nueva Marca
+              </Link>
+            )}
           </div>
         ) : (
           <Table>

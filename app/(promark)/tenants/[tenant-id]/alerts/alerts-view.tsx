@@ -212,9 +212,15 @@ export function AlertsView({
             </CardHeader>
             <CardContent>
               {filtered.length === 0 ? (
-                <p className="py-12 text-center text-sm text-slate-400">
-                  Sin alertas para mostrar
-                </p>
+                <div className="py-12 text-center">
+                  <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-emerald-500" />
+                  <p className="text-sm font-medium text-slate-600">
+                    Sin alertas pendientes
+                  </p>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Todos los vencimientos están al día.
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-2">
                   {filtered.map((alert) => (

@@ -116,7 +116,16 @@ export function ContractsListView({ tenantId, userRole }: Props) {
         ) : contracts.length === 0 ? (
           <div className="py-20 text-center">
             <Scroll className="mx-auto mb-3 h-10 w-10 text-slate-300" />
-            <p className="text-sm font-medium text-slate-600">Sin contratos</p>
+            <p className="text-sm font-medium text-slate-600">No hay contratos registrados</p>
+            <p className="mt-1 text-sm text-slate-400">Registra el primer contrato del cliente.</p>
+            {canCreate && (
+              <Link
+                href={`/tenants/${tenantId}/contratos/nuevo`}
+                className={`${buttonVariants()} mt-4 inline-flex`}
+              >
+                <Plus className="h-4 w-4" />Nuevo Contrato
+              </Link>
+            )}
           </div>
         ) : (
           <Table>

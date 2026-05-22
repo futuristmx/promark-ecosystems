@@ -54,16 +54,33 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, slug, config, active_modules } = body;
+    const { name, slug: providedSlug, config, active_modules } = body;
 
-    if (!name || !slug) {
+    if (!name) {
       return NextResponse.json(
-        { error: 'name and slug are required' },
+        { error: 'name is required' },
         { status: 400 }
       );
     }
 
-    // Validate slug format
+    // Slugify helper: lowercase, remove accents, replace non-alphanum with hyphen
+    function slugify(input: string): string {
+      return input
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60);
+    }
+
+    let slug = providedSlug ? String(providedSlug) : slugify(name);
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Could not derive a valid slug from name' },
+        { status: 400 }
+      );
+    }
     if (!/^[a-z0-9-]+$/.test(slug)) {
       return NextResponse.json(
         { error: 'Slug must be lowercase alphanumeric with hyphens only' },
@@ -71,13 +88,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check slug uniqueness
-    const existing = await prisma.tenant.findUnique({ where: { slug } });
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Slug already in use' },
-        { status: 409 }
-      );
+    // Ensure uniqueness with -2, -3 suffix when colliding
+    const baseSlug = slug;
+    let suffix = 2;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const existing = await prisma.tenant.findUnique({ where: { slug } });
+      if (!existing) break;
+      if (providedSlug) {
+        return NextResponse.json(
+          { error: 'Slug already in use' },
+          { status: 409 }
+        );
+      }
+      slug = `${baseSlug}-${suffix}`;
+      suffix += 1;
+      if (suffix > 100) {
+        return NextResponse.json(
+          { error: 'Could not derive a unique slug' },
+          { status: 500 }
+        );
+      }
     }
 
     // Validate config if provided, otherwise use defaults
