@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma/client';
+import { type Alert } from '@prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { AlertsView } from './alerts-view';
@@ -58,7 +59,7 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
 
       <AlertsView
         tenantId={tenantId}
-        initialAlerts={alerts.map((a) => ({
+        initialAlerts={alerts.map((a: Alert) => ({
           ...a,
           expiry_date: a.expiry_date.toISOString(),
           sent_at: a.sent_at?.toISOString() ?? null,

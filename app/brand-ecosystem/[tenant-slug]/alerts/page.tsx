@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma, Alert } from '@prisma/client';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
 import { ClientAlertsView } from './client-alerts-view';
@@ -66,7 +66,7 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
 
       <ClientAlertsView
         tenantId={session.tenant_id}
-        alerts={alerts.map((a) => ({
+        alerts={alerts.map((a: Alert) => ({
           ...a,
           expiry_date: a.expiry_date.toISOString(),
           created_at: a.created_at.toISOString(),
