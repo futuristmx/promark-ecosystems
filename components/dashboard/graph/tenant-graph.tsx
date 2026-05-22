@@ -181,6 +181,18 @@ function TenantGraphInner({ nodes, edges }: TenantGraphProps) {
         onSearch={setSearch}
       />
       <div className="relative flex-1">
+        {nodes.length === 0 && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+            <div className="text-center">
+              <p className="text-sm font-medium text-slate-600">
+                Sin nodos para mostrar
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                Registra holdings, empresas o marcas para construir el grafo.
+              </p>
+            </div>
+          </div>
+        )}
         <ReactFlow
           nodes={visibleNodes}
           edges={visibleEdges}

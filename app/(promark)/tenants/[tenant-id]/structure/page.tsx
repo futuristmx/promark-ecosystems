@@ -84,11 +84,20 @@ export default async function StructurePage({ params }: StructurePageProps) {
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
           <Network className="mx-auto mb-3 h-10 w-10 text-slate-300" />
           <p className="text-sm font-medium text-slate-600">
-            Aún no hay holdings registrados
+            Sin estructura corporativa registrada
           </p>
           <p className="mt-1 text-sm text-slate-400">
             Crea un holding para comenzar a construir la estructura corporativa.
           </p>
+          {canEdit && (
+            <Link
+              href={`/tenants/${tenantId}/structure?action=new-holding`}
+              className={`${buttonVariants()} mt-4 inline-flex`}
+            >
+              <Plus className="h-4 w-4" />
+              Crear holding
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-4">

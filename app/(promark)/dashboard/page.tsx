@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Users, Tag, Scroll, Bell } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
@@ -124,6 +125,41 @@ export default async function DashboardPage() {
   ]
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .slice(0, 10);
+
+  const allEmpty =
+    totalTenants === 0 &&
+    totalBrands === 0 &&
+    activeContracts === 0 &&
+    pendingAlerts === 0;
+
+  if (allEmpty) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Bienvenido, {session.full_name}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Vista general de todos los clientes
+          </p>
+        </div>
+        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-12 text-center">
+          <p className="text-base font-medium text-slate-700">
+            Sin datos disponibles aún
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            Comienza creando tu primer cliente para registrar marcas, contratos y alertas.
+          </p>
+          <Link
+            href="/tenants"
+            className="mt-4 inline-flex items-center rounded-md bg-[#3E6AE1] px-4 py-2 text-sm font-medium text-white hover:bg-[#3458bd]"
+          >
+            Crear primera marca
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

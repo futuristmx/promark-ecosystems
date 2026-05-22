@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams.get('message') === 'session_expired';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -49,6 +51,13 @@ export default function LoginPage() {
             Inicia sesion en tu cuenta
           </p>
         </div>
+
+        {/* Session expired */}
+        {sessionExpired && !error && (
+          <div className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+            Tu sesión expiró, inicia sesión nuevamente.
+          </div>
+        )}
 
         {/* Error */}
         {error && (
