@@ -12,8 +12,9 @@ async function main() {
   console.log('🌱 Seeding Promark® database...');
 
   // ─── 0. Clean test data (idempotent re-seed) ──────
-  // Note: Tenants, UserPromark, UserClient remain (upserted).
-  // Holdings/Brands/Holders use create() so we wipe them first.
+  // Tenants, UserPromark, UserClient are upserted (kept). Old test slugs
+  // ('grupo-norteno', 'alimentos-pacifico') will be deleted before recreating
+  // with the new demo slugs ('grupo-norteno', 'alimentos-pacifico').
   await prisma.alert.deleteMany({});
   await prisma.alertRule.deleteMany({});
   await prisma.contractHistory.deleteMany({});
@@ -30,6 +31,16 @@ async function main() {
   await prisma.holder.deleteMany({});
   await prisma.company.deleteMany({});
   await prisma.holding.deleteMany({});
+
+  // Remove old demo tenants and their UserClient (if upserted by previous seed).
+  await prisma.userClient.deleteMany({
+    where: {
+      tenant: { slug: { in: ['grupo-norteno', 'alimentos-pacifico'] } },
+    },
+  });
+  await prisma.tenant.deleteMany({
+    where: { slug: { in: ['grupo-norteno', 'alimentos-pacifico'] } },
+  });
   console.log('🧹 Cleared test data');
 
   // ─── 1. Promark Superadmin ─────────────────────────
@@ -48,17 +59,17 @@ async function main() {
 
   // ─── 2. Tenants ────────────────────────────────────
   const tenant1 = await prisma.tenant.upsert({
-    where: { slug: 'grupo-test-norte' },
+    where: { slug: 'grupo-norteno' },
     update: {},
     create: {
-      name: 'Grupo Test Norte S.A. de C.V.',
-      slug: 'grupo-test-norte',
+      name: 'Grupo Norteño S.A. de C.V.',
+      slug: 'grupo-norteno',
       status: 'ACTIVE',
       config: {
         branding: {
           logo_url: null,
           primary_color: '#1E3A5F',
-          company_display_name: 'Grupo Test Norte',
+          company_display_name: 'Grupo Norteño',
           favicon_url: null,
         },
         features: {
@@ -87,17 +98,17 @@ async function main() {
   });
 
   const tenant2 = await prisma.tenant.upsert({
-    where: { slug: 'alimentos-demo-sa' },
+    where: { slug: 'alimentos-pacifico' },
     update: {},
     create: {
-      name: 'Alimentos Demo S.A.',
-      slug: 'alimentos-demo-sa',
+      name: 'Alimentos del Pacífico',
+      slug: 'alimentos-pacifico',
       status: 'ACTIVE',
       config: {
         branding: {
           logo_url: null,
           primary_color: '#8B5CF6',
-          company_display_name: 'Alimentos Demo',
+          company_display_name: 'Alimentos del Pacífico',
           favicon_url: null,
         },
         features: {
@@ -127,64 +138,43 @@ async function main() {
 
   console.log('✅ Tenants created:', tenant1.slug, tenant2.slug);
 
-  // ─── 3. Client Users ───────────────────────────────
-  const pinHash = await hash('123456', 12);
+  // ─── 3. Client Users (PINs individuales) ───────────
+  // Grupo Norteño: admin 1234, visualizador 5678, legal rep 9012
+  // Alimentos del Pacífico: admin 1111, visualizador 2222
+  const userSpecs = [
+    { tenantSlug: 'grupo-norteno', prefix: 'GTN', pin: '1234', cardSuffix: '001', role: 'CLIENT_ADMIN' as const,        name: 'Admin Cliente Norteño' },
+    { tenantSlug: 'grupo-norteno', prefix: 'GTN', pin: '5678', cardSuffix: '002', role: 'CLIENT_VIEWER' as const,       name: 'Visualizador Norteño' },
+    { tenantSlug: 'grupo-norteno', prefix: 'GTN', pin: '9012', cardSuffix: '003', role: 'CLIENT_LEGAL_REP' as const,    name: 'Representante Legal Norteño' },
+    { tenantSlug: 'alimentos-pacifico', prefix: 'ADS', pin: '1111', cardSuffix: '001', role: 'CLIENT_ADMIN' as const,   name: 'Admin Cliente Pacífico' },
+    { tenantSlug: 'alimentos-pacifico', prefix: 'ADS', pin: '2222', cardSuffix: '002', role: 'CLIENT_VIEWER' as const,  name: 'Visualizador Pacífico' },
+  ];
 
-  for (const tenant of [tenant1, tenant2]) {
-    const prefix = tenant.slug === 'grupo-test-norte' ? 'GTN' : 'ADS';
-
-    await prisma.userClient.upsert({
-      where: { card_id: `${prefix}-001` },
-      update: {},
-      create: {
-        tenant_id: tenant.id,
-        full_name: `Admin ${tenant.name.split(' ')[0]}`,
-        email: `admin@${tenant.slug.replace(/-/g, '')}.mx`,
-        pin_hash: pinHash,
-        pin_generated_at: new Date(),
-        card_id: `${prefix}-001`,
-        role: 'CLIENT_ADMIN',
-        status: 'ACTIVE',
-      },
-    });
+  for (const spec of userSpecs) {
+    const tenant = spec.tenantSlug === 'grupo-norteno' ? tenant1 : tenant2;
+    const cardId = `${spec.prefix}-${spec.cardSuffix}`;
+    const pinHash = await hash(spec.pin, 12);
 
     await prisma.userClient.upsert({
-      where: { card_id: `${prefix}-002` },
-      update: {},
+      where: { card_id: cardId },
+      update: { pin_hash: pinHash, role: spec.role, full_name: spec.name },
       create: {
         tenant_id: tenant.id,
-        full_name: `Visor ${tenant.name.split(' ')[0]}`,
-        email: `viewer@${tenant.slug.replace(/-/g, '')}.mx`,
+        full_name: spec.name,
+        email: `${spec.cardSuffix}@${spec.tenantSlug.replace(/-/g, '')}.mx`,
         pin_hash: pinHash,
         pin_generated_at: new Date(),
-        card_id: `${prefix}-002`,
-        role: 'CLIENT_VIEWER',
-        status: 'ACTIVE',
-      },
-    });
-
-    // LEGAL_REP user
-    await prisma.userClient.upsert({
-      where: { card_id: `${prefix}-003` },
-      update: {},
-      create: {
-        tenant_id: tenant.id,
-        full_name: `Legal Rep ${tenant.name.split(' ')[0]}`,
-        email: `legalrep@${tenant.slug.replace(/-/g, '')}.mx`,
-        pin_hash: pinHash,
-        pin_generated_at: new Date(),
-        card_id: `${prefix}-003`,
-        role: 'CLIENT_LEGAL_REP',
+        card_id: cardId,
+        role: spec.role,
         status: 'ACTIVE',
       },
     });
   }
 
-  console.log('✅ Client users created (PIN: 123456 for all)');
+  console.log('✅ Client users created (PINs individuales — ver SPRINT-6-COMPLETED.md)');
 
   // ─── 4. Holdings + Companies + Brands ──────────────
   for (const tenant of [tenant1, tenant2]) {
-    const isT1 = tenant.slug === 'grupo-test-norte';
+    const isT1 = tenant.slug === 'grupo-norteno';
 
     const holding = await prisma.holding.create({
       data: {
@@ -221,35 +211,45 @@ async function main() {
       },
     });
 
+    // Grupo Norteño: 8 marcas (5 activas + 1 en 45 días + 1 en 15 días + 1 vencida)
+    // Alimentos del Pacífico: 5 marcas (4 activas + 1 en 30 días)
     const brandNames = isT1
-      ? ['NortExpress', 'VíaNorte', 'Norte Digital', 'ArcticPack', 'NordLine']
+      ? ['NortExpress', 'VíaNorte', 'Norte Digital', 'ArcticPack', 'NordLine', 'NorthFresh', 'NorteRural', 'NortePremium']
       : ['SaborReal', 'CampoPuro', 'Del Huerto', 'NutriFresh', 'GranoCero'];
 
-    const statuses = ['REGISTERED', 'REGISTERED', 'APPLIED', 'RENEWED', 'REGISTERED'] as const;
-    const types = ['WORDMARK', 'MIXED', 'FIGURATIVE', 'WORDMARK', 'MIXED'] as const;
+    const statuses = isT1
+      ? ['REGISTERED', 'REGISTERED', 'REGISTERED', 'RENEWED', 'REGISTERED', 'REGISTERED', 'REGISTERED', 'EXPIRED'] as const
+      : ['REGISTERED', 'REGISTERED', 'APPLIED', 'RENEWED', 'REGISTERED'] as const;
+    const types = isT1
+      ? ['WORDMARK', 'MIXED', 'FIGURATIVE', 'WORDMARK', 'MIXED', 'WORDMARK', 'MIXED', 'WORDMARK'] as const
+      : ['WORDMARK', 'MIXED', 'FIGURATIVE', 'WORDMARK', 'MIXED'] as const;
 
-    // For grupo-test-norte, the first 3 brands get test expiration dates
-    // that trigger the alert detector (15 days, 45 days, expired yesterday).
     const now = new Date();
     const in15Days = new Date(now);
     in15Days.setDate(in15Days.getDate() + 15);
+    const in30Days = new Date(now);
+    in30Days.setDate(in30Days.getDate() + 30);
     const in45Days = new Date(now);
     in45Days.setDate(in45Days.getDate() + 45);
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const expired45Ago = new Date(now);
+    expired45Ago.setDate(expired45Ago.getDate() - 45);
+    const far = new Date(2029, 0, 1); // ~3 años out
 
-    const alertTestExpirations = isT1
-      ? [in15Days, in45Days, yesterday, null, null]
-      : [null, null, null, null, null];
+    // Grupo Norteño: índices 0-4 activas (far), 5 en 45 días, 6 en 15 días, 7 vencida
+    // Alimentos del Pacífico: 0-3 activas, 4 en 30 días
+    const tenantExpirations: (Date | null)[] = isT1
+      ? [far, far, far, far, far, in45Days, in15Days, expired45Ago]
+      : [far, far, far, far, in30Days];
 
-    // IMPI class assignments per brand (varied across the catalog for chart data)
+    // IMPI: T1 usa {29, 30, 35} distribuidas; T2 usa {29, 43}
     const classAssignments: number[][] = isT1
-      ? [[35, 39], [12], [9, 42], [25], [16, 35]]
-      : [[29, 30], [29], [30, 32], [3], [35]];
+      ? [[29], [30], [35], [29, 30], [35], [30], [29, 35], [29]]
+      : [[29], [29, 43], [43], [29], [43]];
 
-    for (let i = 0; i < 5; i++) {
-      const company = i < 3 ? parentCo : subsidiary;
-      const testExpiry = alertTestExpirations[i];
+    const brandCount = brandNames.length;
+    for (let i = 0; i < brandCount; i++) {
+      const company = i < Math.ceil(brandCount / 2) ? parentCo : subsidiary;
+      const expiry = tenantExpirations[i];
       const brand = await prisma.brand.create({
         data: {
           tenant_id: tenant.id,
@@ -259,11 +259,9 @@ async function main() {
           legal_status: statuses[i],
           brand_type: types[i],
           registration_number: statuses[i] !== 'APPLIED' ? `MX-${isT1 ? 'N' : 'A'}${String(i+1).padStart(4, '0')}` : null,
-          application_date: new Date(2024, i, 15),
-          registration_date: statuses[i] !== 'APPLIED' ? new Date(2024, i + 3, 1) : null,
-          expiration_date:
-            testExpiry ??
-            (statuses[i] !== 'APPLIED' ? new Date(2034, i + 3, 1) : null),
+          application_date: new Date(2024, i % 12, 15),
+          registration_date: statuses[i] !== 'APPLIED' ? new Date(2024, (i + 3) % 12, 1) : null,
+          expiration_date: expiry,
         },
       });
 
@@ -283,7 +281,7 @@ async function main() {
 
   // ─── 4b. Holders + BrandHolder + UserClientHolder ──
   for (const tenant of [tenant1, tenant2]) {
-    const isT1 = tenant.slug === 'grupo-test-norte';
+    const isT1 = tenant.slug === 'grupo-norteno';
     const prefix = isT1 ? 'GTN' : 'ADS';
 
     // Create a holder (representative)
@@ -373,7 +371,7 @@ async function main() {
   console.log('✅ Alert rules created');
 
   // ─── 4d. Sample Document with future expiry ─────────
-  // Attach a document record to the first brand of grupo-test-norte
+  // Attach a document record to the first brand of grupo-norteno
   // pointing at a non-existent storage path (acceptable for dev seed —
   // the file isn't actually uploaded). The detector picks it up because
   // expires_at falls into the 30-day window.
@@ -521,7 +519,7 @@ async function main() {
 
   console.log('✅ Role permissions seeded');
 
-  // ─── 5b. Contracts + Licenses for grupo-test-norte ──
+  // ─── 5b. Contracts + Licenses for grupo-norteno ──
   const t1Brands = await prisma.brand.findMany({
     where: { tenant_id: tenant1.id },
     orderBy: { name: 'asc' },
@@ -621,10 +619,13 @@ async function main() {
   console.log('\n🎉 Seed completed successfully!');
   console.log('────────────────────────────────────');
   console.log('Promark Admin: admin@promark.mx');
-  console.log('Tenant 1: grupo-test-norte');
-  console.log('Tenant 2: alimentos-demo-sa');
-  console.log('Client users: GTN-001/002/003, ADS-001/002/003 (PIN: 123456)');
-  console.log('  -001: CLIENT_ADMIN, -002: CLIENT_VIEWER, -003: CLIENT_LEGAL_REP');
+  console.log('Tenant 1: grupo-norteno — Grupo Norteño S.A. de C.V.');
+  console.log('  GTN-001 CLIENT_ADMIN     PIN 1234');
+  console.log('  GTN-002 CLIENT_VIEWER    PIN 5678');
+  console.log('  GTN-003 CLIENT_LEGAL_REP PIN 9012');
+  console.log('Tenant 2: alimentos-pacifico — Alimentos del Pacífico');
+  console.log('  ADS-001 CLIENT_ADMIN     PIN 1111');
+  console.log('  ADS-002 CLIENT_VIEWER    PIN 2222');
 
   // ─── 6. Run alert detector to generate test alerts ──
   console.log('\n🔔 Running alert detector...');
