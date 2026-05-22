@@ -1,7 +1,7 @@
 import { requirePromarkAuth } from '@/lib/auth/promark';
 
 const statCards = [
-  { label: 'Total Tenants', value: '--' },
+  { label: 'Total Clientes', value: '--' },
   { label: 'Total Marcas', value: '--' },
   { label: 'Usuarios Activos', value: '--' },
   { label: 'Documentos', value: '--' },

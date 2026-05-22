@@ -15,7 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 const HOLDER_TYPES = ['INDIVIDUAL', 'CORPORATION'] as const;
 
 const holderFormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Campo requerido'),
   holder_type: z.enum(HOLDER_TYPES),
   rfc: z.string().optional(),
   curp: z.string().optional(),
@@ -83,15 +83,15 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
     <div className="mx-auto max-w-2xl">
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: '...', href: `/tenants/${tenantId}/structure` },
-          { label: 'Holders', href: `/tenants/${tenantId}/holders` },
-          { label: 'New Holder' },
+          { label: 'Titulares', href: `/tenants/${tenantId}/holders` },
+          { label: 'Nuevo Titular' },
         ]}
       />
 
       <h1 className="mb-6 text-2xl font-bold text-slate-900">
-        Create New Holder
+        Crear nuevo titular
       </h1>
 
       {error && (
@@ -103,12 +103,12 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Card>
           <CardHeader className="border-b">
-            <CardTitle>Holder Information</CardTitle>
+            <CardTitle>Información del titular</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <Label htmlFor="name">Full Name / Company Name *</Label>
+                <Label htmlFor="name">Nombre completo / Razón social *</Label>
                 <Input
                   id="name"
                   {...register('name')}
@@ -123,7 +123,7 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
               </div>
 
               <div>
-                <Label htmlFor="holder_type">Type *</Label>
+                <Label htmlFor="holder_type">Tipo *</Label>
                 <select
                   id="holder_type"
                   {...register('holder_type')}
@@ -138,12 +138,12 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
               </div>
 
               <div>
-                <Label htmlFor="nationality">Nationality</Label>
+                <Label htmlFor="nationality">Nacionalidad</Label>
                 <Input
                   id="nationality"
                   {...register('nationality')}
                   className="mt-1"
-                  placeholder="e.g., Mexicana"
+                  placeholder="Ej., Mexicana"
                 />
               </div>
 
@@ -153,7 +153,7 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
                   id="rfc"
                   {...register('rfc')}
                   className="mt-1"
-                  placeholder="e.g., ABC1234567A1"
+                  placeholder="Ej., ABC1234567A1"
                 />
               </div>
 
@@ -163,7 +163,7 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
                   id="curp"
                   {...register('curp')}
                   className="mt-1"
-                  placeholder="Only for individuals"
+                  placeholder="Solo personas físicas"
                 />
               </div>
             </div>
@@ -172,12 +172,12 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
 
         <Card>
           <CardHeader className="border-b">
-            <CardTitle>Contact Information</CardTitle>
+            <CardTitle>Información de contacto</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="contact_email">Email</Label>
+                <Label htmlFor="contact_email">Correo electrónico</Label>
                 <Input
                   id="contact_email"
                   type="email"
@@ -193,7 +193,7 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
               </div>
 
               <div>
-                <Label htmlFor="contact_phone">Phone</Label>
+                <Label htmlFor="contact_phone">Teléfono</Label>
                 <Input
                   id="contact_phone"
                   {...register('contact_phone')}
@@ -203,7 +203,7 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
               </div>
 
               <div className="col-span-2">
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes">Notas internas</Label>
                 <Textarea
                   id="notes"
                   {...register('notes')}
@@ -221,10 +221,10 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
             variant="outline"
             onClick={() => router.push(`/tenants/${tenantId}/holders`)}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            {submitting ? 'Creating...' : 'Create Holder'}
+            {submitting ? 'Creando...' : 'Crear titular'}
           </Button>
         </div>
       </form>

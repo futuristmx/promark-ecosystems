@@ -31,17 +31,17 @@ function formatDate(date: Date | null | undefined): string {
 
 function getEventTypeLabel(eventType: string): string {
   const labels: Record<string, string> = {
-    REGISTRATION: 'Registration',
-    RENEWAL: 'Renewal',
-    TRANSFER: 'Transfer',
-    OPPOSITION: 'Opposition',
-    CANCELLATION: 'Cancellation',
-    STATUS_CHANGE: 'Status Change',
-    MODIFICATION: 'Modification',
-    LITIGATION_START: 'Litigation Started',
-    LITIGATION_END: 'Litigation Ended',
-    ASSIGNMENT: 'Assignment',
-    LICENSE_GRANT: 'License Granted',
+    REGISTRATION: 'Registro',
+    RENEWAL: 'Renovación',
+    TRANSFER: 'Transferencia',
+    OPPOSITION: 'Oposición',
+    CANCELLATION: 'Cancelación',
+    STATUS_CHANGE: 'Cambio de estado',
+    MODIFICATION: 'Modificación',
+    LITIGATION_START: 'Inicio de litigio',
+    LITIGATION_END: 'Fin de litigio',
+    ASSIGNMENT: 'Cesión',
+    LICENSE_GRANT: 'Licencia otorgada',
   };
   return labels[eventType] || eventType;
 }
@@ -100,9 +100,9 @@ export default async function BrandDetailPage({
     <div>
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: '...', href: `/tenants/${tenantId}/structure` },
-          { label: 'Brands', href: `/tenants/${tenantId}/brands` },
+          { label: 'Marcas', href: `/tenants/${tenantId}/brands` },
           { label: brand.name },
         ]}
       />
@@ -124,7 +124,7 @@ export default async function BrandDetailPage({
         {canEdit && (
           <Link href={`/tenants/${tenantId}/brands/${brand.id}/edit`} className={buttonVariants()}>
               <Pencil className="h-4 w-4" />
-              Edit Brand
+              Editar marca
           </Link>
         )}
       </div>
@@ -135,13 +135,13 @@ export default async function BrandDetailPage({
           {/* Brand Details Card */}
           <Card>
             <CardHeader className="border-b">
-              <CardTitle>Brand Details</CardTitle>
+              <CardTitle>Detalles de la marca</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Legal Status
+                    Estado legal
                   </p>
                   <p className="mt-1 text-sm font-medium text-slate-900">
                     {brand.legal_status}
@@ -149,7 +149,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Brand Type
+                    Tipo de marca
                   </p>
                   <p className="mt-1 text-sm font-medium text-slate-900">
                     {brand.brand_type}
@@ -157,7 +157,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Registration #
+                    Número de registro
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {brand.registration_number || '-'}
@@ -165,7 +165,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Application #
+                    Número de solicitud
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {brand.application_number || '-'}
@@ -173,7 +173,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Application Date
+                    Fecha de solicitud
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {formatDate(brand.application_date)}
@@ -181,7 +181,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Registration Date
+                    Fecha de registro
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {formatDate(brand.registration_date)}
@@ -189,7 +189,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Expiration Date
+                    Fecha de vencimiento
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {formatDate(brand.expiration_date)}
@@ -197,7 +197,7 @@ export default async function BrandDetailPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Renewal Date
+                    Fecha de renovación
                   </p>
                   <p className="mt-1 text-sm text-slate-900">
                     {formatDate(brand.renewal_date)}
@@ -210,7 +210,7 @@ export default async function BrandDetailPage({
                   <Separator className="my-4" />
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                      Description
+                      Descripción
                     </p>
                     <p className="mt-1 text-sm text-slate-700">
                       {brand.description}
@@ -222,7 +222,7 @@ export default async function BrandDetailPage({
               {brand.disclaimers && (
                 <div className="mt-4">
                   <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Disclaimers
+                    Reservas
                   </p>
                   <p className="mt-1 text-sm text-slate-700">
                     {brand.disclaimers}
@@ -236,7 +236,7 @@ export default async function BrandDetailPage({
           {brand.classes.length > 0 && (
             <Card>
               <CardHeader className="border-b">
-                <CardTitle>Nice Classes</CardTitle>
+                <CardTitle>Clases de Niza</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -246,7 +246,7 @@ export default async function BrandDetailPage({
                       className="flex items-start gap-3 rounded-lg border border-slate-100 p-3"
                     >
                       <Badge variant="secondary">
-                        Class {cls.class_number}
+                        Clase {cls.class_number}
                       </Badge>
                       <div className="flex-1">
                         {cls.class_description && (
@@ -283,13 +283,13 @@ export default async function BrandDetailPage({
             <CardHeader className="border-b">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-slate-400" />
-                <CardTitle>History</CardTitle>
+                <CardTitle>Historial</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               {brand.history.length === 0 ? (
                 <p className="py-6 text-center text-sm text-slate-400">
-                  No history entries yet
+                  Sin entradas en el historial
                 </p>
               ) : (
                 <div className="relative space-y-0">
@@ -313,7 +313,7 @@ export default async function BrandDetailPage({
                         <p className="mt-1 text-xs text-slate-400">
                           {formatDate(entry.event_date)}
                           {entry.performed_by &&
-                            ` by ${entry.performed_by.full_name}`}
+                            ` por ${entry.performed_by.full_name}`}
                         </p>
                       </div>
                     </div>
@@ -331,13 +331,13 @@ export default async function BrandDetailPage({
             <CardHeader className="border-b">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-slate-400" />
-                <CardTitle>Holders</CardTitle>
+                <CardTitle>Titulares</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               {brand.holders.length === 0 ? (
                 <p className="py-4 text-center text-sm text-slate-400">
-                  No holders linked
+                  Sin titulares vinculados
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -365,13 +365,13 @@ export default async function BrandDetailPage({
             <CardHeader className="border-b">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-slate-400" />
-                <CardTitle>Contracts</CardTitle>
+                <CardTitle>Contratos</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
               {brand.contract_brands.length === 0 ? (
                 <p className="py-4 text-center text-sm text-slate-400">
-                  No contracts linked
+                  Sin contratos vinculados
                 </p>
               ) : (
                 <div className="space-y-3">

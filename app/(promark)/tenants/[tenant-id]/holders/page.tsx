@@ -74,24 +74,24 @@ export default function HoldersPage({ params }: HoldersPageProps) {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           { label: '...', href: `/tenants/${tenantId}/structure` },
-          { label: 'Holders' },
+          { label: 'Titulares' },
         ]}
       />
 
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Holders</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Titulares</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {filteredHolders.length} holder
-            {filteredHolders.length !== 1 && 's'} found
+            {filteredHolders.length} titular
+            {filteredHolders.length !== 1 && 'es'}
           </p>
         </div>
         {canCreate && (
           <Link href={`/tenants/${tenantId}/holders/new`} className={buttonVariants()}>
               <Plus className="h-4 w-4" />
-              New Holder
+              Nuevo Titular
           </Link>
         )}
       </div>
@@ -101,7 +101,7 @@ export default function HoldersPage({ params }: HoldersPageProps) {
         <div className="relative max-w-md">
           <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
-            placeholder="Search by name or RFC..."
+            placeholder="Buscar por nombre o RFC..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -119,20 +119,20 @@ export default function HoldersPage({ params }: HoldersPageProps) {
           <div className="py-20 text-center">
             <Users className="mx-auto mb-3 h-10 w-10 text-slate-300" />
             <p className="text-sm font-medium text-slate-600">
-              No holders found
+              Sin titulares registrados
             </p>
             <p className="mt-1 text-sm text-slate-400">
-              Create a new holder to get started.
+              Crea un nuevo titular para comenzar.
             </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="px-4">Name</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead className="px-4">Nombre</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead>RFC</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Estado</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

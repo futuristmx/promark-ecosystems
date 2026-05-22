@@ -48,7 +48,7 @@ const LEGAL_STATUSES = [
   'IN_LITIGATION',
 ];
 
-const VIGENCY_FILTERS = ['All', 'Active', 'Expiring', 'Expired'] as const;
+const VIGENCY_FILTERS = ['Todas', 'Vigentes', 'Por vencer', 'Vencidas'] as const;
 
 function getVigencyCategory(
   expirationDate: string | null,
@@ -105,7 +105,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
   const [companyFilter, setCompanyFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [vigencyFilter, setVigencyFilter] =
-    useState<(typeof VIGENCY_FILTERS)[number]>('All');
+    useState<(typeof VIGENCY_FILTERS)[number]>('Todas');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -136,14 +136,14 @@ export default function BrandsPage({ params }: BrandsPageProps) {
     }
     if (companyFilter && brand.company.id !== companyFilter) return false;
     if (statusFilter && brand.legal_status !== statusFilter) return false;
-    if (vigencyFilter !== 'All') {
+    if (vigencyFilter !== 'Todas') {
       const category = getVigencyCategory(
         brand.expiration_date,
         brand.legal_status
       );
-      if (vigencyFilter === 'Active' && category !== 'Active') return false;
-      if (vigencyFilter === 'Expiring' && category !== 'Expiring') return false;
-      if (vigencyFilter === 'Expired' && category !== 'Expired') return false;
+      if (vigencyFilter === 'Vigentes' && category !== 'Active') return false;
+      if (vigencyFilter === 'Por vencer' && category !== 'Expiring') return false;
+      if (vigencyFilter === 'Vencidas' && category !== 'Expired') return false;
     }
     return true;
   });
@@ -154,27 +154,26 @@ export default function BrandsPage({ params }: BrandsPageProps) {
     <div>
       <Breadcrumb
         items={[
-          { label: 'Tenants', href: '/tenants' },
+          { label: 'Clientes', href: '/tenants' },
           {
             label: '...',
             href: `/tenants/${tenantId}/structure`,
           },
-          { label: 'Brands' },
+          { label: 'Marcas' },
         ]}
       />
 
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Brand Catalog</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Catálogo de Marcas</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {filteredBrands.length} brand{filteredBrands.length !== 1 && 's'}{' '}
-            found
+            {filteredBrands.length} marca{filteredBrands.length !== 1 && 's'}
           </p>
         </div>
         {canCreate && (
           <Link href={`/tenants/${tenantId}/brands/new`} className={buttonVariants()}>
               <Plus className="h-4 w-4" />
-              New Brand
+              Nueva Marca
           </Link>
         )}
       </div>
@@ -184,7 +183,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
-            placeholder="Search brands..."
+            placeholder="Buscar marcas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -196,7 +195,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
           onChange={(e) => setCompanyFilter(e.target.value)}
           className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <option value="">All Companies</option>
+          <option value="">Todas las empresas</option>
           {companies.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -209,7 +208,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <option value="">All Statuses</option>
+          <option value="">Todos los estados</option>
           {LEGAL_STATUSES.map((s) => (
             <option key={s} value={s}>
               {s}
@@ -244,22 +243,22 @@ export default function BrandsPage({ params }: BrandsPageProps) {
           <div className="py-20 text-center">
             <Tag className="mx-auto mb-3 h-10 w-10 text-slate-300" />
             <p className="text-sm font-medium text-slate-600">
-              No brands found
+              Sin marcas registradas
             </p>
             <p className="mt-1 text-sm text-slate-400">
-              Try adjusting your filters or create a new brand.
+              Ajusta los filtros o crea una nueva marca.
             </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="px-4">Name</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Registration #</TableHead>
-                <TableHead>Expiration</TableHead>
-                <TableHead className="w-10">Vigency</TableHead>
+                <TableHead className="px-4">Nombre</TableHead>
+                <TableHead>Empresa</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>N° de registro</TableHead>
+                <TableHead>Vencimiento</TableHead>
+                <TableHead className="w-10">Vigencia</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

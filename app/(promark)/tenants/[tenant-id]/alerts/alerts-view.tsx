@@ -189,16 +189,24 @@ export function AlertsView({
               <div className="flex items-center justify-between">
                 <CardTitle>Alertas</CardTitle>
                 <div className="flex gap-1">
-                  {(['PENDING', 'DISMISSED', 'RESOLVED', 'ALL'] as const).map((s) => (
-                    <Button
-                      key={s}
-                      size="sm"
-                      variant={filter === s ? 'default' : 'outline'}
-                      onClick={() => setFilter(s)}
-                    >
-                      {s}
-                    </Button>
-                  ))}
+                  {(['PENDING', 'DISMISSED', 'RESOLVED', 'ALL'] as const).map((s) => {
+                    const labels: Record<typeof s, string> = {
+                      PENDING: 'Pendientes',
+                      DISMISSED: 'Descartadas',
+                      RESOLVED: 'Resueltas',
+                      ALL: 'Todas',
+                    };
+                    return (
+                      <Button
+                        key={s}
+                        size="sm"
+                        variant={filter === s ? 'default' : 'outline'}
+                        onClick={() => setFilter(s)}
+                      >
+                        {labels[s]}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
             </CardHeader>
@@ -225,7 +233,13 @@ export function AlertsView({
                           {alert.entity_type} · {alert.alert_type}
                         </p>
                       </div>
-                      <Badge variant="outline">{alert.status}</Badge>
+                      <Badge variant="outline">{
+                        alert.status === 'PENDING' ? 'Pendiente'
+                        : alert.status === 'DISMISSED' ? 'Descartado'
+                        : alert.status === 'RESOLVED' ? 'Resuelto'
+                        : alert.status === 'SENT' ? 'Enviado'
+                        : alert.status
+                      }</Badge>
                       {alert.status === 'PENDING' && (
                         <div className="flex gap-1">
                           <Button
