@@ -104,19 +104,20 @@ export default function ClientLoginPage({
               htmlFor="pin"
               className="mb-1 block text-sm font-medium text-slate-700"
             >
-              PIN (6 digitos)
+              PIN (4-6 dígitos)
             </label>
             <input
               id="pin"
               type="password"
               required
               inputMode="numeric"
+              minLength={4}
               maxLength={6}
-              pattern="[0-9]{6}"
+              pattern="[0-9]{4,6}"
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-center text-lg tracking-[0.3em] text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="------"
+              placeholder="----"
             />
           </div>
 
