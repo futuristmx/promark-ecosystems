@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Tag, FileText, ScrollText } from 'lucide-react';
+import { Tag, FileText, ScrollText, Bell } from 'lucide-react';
 
 interface ClientSidebarProps {
   tenantSlug: string;
+  tenantId: string;
   displayName: string;
   logoUrl: string | null;
   primaryColor: string;
@@ -21,6 +23,7 @@ interface NavItem {
 
 export function ClientSidebar({
   tenantSlug,
+  tenantId,
   displayName,
   logoUrl,
   primaryColor,
@@ -30,8 +33,24 @@ export function ClientSidebar({
   const pathname = usePathname();
   const basePath = `/brand-ecosystem/${tenantSlug}`;
 
+  const [pendingAlerts, setPendingAlerts] = useState<number>(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/tenants/${tenantId}/alerts?status=PENDING&limit=1`, {
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? res.json() : { total: 0 }))
+      .then((data) => setPendingAlerts(data.total ?? 0))
+      .catch(() => {
+        /* ignore */
+      });
+    return () => controller.abort();
+  }, [tenantId, pathname]);
+
   const navItems: NavItem[] = [
     { label: 'Marcas', href: `${basePath}/brands`, icon: Tag },
+    { label: 'Alertas', href: `${basePath}/alerts`, icon: Bell },
     { label: 'Documentos', href: `${basePath}/documents`, icon: FileText },
     { label: 'Contratos', href: `${basePath}/contracts`, icon: ScrollText },
   ];
@@ -75,6 +94,7 @@ export function ClientSidebar({
           {navItems.map((item) => {
             const active = isActive(item.href);
             const Icon = item.icon;
+            const isAlerts = item.href.endsWith('/alerts');
             return (
               <li key={item.href}>
                 <Link
@@ -90,7 +110,12 @@ export function ClientSidebar({
                   }
                 >
                   <Icon className="size-4 shrink-0" />
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {isAlerts && pendingAlerts > 0 && (
+                    <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      {pendingAlerts}
+                    </span>
+                  )}
                 </Link>
               </li>
             );

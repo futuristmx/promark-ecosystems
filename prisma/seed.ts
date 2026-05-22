@@ -11,6 +11,23 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('🌱 Seeding Promark® database...');
 
+  // ─── 0. Clean test data (idempotent re-seed) ──────
+  // Note: Tenants, UserPromark, UserClient remain (upserted).
+  // Holdings/Brands/Holders use create() so we wipe them first.
+  await prisma.alert.deleteMany({});
+  await prisma.alertRule.deleteMany({});
+  await prisma.userClientHolder.deleteMany({});
+  await prisma.brandHolder.deleteMany({});
+  await prisma.document.deleteMany({});
+  await prisma.brandHistory.deleteMany({});
+  await prisma.brandClass.deleteMany({});
+  await prisma.brandRelationship.deleteMany({});
+  await prisma.brand.deleteMany({});
+  await prisma.holder.deleteMany({});
+  await prisma.company.deleteMany({});
+  await prisma.holding.deleteMany({});
+  console.log('🧹 Cleared test data');
+
   // ─── 1. Promark Superadmin ─────────────────────────
   const superadmin = await prisma.userPromark.upsert({
     where: { email: 'mcadena@promark.mx' },
@@ -207,8 +224,23 @@ async function main() {
     const statuses = ['REGISTERED', 'REGISTERED', 'APPLIED', 'RENEWED', 'REGISTERED'] as const;
     const types = ['WORDMARK', 'MIXED', 'FIGURATIVE', 'WORDMARK', 'MIXED'] as const;
 
+    // For grupo-test-norte, the first 3 brands get test expiration dates
+    // that trigger the alert detector (15 days, 45 days, expired yesterday).
+    const now = new Date();
+    const in15Days = new Date(now);
+    in15Days.setDate(in15Days.getDate() + 15);
+    const in45Days = new Date(now);
+    in45Days.setDate(in45Days.getDate() + 45);
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const alertTestExpirations = isT1
+      ? [in15Days, in45Days, yesterday, null, null]
+      : [null, null, null, null, null];
+
     for (let i = 0; i < 5; i++) {
       const company = i < 3 ? parentCo : subsidiary;
+      const testExpiry = alertTestExpirations[i];
       await prisma.brand.create({
         data: {
           tenant_id: tenant.id,
@@ -220,7 +252,9 @@ async function main() {
           registration_number: statuses[i] !== 'APPLIED' ? `MX-${isT1 ? 'N' : 'A'}${String(i+1).padStart(4, '0')}` : null,
           application_date: new Date(2024, i, 15),
           registration_date: statuses[i] !== 'APPLIED' ? new Date(2024, i + 3, 1) : null,
-          expiration_date: statuses[i] !== 'APPLIED' ? new Date(2034, i + 3, 1) : null,
+          expiration_date:
+            testExpiry ??
+            (statuses[i] !== 'APPLIED' ? new Date(2034, i + 3, 1) : null),
         },
       });
     }
@@ -284,6 +318,71 @@ async function main() {
   }
 
   console.log('✅ Holders, BrandHolders, and UserClientHolder assignments created');
+
+  // ─── 4c. Default Alert Rules per tenant ─────────────
+  const defaultAlertRules = [
+    { name: 'Marca por vencer — 90 días',     entity_type: 'BRAND',    trigger_days: 90 },
+    { name: 'Marca por vencer — 30 días',     entity_type: 'BRAND',    trigger_days: 30 },
+    { name: 'Marca vencida',                  entity_type: 'BRAND',    trigger_days: 0  },
+    { name: 'Documento por vencer — 30 días', entity_type: 'DOCUMENT', trigger_days: 30 },
+    { name: 'Documento vencido',              entity_type: 'DOCUMENT', trigger_days: 0  },
+  ];
+
+  for (const tenant of [tenant1, tenant2]) {
+    const existing = await prisma.alertRule.count({ where: { tenant_id: tenant.id } });
+    if (existing === 0) {
+      for (const rule of defaultAlertRules) {
+        await prisma.alertRule.create({
+          data: {
+            tenant_id: tenant.id,
+            name: rule.name,
+            entity_type: rule.entity_type,
+            trigger_days: rule.trigger_days,
+            is_active: true,
+            notify_email: true,
+            notify_in_app: true,
+          },
+        });
+      }
+    }
+  }
+  console.log('✅ Alert rules created');
+
+  // ─── 4d. Sample Document with future expiry ─────────
+  // Attach a document record to the first brand of grupo-test-norte
+  // pointing at a non-existent storage path (acceptable for dev seed —
+  // the file isn't actually uploaded). The detector picks it up because
+  // expires_at falls into the 30-day window.
+  const firstBrand = await prisma.brand.findFirst({
+    where: { tenant_id: tenant1.id },
+    orderBy: { name: 'asc' },
+  });
+  if (firstBrand) {
+    const existingDoc = await prisma.document.findFirst({
+      where: { tenant_id: tenant1.id, entity_id: firstBrand.id },
+    });
+    if (!existingDoc) {
+      const in20Days = new Date();
+      in20Days.setDate(in20Days.getDate() + 20);
+      await prisma.document.create({
+        data: {
+          tenant_id: tenant1.id,
+          entity_type: 'BRAND',
+          entity_id: firstBrand.id,
+          file_name: 'certificado-seed.pdf',
+          file_type: 'application/pdf',
+          file_size: 102400,
+          storage_path: `${tenant1.id}/brands/${firstBrand.id}/seed-certificado.pdf`,
+          description: 'Documento de prueba seed — vence en 20 días',
+          uploaded_by: superadmin.id,
+          expires_at: in20Days,
+          version_number: 1,
+          is_latest_version: true,
+        },
+      });
+    }
+  }
+  console.log('✅ Sample document seeded');
 
   // ─── 5. Role Permissions ────────────────────────────
   // Define all modules
@@ -404,6 +503,102 @@ async function main() {
   console.log('Tenant 2: alimentos-demo-sa');
   console.log('Client users: GTN-001/002/003, ADS-001/002/003 (PIN: 123456)');
   console.log('  -001: CLIENT_ADMIN, -002: CLIENT_VIEWER, -003: CLIENT_LEGAL_REP');
+
+  // ─── 6. Run alert detector to generate test alerts ──
+  console.log('\n🔔 Running alert detector...');
+  // Sort rules tightest first; each entity matches only one rule per run
+  const allRules = await prisma.alertRule.findMany({ where: { is_active: true } });
+  const sortedRules = [...allRules].sort((a, b) => {
+    if (a.tenant_id !== b.tenant_id) return a.tenant_id.localeCompare(b.tenant_id);
+    if (a.entity_type !== b.entity_type) return a.entity_type.localeCompare(b.entity_type);
+    if (a.trigger_days === 0) return 1;
+    if (b.trigger_days === 0) return -1;
+    return a.trigger_days - b.trigger_days;
+  });
+
+  const detectorNow = new Date();
+  const matched = new Set<string>();
+  let alertsCreated = 0;
+
+  for (const rule of sortedRules) {
+    const upperDate = new Date(detectorNow);
+    upperDate.setDate(upperDate.getDate() + rule.trigger_days);
+
+    type Candidate = { id: string; name: string; expiry: Date; alertType: string };
+    let candidates: Candidate[] = [];
+
+    if (rule.entity_type === 'BRAND') {
+      const brands = await prisma.brand.findMany({
+        where:
+          rule.trigger_days === 0
+            ? {
+                tenant_id: rule.tenant_id,
+                expiration_date: { lt: detectorNow },
+                legal_status: { notIn: ['EXPIRED', 'CANCELLED'] },
+              }
+            : {
+                tenant_id: rule.tenant_id,
+                expiration_date: { gte: detectorNow, lte: upperDate },
+              },
+        select: { id: true, name: true, expiration_date: true },
+      });
+      candidates = brands
+        .filter((b) => b.expiration_date)
+        .map((b) => ({
+          id: b.id,
+          name: b.name,
+          expiry: b.expiration_date as Date,
+          alertType: rule.trigger_days === 0 ? 'EXPIRED' : 'EXPIRY_WARNING',
+        }));
+    } else if (rule.entity_type === 'DOCUMENT') {
+      const docs = await prisma.document.findMany({
+        where:
+          rule.trigger_days === 0
+            ? {
+                tenant_id: rule.tenant_id,
+                expires_at: { lt: detectorNow },
+                deleted_at: null,
+                is_latest_version: true,
+              }
+            : {
+                tenant_id: rule.tenant_id,
+                expires_at: { gte: detectorNow, lte: upperDate },
+                deleted_at: null,
+                is_latest_version: true,
+              },
+        select: { id: true, file_name: true, expires_at: true },
+      });
+      candidates = docs
+        .filter((d) => d.expires_at)
+        .map((d) => ({
+          id: d.id,
+          name: d.file_name,
+          expiry: d.expires_at as Date,
+          alertType: 'DOCUMENT_EXPIRY',
+        }));
+    }
+
+    for (const c of candidates) {
+      const key = `${rule.tenant_id}|${rule.entity_type}|${c.id}`;
+      if (matched.has(key)) continue;
+      matched.add(key);
+      await prisma.alert.create({
+        data: {
+          tenant_id: rule.tenant_id,
+          alert_rule_id: rule.id,
+          entity_type: rule.entity_type,
+          entity_id: c.id,
+          entity_name: c.name,
+          alert_type: c.alertType,
+          trigger_days: rule.trigger_days,
+          expiry_date: c.expiry,
+          status: 'PENDING',
+        },
+      });
+      alertsCreated++;
+    }
+  }
+  console.log(`✅ Alert detector generated ${alertsCreated} new alerts`);
 }
 
 main()

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -9,6 +10,7 @@ import {
   Users,
   ChevronRight,
   Network,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -43,6 +45,25 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
   const tenantMatch = pathname.match(/^\/tenants\/([^/]+)\//);
   const tenantId = tenantMatch ? tenantMatch[1] : null;
 
+  const [pendingAlerts, setPendingAlerts] = useState<number>(0);
+
+  useEffect(() => {
+    if (!tenantId) {
+      setPendingAlerts(0);
+      return;
+    }
+    const controller = new AbortController();
+    fetch(`/api/tenants/${tenantId}/alerts?status=PENDING&limit=1`, {
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? res.json() : { total: 0 }))
+      .then((data) => setPendingAlerts(data.total ?? 0))
+      .catch(() => {
+        /* ignore */
+      });
+    return () => controller.abort();
+  }, [tenantId, pathname]);
+
   const tenantSubNav: NavItem[] = tenantId
     ? [
         {
@@ -59,6 +80,11 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           href: `/tenants/${tenantId}/holders`,
           label: 'Holders',
           icon: <Users className="h-4 w-4" />,
+        },
+        {
+          href: `/tenants/${tenantId}/alerts`,
+          label: 'Alertas',
+          icon: <Bell className="h-4 w-4" />,
         },
       ]
     : [];
@@ -107,6 +133,7 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
             </p>
             {tenantSubNav.map((item) => {
               const isActive = pathname.startsWith(item.href);
+              const isAlerts = item.href.endsWith('/alerts');
               return (
                 <Link
                   key={item.href}
@@ -119,7 +146,12 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
                   )}
                 >
                   {item.icon}
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {isAlerts && pendingAlerts > 0 && (
+                    <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      {pendingAlerts}
+                    </span>
+                  )}
                 </Link>
               );
             })}

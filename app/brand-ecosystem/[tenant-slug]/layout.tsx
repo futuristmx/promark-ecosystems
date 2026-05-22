@@ -104,6 +104,7 @@ export default async function BrandEcosystemLayout({
       {userName && (
         <ClientSidebar
           tenantSlug={tenantSlug}
+          tenantId={tenant.id}
           displayName={displayName}
           logoUrl={logoUrl}
           primaryColor={primaryColor}
