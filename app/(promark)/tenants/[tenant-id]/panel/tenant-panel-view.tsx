@@ -8,6 +8,7 @@ import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { StatusDonut } from '@/components/dashboard/charts/status-donut';
 import { VigencyTimeline } from '@/components/dashboard/charts/vigency-timeline';
 import { ImpiClassBar } from '@/components/dashboard/charts/impi-class-bar';
+import { TenantGraph } from '@/components/dashboard/graph/tenant-graph';
 import type { TenantAggregates } from '@/lib/dashboard/tenant-aggregates';
 import type { GraphPayload } from '@/lib/dashboard/tenant-graph';
 
@@ -123,10 +124,7 @@ export function TenantPanelView({
       </TabsContent>
 
       <TabsContent value="graph" className="pt-4">
-        <div className="flex h-[70vh] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-sm text-slate-400">
-          Grafo se renderiza en el siguiente commit ({graph.nodes.length} nodos,{' '}
-          {graph.edges.length} enlaces)
-        </div>
+        <TenantGraph nodes={graph.nodes} edges={graph.edges} />
       </TabsContent>
 
       <TabsContent value="tree" className="pt-4">
