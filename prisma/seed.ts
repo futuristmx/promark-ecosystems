@@ -242,10 +242,15 @@ async function main() {
       ? [in15Days, in45Days, yesterday, null, null]
       : [null, null, null, null, null];
 
+    // IMPI class assignments per brand (varied across the catalog for chart data)
+    const classAssignments: number[][] = isT1
+      ? [[35, 39], [12], [9, 42], [25], [16, 35]]
+      : [[29, 30], [29], [30, 32], [3], [35]];
+
     for (let i = 0; i < 5; i++) {
       const company = i < 3 ? parentCo : subsidiary;
       const testExpiry = alertTestExpirations[i];
-      await prisma.brand.create({
+      const brand = await prisma.brand.create({
         data: {
           tenant_id: tenant.id,
           company_id: company.id,
@@ -261,6 +266,16 @@ async function main() {
             (statuses[i] !== 'APPLIED' ? new Date(2034, i + 3, 1) : null),
         },
       });
+
+      for (const classNum of classAssignments[i]) {
+        await prisma.brandClass.create({
+          data: {
+            brand_id: brand.id,
+            class_number: classNum,
+            status: statuses[i] === 'APPLIED' ? 'PENDING' : 'ACTIVE',
+          },
+        });
+      }
     }
   }
 

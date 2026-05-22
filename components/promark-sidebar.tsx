@@ -69,6 +69,11 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
   const tenantSubNav: NavItem[] = tenantId
     ? [
         {
+          href: `/tenants/${tenantId}/panel`,
+          label: 'Vista general',
+          icon: <LayoutDashboard className="h-4 w-4" />,
+        },
+        {
           href: `/tenants/${tenantId}/structure`,
           label: 'Estructura Corporativa',
           icon: <Network className="h-4 w-4" />,

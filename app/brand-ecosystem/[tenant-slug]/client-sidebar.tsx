@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Tag, FileText, ScrollText, Bell } from 'lucide-react';
+import { Tag, FileText, ScrollText, Bell, LayoutDashboard } from 'lucide-react';
 
 interface ClientSidebarProps {
   tenantSlug: string;
@@ -51,6 +51,7 @@ export function ClientSidebar({
   }, [tenantId, pathname]);
 
   const navItems: NavItem[] = [
+    { label: 'Panel', href: `${basePath}/panel`, icon: LayoutDashboard },
     { label: 'Marcas', href: `${basePath}/brands`, icon: Tag },
     { label: 'Alertas', href: `${basePath}/alerts`, icon: Bell },
     { label: 'Documentos', href: `${basePath}/documents`, icon: FileText },
