@@ -120,22 +120,53 @@ export async function POST(
     const expiresAt = expiresAtRaw ? new Date(expiresAtRaw) : null;
     const uploadedBy = getSessionUserId(session);
 
-    const document = await prisma.document.create({
-      data: {
-        tenant_id: tenantId,
-        entity_type: entityType,
-        entity_id: entityId,
-        file_name: upload.file_name,
-        file_type: upload.file_type,
-        file_size: upload.file_size,
-        storage_path: upload.storage_path,
-        storage_url: upload.storage_url,
-        description: description ?? null,
-        uploaded_by: uploadedBy,
-        expires_at: expiresAt ?? undefined,
-        version_number: 1,
-        is_latest_version: true,
-      },
+    // F4 — Versionado real: si ya existe un Document con el mismo
+    // (tenant, entity, file_name) marcado is_latest_version=true, se demota
+    // y se crea uno nuevo con version_number+1 y previous_version_id.
+    // Todo en una transacción para evitar dos "latest" simultáneos.
+    const document = await prisma.$transaction(async (tx) => {
+      const previousLatest = await tx.document.findFirst({
+        where: {
+          tenant_id: tenantId,
+          entity_type: entityType,
+          entity_id: entityId,
+          file_name: upload.file_name,
+          is_latest_version: true,
+          deleted_at: null,
+        },
+        select: { id: true, version_number: true },
+        orderBy: { version_number: 'desc' },
+      });
+
+      let nextVersion = 1;
+      let previousVersionId: string | null = null;
+      if (previousLatest) {
+        nextVersion = previousLatest.version_number + 1;
+        previousVersionId = previousLatest.id;
+        await tx.document.update({
+          where: { id: previousLatest.id },
+          data: { is_latest_version: false },
+        });
+      }
+
+      return tx.document.create({
+        data: {
+          tenant_id: tenantId,
+          entity_type: entityType,
+          entity_id: entityId,
+          file_name: upload.file_name,
+          file_type: upload.file_type,
+          file_size: upload.file_size,
+          storage_path: upload.storage_path,
+          storage_url: upload.storage_url,
+          description: description ?? null,
+          uploaded_by: uploadedBy,
+          expires_at: expiresAt ?? undefined,
+          version_number: nextVersion,
+          is_latest_version: true,
+          previous_version_id: previousVersionId,
+        },
+      });
     });
 
     // Log BrandHistory if entity is a BRAND
