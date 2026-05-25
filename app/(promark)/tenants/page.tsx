@@ -2,28 +2,8 @@ import Link from 'next/link';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import prisma from '@/lib/prisma/client';
 import { Plus, Building2 } from 'lucide-react';
-import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
-import {
-  PageTitle,
-  StatusBadge,
-  EmptyState,
-  DsDataTable,
-} from '@/components/ds';
-import type { StatusTone, DsColumn } from '@/components/ds';
-
-const STATUS_TONE: Record<string, StatusTone> = {
-  ACTIVE: 'success',
-  SUSPENDED: 'error',
-  ONBOARDING: 'warning',
-};
-
-interface TenantRow {
-  id: string;
-  name: string;
-  slug: string;
-  status: string;
-  created_at: Date;
-}
+import { PageTitle, EmptyState } from '@/components/ds';
+import { TenantsTable } from './tenants-table';
 
 export default async function TenantsPage() {
   const user = await requirePromarkAuth();
@@ -39,44 +19,14 @@ export default async function TenantsPage() {
     },
   });
 
-  const columns: DsColumn<TenantRow>[] = [
-    {
-      key: 'name',
-      header: 'Nombre',
-      sortable: true,
-      cell: (t) => (
-        <strong className="text-slate-900">{t.name}</strong>
-      ),
-    },
-    {
-      key: 'slug',
-      header: 'Slug',
-      cell: (t) => (
-        <span className="font-mono text-xs text-slate-500">{t.slug}</span>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Estado',
-      cell: (t) => (
-        <StatusBadge
-          tone={STATUS_TONE[t.status] ?? 'muted'}
-          label={TENANT_STATUS_LABELS[t.status] ?? t.status}
-        />
-      ),
-    },
-    {
-      key: 'created_at',
-      header: 'Creado',
-      sortable: true,
-      cell: (t) =>
-        t.created_at.toLocaleDateString('es-MX', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
-    },
-  ];
+  // Serializar Date a ISO antes de pasar al client component
+  const tenantRows = tenants.map((t) => ({
+    id: t.id,
+    name: t.name,
+    slug: t.slug,
+    status: t.status,
+    created_at: t.created_at.toISOString(),
+  }));
 
   return (
     <div>
@@ -97,7 +47,7 @@ export default async function TenantsPage() {
         }
       />
 
-      {tenants.length === 0 ? (
+      {tenantRows.length === 0 ? (
         <EmptyState
           icon={<Building2 className="size-6" />}
           title="No hay clientes registrados"
@@ -115,28 +65,9 @@ export default async function TenantsPage() {
           }
         />
       ) : (
-        <DsDataTable<TenantRow>
-          columns={columns}
-          rows={tenants}
-          getRowId={(t) => t.id}
-          rowActions={[
-            {
-              label: 'Gestionar',
-              href: (t) => `/tenants/${t.id}/structure`,
-            },
-            {
-              label: 'Ver panel',
-              href: (t) => `/tenants/${t.id}/panel`,
-            },
-            ...(user.role === 'SUPERADMIN'
-              ? [
-                  {
-                    label: 'Configurar',
-                    href: (t: TenantRow) => `/tenants/${t.id}/configuracion`,
-                  },
-                ]
-              : []),
-          ]}
+        <TenantsTable
+          tenants={tenantRows}
+          isSuperAdmin={user.role === 'SUPERADMIN'}
         />
       )}
     </div>
