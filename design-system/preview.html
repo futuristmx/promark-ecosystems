@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Promark® — Design System Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Open+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Black scale */
+      --black-100: #0A0E15;
+      --black-90:  #212631;
+      --black-80:  #373F4E;
+      --black-70:  #4E576A;
+      --black-60:  #667085;
+
+      /* White scale */
+      --white-100: #FFFFFF;
+      --white-90:  #F0F1F5;
+      --white-80:  #E0E4EB;
+      --white-70:  #D1D6E0;
+      --white-60:  #BFC6D4;
+
+      /* Text */
+      --text-header:  #FFFFFF;
+      --text-body:    #E0E4EB;
+      --text-muted:   #BFC6D4;
+      --text-soft:    #667085;
+      --text-reverse: #0A0E15;
+
+      /* Surfaces */
+      --bg-app:        #0A0E15;
+      --bg-sidebar:    #11151C;
+      --bg-panel:      #161A22;
+      --bg-card:       #181D26;
+      --bg-card-soft:  #212631;
+      --bg-input:      #121720;
+
+      /* Borders */
+      --border-subtle: rgba(224, 228, 235, 0.10);
+      --border-medium: rgba(224, 228, 235, 0.18);
+      --border-strong: rgba(224, 228, 235, 0.28);
+
+      /* Accents */
+      --accent-blue:   #4F46E5;
+      --accent-violet: #6D5DFB;
+      --accent-cyan:   #38BDF8;
+      --accent-pink:   #EC4899;
+      --accent-orange: #F97316;
+
+      /* Status */
+      --status-active:   #38BDF8;
+      --status-progress: #6D5DFB;
+      --status-success:  #22C55E;
+      --status-warning:  #F97316;
+      --status-error:    #EF4444;
+      --status-muted:    #667085;
+
+      /* Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-2xl: 24px;
+
+      /* Space */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 72px;
+
+      /* Motion */
+      --motion-base: 220ms ease-out;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: var(--bg-app);
+      color: var(--text-body);
+      font-family: 'DM Sans', 'Open Sans', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* Layout */
+    .page-shell { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 240px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 8px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sidebar-logo-mark {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 800; font-size: 13px;
+    }
+    .sidebar-logo-text {
+      font-size: 16px; font-weight: 700; color: var(--text-header);
+      letter-spacing: -0.01em;
+    }
+    .sidebar-group { display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-group-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all var(--motion-base);
+      border: 1px solid transparent;
+    }
+    .nav-item:hover {
+      color: var(--text-body);
+      background: rgba(255,255,255,0.03);
+    }
+    .nav-item.active {
+      background:
+        radial-gradient(circle at right center, rgba(109,93,251,0.42), transparent 30%),
+        rgba(255,255,255,0.06);
+      border: 1px solid rgba(224,228,235,0.08);
+      color: var(--text-header);
+    }
+    .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .main {
+      flex: 1;
+      padding: 32px 40px;
+      max-width: 1400px;
+    }
+
+    /* Headings */
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-header);
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin: 6px 0 0;
+    }
+    .section-header {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-header);
+      margin: 48px 0 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .section-header-hint {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-soft);
+    }
+
+    /* Cards */
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      transition: all var(--motion-base);
+    }
+    .card:hover {
+      border-color: var(--border-medium);
+      transform: translateY(-1px);
+    }
+
+    .premium-card {
+      background:
+        radial-gradient(circle at bottom right, rgba(109,93,251,0.20), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-2xl);
+      padding: 28px;
+    }
+
+    .atmospheric-card {
+      background:
+        radial-gradient(circle at bottom left, rgba(236,72,153,0.22), transparent 32%),
+        radial-gradient(circle at bottom center, rgba(249,115,22,0.18), transparent 30%),
+        radial-gradient(circle at right center, rgba(109,93,251,0.18), transparent 32%),
+        #181D26;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-2xl);
+      padding: 28px;
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+    }
+    .kpi-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .kpi-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-header);
+      margin-top: 8px;
+      letter-spacing: -0.02em;
+    }
+    .kpi-delta {
+      font-size: 12px;
+      margin-top: 6px;
+      color: var(--status-success);
+    }
+    .kpi-delta.negative { color: var(--status-error); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--motion-base);
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+      color: white;
+      border-color: rgba(255,255,255,0.14);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 0 24px rgba(109,93,251,0.28);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-body);
+      border: 1px solid var(--border-medium);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover { color: var(--text-header); }
+
+    /* Inputs */
+    .input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      color: var(--text-header);
+      font-size: 13px;
+      width: 100%;
+      font-family: inherit;
+      transition: all var(--motion-base);
+    }
+    .input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.18);
+    }
+    .input::placeholder { color: var(--text-soft); }
+
+    .prompt-box {
+      background:
+        radial-gradient(circle at bottom left, rgba(236,72,153,0.18), transparent 28%),
+        radial-gradient(circle at right bottom, rgba(109,93,251,0.16), transparent 28%),
+        var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-2xl);
+      padding: 24px;
+    }
+    .prompt-box textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-header);
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      min-height: 60px;
+      outline: none;
+    }
+    .prompt-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-body);
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 999px;
+      background: var(--status-muted);
+    }
+    .badge[data-status="active"] .badge-dot { background: var(--status-active); }
+    .badge[data-status="success"] .badge-dot { background: var(--status-success); }
+    .badge[data-status="warning"] .badge-dot { background: var(--status-warning); }
+    .badge[data-status="error"] .badge-dot { background: var(--status-error); }
+    .badge[data-status="progress"] .badge-dot { background: var(--status-progress); }
+
+    /* Swatches */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .swatch {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: var(--bg-card);
+    }
+    .swatch-color {
+      width: 100%;
+      height: 56px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 8px;
+    }
+    .swatch-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-header);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .swatch-hex {
+      font-size: 11px;
+      color: var(--text-soft);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      margin-top: 2px;
+    }
+
+    /* Typography preview */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .type-label {
+      width: 100px;
+      font-size: 12px;
+      color: var(--text-soft);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .type-sample { color: var(--text-header); }
+
+    /* Data table */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table th, .table td {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13px;
+    }
+    .table th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+    .table tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* Node card (canvas) */
+    .node-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      min-width: 180px;
+    }
+    .node-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    .node-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-header);
+      margin-top: 6px;
+    }
+
+    /* Utils */
+    .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+    .row > * { min-width: 240px; flex: 1; }
+    .stack { display: flex; flex-direction: column; gap: 12px; }
+    .meta { font-size: 12px; color: var(--text-soft); }
+    .label-uc {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+
+    /* Theme switcher */
+    .theme-switcher {
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .theme-switcher a {
+      padding: 4px 12px;
+      border-radius: 999px;
+      color: var(--text-soft);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .theme-switcher a.active {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-header);
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-switcher">
+    <a href="design-preview.html" class="active">Dark</a>
+    <a href="design-preview-light.html">Light</a>
+  </div>
+
+  <div class="page-shell">
+
+    <!-- ───── SIDEBAR ───── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">P</div>
+        <div class="sidebar-logo-text">Promark<span style="color:var(--text-soft)">®</span></div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">Workspace</div>
+        <a class="nav-item active" href="#"><span class="nav-icon">▦</span> Panel</a>
+        <a class="nav-item" href="#"><span class="nav-icon">◷</span> Clientes</a>
+        <a class="nav-item" href="#"><span class="nav-icon">⚙</span> Configuración</a>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-label">Cliente · Grupo Norteño</div>
+        <a class="nav-item" href="#"><span class="nav-icon">▤</span> Vista general</a>
+        <a class="nav-item" href="#"><span class="nav-icon">⌗</span> Estructura</a>
+        <a class="nav-item" href="#"><span class="nav-icon">◐</span> Marcas</a>
+        <a class="nav-item" href="#"><span class="nav-icon">⚐</span> Alertas</a>
+        <a class="nav-item" href="#"><span class="nav-icon">▦</span> Actividad</a>
+      </div>
+
+      <div style="margin-top:auto; padding:12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:rgba(255,255,255,0.03);">
+        <div class="label-uc" style="margin-bottom:4px;">M. Cadena</div>
+        <div class="meta">SUPERADMIN</div>
+      </div>
+    </aside>
+
+    <!-- ───── MAIN ───── -->
+    <main class="main">
+
+      <!-- Header -->
+      <header>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px;">
+          <div>
+            <p class="label-uc" style="color:var(--accent-cyan); margin:0 0 6px;">Panel ejecutivo</p>
+            <h1 class="page-title">Inteligencia marcaria</h1>
+            <p class="page-subtitle">Vista consolidada de 2 clientes activos · 13 marcas · 3 contratos</p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary">⌕ Buscar</button>
+            <button class="btn btn-primary">+ Nuevo cliente</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- KPIs -->
+      <div class="kpi-grid" style="margin-top: 32px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Total marcas</div>
+          <div class="kpi-value">13</div>
+          <div class="kpi-delta">+2 este mes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Por vencer (90d)</div>
+          <div class="kpi-value" style="color:var(--status-warning)">2</div>
+          <div class="kpi-delta">Atención requerida</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Contratos vigentes</div>
+          <div class="kpi-value">3</div>
+          <div class="kpi-delta negative">−1 vs trimestre</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Alertas próximas</div>
+          <div class="kpi-value" style="color:var(--status-error)">4</div>
+          <div class="kpi-delta negative">2 críticas</div>
+        </div>
+      </div>
+
+      <!-- Cards row -->
+      <h2 class="section-header">
+        Cards
+        <span class="section-header-hint">3 variantes: standard, premium, atmospheric</span>
+      </h2>
+      <div class="row">
+
+        <div class="card">
+          <div class="label-uc">Card estándar</div>
+          <h3 style="margin:8px 0 4px; color:var(--text-header); font-size:18px; font-weight:600;">NortePremium</h3>
+          <p class="meta">Logística Norte Express · Vence en 7 días</p>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <span class="badge" data-status="error"><span class="badge-dot"></span> Expirada</span>
+            <span class="badge"><span class="badge-dot"></span> Clase 29</span>
+          </div>
+        </div>
+
+        <div class="premium-card">
+          <div class="label-uc" style="color:var(--accent-violet);">Card premium</div>
+          <h3 style="margin:8px 0 4px; color:var(--text-header); font-size:18px; font-weight:600;">Vencimiento crítico</h3>
+          <p class="meta">3 marcas vencen en menos de 30 días. Revisa la cartera de renovación.</p>
+          <button class="btn btn-primary" style="margin-top:16px;">Revisar ahora →</button>
+        </div>
+
+        <div class="atmospheric-card">
+          <div class="label-uc" style="color:var(--accent-pink);">Card atmospheric · AI</div>
+          <h3 style="margin:8px 0 4px; color:var(--text-header); font-size:18px; font-weight:600;">Sugerencias del agente</h3>
+          <p class="meta">Detecté 2 oportunidades de licenciamiento cruzado entre tus tenants. ¿Quieres verlas?</p>
+          <button class="btn btn-primary" style="margin-top:16px;">Generar análisis</button>
+        </div>
+
+      </div>
+
+      <!-- Prompt box -->
+      <h2 class="section-header">
+        Prompt box
+        <span class="section-header-hint">Input atmospheric para agentes IA</span>
+      </h2>
+      <div class="prompt-box">
+        <textarea placeholder="¿Qué marcas vencen este trimestre y no tienen contrato vigente?"></textarea>
+        <div class="prompt-actions">
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-ghost">📎 Adjuntar</button>
+            <button class="btn btn-ghost">⚙ Contexto</button>
+          </div>
+          <button class="btn btn-primary">Analizar →</button>
+        </div>
+      </div>
+
+      <!-- Data table -->
+      <h2 class="section-header">
+        Data table
+        <span class="section-header-hint">Estilo intelligence, no Excel</span>
+      </h2>
+      <div class="card" style="padding:0;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Marca</th>
+              <th>Empresa</th>
+              <th>Estado</th>
+              <th>Clases</th>
+              <th>Vencimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--text-header)">ArcticPack</strong></td>
+              <td>Distribuidora Norte</td>
+              <td><span class="badge" data-status="success"><span class="badge-dot"></span> Renovada</span></td>
+              <td>29, 30</td>
+              <td>1 ene 2029</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text-header)">NorthFresh</strong></td>
+              <td>Logística Norte Express</td>
+              <td><span class="badge" data-status="warning"><span class="badge-dot"></span> Por vencer</span></td>
+              <td>30</td>
+              <td>6 jul 2026</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text-header)">NortePremium</strong></td>
+              <td>Logística Norte Express</td>
+              <td><span class="badge" data-status="error"><span class="badge-dot"></span> Expirada</span></td>
+              <td>29</td>
+              <td>7 abr 2026</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text-header)">NorteRural</strong></td>
+              <td>Logística Norte Express</td>
+              <td><span class="badge" data-status="active"><span class="badge-dot"></span> Activa</span></td>
+              <td>29, 35</td>
+              <td>6 jun 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Workflow nodes -->
+      <h2 class="section-header">
+        Canvas / nodos
+        <span class="section-header-hint">Estructura visual para flujos de inteligencia</span>
+      </h2>
+      <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:32px; position:relative;">
+        <div style="display:flex; align-items:center; gap:32px; justify-content:center; flex-wrap:wrap;">
+          <div class="node-card">
+            <div class="node-type" style="color:var(--accent-cyan);">Input</div>
+            <div class="node-title">Catálogo de marcas</div>
+            <div class="meta" style="margin-top:8px;">13 registros · 2 tenants</div>
+          </div>
+          <div style="font-size:24px; color:var(--text-soft);">→</div>
+          <div class="node-card" style="border-color:rgba(109,93,251,0.30); background: radial-gradient(circle at right center, rgba(109,93,251,0.10), transparent 50%), var(--bg-card);">
+            <div class="node-type" style="color:var(--accent-violet);">Proceso</div>
+            <div class="node-title">Detector de vigencia</div>
+            <div class="meta" style="margin-top:8px;">Reglas: 20 · Cron: diario</div>
+          </div>
+          <div style="font-size:24px; color:var(--text-soft);">→</div>
+          <div class="node-card">
+            <div class="node-type" style="color:var(--accent-orange);">Output</div>
+            <div class="node-title">4 alertas activas</div>
+            <div class="meta" style="margin-top:8px;">2 críticas · 2 informativas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <h2 class="section-header">Botones</h2>
+      <div class="row">
+        <div class="stack">
+          <span class="label-uc">Primario</span>
+          <div><button class="btn btn-primary">Crear cliente</button></div>
+        </div>
+        <div class="stack">
+          <span class="label-uc">Secundario</span>
+          <div><button class="btn btn-secondary">Cancelar</button></div>
+        </div>
+        <div class="stack">
+          <span class="label-uc">Ghost</span>
+          <div><button class="btn btn-ghost">Ver detalles</button></div>
+        </div>
+      </div>
+
+      <!-- Status badges -->
+      <h2 class="section-header">Estados</h2>
+      <div class="row">
+        <span class="badge" data-status="active"><span class="badge-dot"></span> Activa</span>
+        <span class="badge" data-status="progress"><span class="badge-dot"></span> En proceso</span>
+        <span class="badge" data-status="success"><span class="badge-dot"></span> Renovada</span>
+        <span class="badge" data-status="warning"><span class="badge-dot"></span> Por vencer</span>
+        <span class="badge" data-status="error"><span class="badge-dot"></span> Expirada</span>
+        <span class="badge"><span class="badge-dot"></span> Borrador</span>
+      </div>
+
+      <!-- Typography -->
+      <h2 class="section-header">Tipografía</h2>
+      <div class="card">
+        <div class="type-row">
+          <span class="type-label">3xl · 56px</span>
+          <span class="type-sample" style="font-size:56px; font-weight:700; line-height:1.05; letter-spacing:-0.025em;">Inteligencia marcaria</span>
+        </div>
+        <div class="type-row">
+          <span class="type-label">2xl · 40px</span>
+          <span class="type-sample" style="font-size:40px; font-weight:700; letter-spacing:-0.02em;">Inteligencia marcaria</span>
+        </div>
+        <div class="type-row">
+          <span class="type-label">xl · 28px</span>
+          <span class="type-sample" style="font-size:28px; font-weight:700; letter-spacing:-0.02em;">Inteligencia marcaria</span>
+        </div>
+        <div class="type-row">
+          <span class="type-label">lg · 20px</span>
+          <span class="type-sample" style="font-size:20px; font-weight:600;">Inteligencia marcaria</span>
+        </div>
+        <div class="type-row">
+          <span class="type-label">md · 16px</span>
+          <span class="type-sample" style="font-size:16px;">Inteligencia marcaria — cuerpo principal del texto.</span>
+        </div>
+        <div class="type-row">
+          <span class="type-label">sm · 14px</span>
+          <span class="type-sample" style="font-size:14px; color:var(--text-body);">Inteligencia marcaria — texto secundario.</span>
+        </div>
+        <div class="type-row">
+          <span class="type-label">xs · 12px</span>
+          <span class="type-sample" style="font-size:12px; color:var(--text-muted);">Inteligencia marcaria — metadatos y captions.</span>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <h2 class="section-header">Inputs</h2>
+      <div class="row">
+        <input class="input" placeholder="Buscar marca, contrato o cliente…" />
+        <input class="input" placeholder="alertas@cliente.mx" />
+        <input class="input" type="number" placeholder="90" />
+      </div>
+
+      <!-- ───── PALETA ───── -->
+      <h2 class="section-header" id="paleta">Paleta · Black scale</h2>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#0A0E15"></div><div class="swatch-name">--black-100</div><div class="swatch-hex">#0A0E15 · bg-app</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#212631"></div><div class="swatch-name">--black-90</div><div class="swatch-hex">#212631</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#373F4E"></div><div class="swatch-name">--black-80</div><div class="swatch-hex">#373F4E</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#4E576A"></div><div class="swatch-name">--black-70</div><div class="swatch-hex">#4E576A</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#667085"></div><div class="swatch-name">--black-60</div><div class="swatch-hex">#667085</div></div>
+      </div>
+
+      <h2 class="section-header">Paleta · White scale</h2>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#FFFFFF"></div><div class="swatch-name">--white-100</div><div class="swatch-hex">#FFFFFF · text-header</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F0F1F5"></div><div class="swatch-name">--white-90</div><div class="swatch-hex">#F0F1F5</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#E0E4EB"></div><div class="swatch-name">--white-80</div><div class="swatch-hex">#E0E4EB · text-body</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#D1D6E0"></div><div class="swatch-name">--white-70</div><div class="swatch-hex">#D1D6E0</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#BFC6D4"></div><div class="swatch-name">--white-60</div><div class="swatch-hex">#BFC6D4 · text-muted</div></div>
+      </div>
+
+      <h2 class="section-header">Paleta · Surfaces</h2>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#0A0E15"></div><div class="swatch-name">--bg-app</div><div class="swatch-hex">#0A0E15</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#11151C"></div><div class="swatch-name">--bg-sidebar</div><div class="swatch-hex">#11151C</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#161A22"></div><div class="swatch-name">--bg-panel</div><div class="swatch-hex">#161A22</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#181D26"></div><div class="swatch-name">--bg-card</div><div class="swatch-hex">#181D26</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#212631"></div><div class="swatch-name">--bg-card-soft</div><div class="swatch-hex">#212631</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#121720"></div><div class="swatch-name">--bg-input</div><div class="swatch-hex">#121720</div></div>
+      </div>
+
+      <h2 class="section-header">Paleta · Accents</h2>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#4F46E5"></div><div class="swatch-name">--accent-blue</div><div class="swatch-hex">#4F46E5 · primario</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#6D5DFB"></div><div class="swatch-name">--accent-violet</div><div class="swatch-hex">#6D5DFB · secundario</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#38BDF8"></div><div class="swatch-name">--accent-cyan</div><div class="swatch-hex">#38BDF8 · activo</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#EC4899"></div><div class="swatch-name">--accent-pink</div><div class="swatch-hex">#EC4899 · atmosférico</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F97316"></div><div class="swatch-name">--accent-orange</div><div class="swatch-hex">#F97316 · warning</div></div>
+      </div>
+
+      <h2 class="section-header">Paleta · Status</h2>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#38BDF8"></div><div class="swatch-name">--status-active</div><div class="swatch-hex">#38BDF8</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#6D5DFB"></div><div class="swatch-name">--status-progress</div><div class="swatch-hex">#6D5DFB</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#22C55E"></div><div class="swatch-name">--status-success</div><div class="swatch-hex">#22C55E</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F97316"></div><div class="swatch-name">--status-warning</div><div class="swatch-hex">#F97316</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#EF4444"></div><div class="swatch-name">--status-error</div><div class="swatch-hex">#EF4444</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#667085"></div><div class="swatch-name">--status-muted</div><div class="swatch-hex">#667085</div></div>
+      </div>
+
+      <!-- Footer -->
+      <div style="margin-top:80px; padding:24px 0; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <p class="meta">Promark® Design System · Preview v1 · Tokens listados en <code style="color:var(--accent-cyan)">design-system/preview.html</code></p>
+        <p class="meta">Si esta vista te convence, aplico todo a la app real.</p>
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>
