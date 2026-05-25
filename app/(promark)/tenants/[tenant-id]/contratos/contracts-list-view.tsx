@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, Scroll } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
-import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
+import { PageTitle, EmptyState } from '@/components/ds';
 import {
   CONTRACT_TYPE_LABELS,
   CONTRACT_STATUS_LABELS,
@@ -71,17 +71,22 @@ export function ContractsListView({ tenantId, userRole }: Props) {
         { label: '...', href: `/tenants/${tenantId}/structure` },
         { label: 'Contratos' },
       ]} />
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Contratos</h1>
-          <p className="mt-1 text-sm text-slate-500">{contracts.length} contrato{contracts.length !== 1 && 's'}</p>
-        </div>
-        {canCreate && (
-          <Link href={`/tenants/${tenantId}/contratos/nuevo`} className={buttonVariants()}>
-            <Plus className="h-4 w-4" />Nuevo Contrato
-          </Link>
-        )}
-      </div>
+      <PageTitle
+        eyebrow="Cliente"
+        title="Contratos"
+        subtitle={`${contracts.length} contrato${contracts.length !== 1 ? 's' : ''} registrado${contracts.length !== 1 ? 's' : ''}.`}
+        actions={
+          canCreate ? (
+            <Link
+              href={`/tenants/${tenantId}/contratos/nuevo`}
+              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+            >
+              <Plus className="size-4" />
+              Nuevo contrato
+            </Link>
+          ) : null
+        }
+      />
 
       <div className="mb-4 rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[220px]">
@@ -121,9 +126,10 @@ export function ContractsListView({ tenantId, userRole }: Props) {
             {canCreate && (
               <Link
                 href={`/tenants/${tenantId}/contratos/nuevo`}
-                className={`${buttonVariants()} mt-4 inline-flex`}
+                className="ds-btn-primary mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
               >
-                <Plus className="h-4 w-4" />Nuevo Contrato
+                <Plus className="size-4" />
+                Nuevo Contrato
               </Link>
             )}
           </div>

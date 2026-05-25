@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, KeyRound } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
-import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
 import { LICENSE_TYPE_LABELS, LICENSE_STATUS_LABELS } from '@/lib/i18n/status-labels';
+import { PageTitle, EmptyState } from '@/components/ds';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 
 interface LicenseItem {
@@ -61,17 +61,22 @@ export function LicensesListView({ tenantId, userRole }: { tenantId: string; use
         { label: '...', href: `/tenants/${tenantId}/structure` },
         { label: 'Licencias' },
       ]} />
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Licencias</h1>
-          <p className="mt-1 text-sm text-slate-500">{licenses.length} licencia{licenses.length !== 1 && 's'}</p>
-        </div>
-        {canCreate && (
-          <Link href={`/tenants/${tenantId}/licencias/nueva`} className={buttonVariants()}>
-            <Plus className="h-4 w-4" />Nueva Licencia
-          </Link>
-        )}
-      </div>
+      <PageTitle
+        eyebrow="Cliente"
+        title="Licencias"
+        subtitle={`${licenses.length} licencia${licenses.length !== 1 ? 's' : ''} registrada${licenses.length !== 1 ? 's' : ''}.`}
+        actions={
+          canCreate ? (
+            <Link
+              href={`/tenants/${tenantId}/licencias/nueva`}
+              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+            >
+              <Plus className="size-4" />
+              Nueva Licencia
+            </Link>
+          ) : null
+        }
+      />
 
       <div className="mb-4 rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[220px]">

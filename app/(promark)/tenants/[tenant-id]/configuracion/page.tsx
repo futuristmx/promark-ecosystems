@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
+import { PageTitle } from '@/components/ds';
 import { BrandingEditor } from './branding-editor';
 
 interface Props {
@@ -56,13 +57,11 @@ export default async function TenantConfigPage({ params }: Props) {
         Volver al panel
       </Link>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Configuración</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Personalización del portal de {tenant.name}. Cada cambio se guarda
-          como nueva versión (actual: v{versionCount + 1}).
-        </p>
-      </div>
+      <PageTitle
+        eyebrow="Cliente"
+        title="Configuración"
+        subtitle={`Personalización del portal de ${tenant.name}. Cada cambio se guarda como nueva versión (actual: v${versionCount + 1}).`}
+      />
 
       <BrandingEditor
         tenantId={tenantId}

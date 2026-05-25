@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
+import { PageTitle } from '@/components/ds';
 import { ActivityFilters } from './activity-filters';
 import { ActivityList } from './activity-list';
 
@@ -131,10 +132,11 @@ export default async function ActivityPage({ params, searchParams }: Props) {
         Volver al panel
       </Link>
 
-      <h1 className="text-2xl font-bold text-slate-900">Actividad</h1>
-      <p className="mb-6 mt-1 text-sm text-slate-500">
-        Historial de cambios sobre marcas y contratos de {tenant.name}.
-      </p>
+      <PageTitle
+        eyebrow="Auditoría"
+        title="Actividad"
+        subtitle={`Historial de cambios sobre marcas y contratos de ${tenant.name}.`}
+      />
 
       <ActivityFilters basePath={`/tenants/${tenantId}/actividad`} />
 

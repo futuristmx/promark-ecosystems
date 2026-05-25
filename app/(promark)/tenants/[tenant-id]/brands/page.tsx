@@ -9,6 +9,19 @@ import { VigencyBadge, VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BRAND_STATUS_LABELS } from '@/lib/i18n/status-labels';
+import { PageTitle, StatusBadge, EmptyState } from '@/components/ds';
+import type { StatusTone } from '@/components/ds';
+
+const BRAND_STATUS_TONE: Record<string, StatusTone> = {
+  REGISTERED: 'success',
+  RENEWED: 'success',
+  APPLIED: 'info',
+  PUBLISHED: 'info',
+  EXPIRED: 'error',
+  CANCELLED: 'muted',
+  OPPOSED: 'warning',
+  IN_LITIGATION: 'warning',
+};
 import {
   Table,
   TableHeader,
@@ -164,20 +177,22 @@ export default function BrandsPage({ params }: BrandsPageProps) {
         ]}
       />
 
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Catálogo de Marcas</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            {filteredBrands.length} marca{filteredBrands.length !== 1 && 's'}
-          </p>
-        </div>
-        {canCreate && (
-          <Link href={`/tenants/${tenantId}/brands/new`} className={buttonVariants()}>
-              <Plus className="h-4 w-4" />
+      <PageTitle
+        eyebrow="Cliente"
+        title="Catálogo de Marcas"
+        subtitle={`${filteredBrands.length} marca${filteredBrands.length !== 1 ? 's' : ''} registrada${filteredBrands.length !== 1 ? 's' : ''}.`}
+        actions={
+          canCreate ? (
+            <Link
+              href={`/tenants/${tenantId}/brands/new`}
+              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+            >
+              <Plus className="size-4" />
               Nueva Marca
-          </Link>
-        )}
-      </div>
+            </Link>
+          ) : null
+        }
+      />
 
       {/* Filters bar */}
       <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4">
@@ -293,11 +308,10 @@ export default function BrandsPage({ params }: BrandsPageProps) {
                     {brand.company.name}
                   </TableCell>
                   <TableCell>
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${getLegalStatusColor(brand.legal_status)}`}
-                    >
-                      {BRAND_STATUS_LABELS[brand.legal_status] ?? brand.legal_status}
-                    </span>
+                    <StatusBadge
+                      tone={BRAND_STATUS_TONE[brand.legal_status] ?? 'muted'}
+                      label={BRAND_STATUS_LABELS[brand.legal_status] ?? brand.legal_status}
+                    />
                   </TableCell>
                   <TableCell className="text-slate-500">
                     {brand.registration_number || '-'}
