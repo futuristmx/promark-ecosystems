@@ -126,9 +126,10 @@ export function ContractsListView({ tenantId, userRole }: Props) {
             {canCreate && (
               <Link
                 href={`/tenants/${tenantId}/contratos/nuevo`}
-                className={`${buttonVariants()} mt-4 inline-flex`}
+                className="ds-btn-primary mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
               >
-                <Plus className="h-4 w-4" />Nuevo Contrato
+                <Plus className="size-4" />
+                Nuevo Contrato
               </Link>
             )}
           </div>
