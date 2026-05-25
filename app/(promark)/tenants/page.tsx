@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import prisma from '@/lib/prisma/client';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Plus } from 'lucide-react';
 import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
 
 export default async function TenantsPage() {
-  await requirePromarkAuth();
+  const user = await requirePromarkAuth();
 
   const tenants = await prisma.tenant.findMany({
     orderBy: { created_at: 'desc' },
@@ -22,6 +22,15 @@ export default async function TenantsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Clientes</h1>
+        {user.role === 'SUPERADMIN' && (
+          <Link
+            href="/tenants/new"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+          >
+            <Plus className="size-4" />
+            Nuevo cliente
+          </Link>
+        )}
       </div>
 
       {tenants.length === 0 ? (
