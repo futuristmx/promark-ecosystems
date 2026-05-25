@@ -18,15 +18,55 @@ Vercel Dashboard → tu proyecto → Settings → Environment Variables.
 
 ---
 
-## Configurar Resend (emails)
+## Configurar Resend (emails de alertas)
 
-1. Crear cuenta en https://resend.com
-2. Verificar dominio `promark.mx` (DNS records)
-3. Generar API Key en el dashboard
-4. Agregar como `RESEND_API_KEY` en Vercel
-5. Redeploy para que tome la variable
+El cron `/api/cron/check-alerts` envía emails cuando detecta vencimientos próximos. Para activarlo en producción:
 
-Sin Resend configurado, `lib/alerts/email.ts` cae a logging — el cron sigue funcionando, solo no manda emails.
+### 1. Crear cuenta y dominio
+
+1. Crear cuenta en https://resend.com (plan Free: 3,000 emails/mes, suficiente para piloto)
+2. Ir a **Domains** → **Add Domain** → ingresar `promark.mx`
+3. Resend te da 3 DNS records (SPF, DKIM, MX). Agregarlos al DNS de promark.mx
+4. Esperar verificación (5-30 min)
+
+### 2. Generar API Key
+
+1. Dashboard Resend → **API Keys** → **Create API Key**
+2. Permisos: **Sending access** (no full access)
+3. Copiar el token (empieza con `re_...`)
+
+### 3. Variables Vercel
+
+| Variable | Valor |
+|---|---|
+| `RESEND_API_KEY` | el token `re_...` del paso 2 |
+| `RESEND_FROM_EMAIL` | `alertas@promark.mx` (debe coincidir con dominio verificado) |
+| `NEXT_PUBLIC_APP_URL` | `https://promark-ecosystems.vercel.app` (usado en los CTAs del email) |
+
+### 4. Redeploy
+
+Vercel necesita un redeploy para tomar las variables nuevas. Tras el redeploy, el próximo cron diario (`0 14 * * *` UTC) enviará emails reales.
+
+### 5. Trigger de prueba manual
+
+```bash
+curl https://promark-ecosystems.vercel.app/api/cron/check-alerts \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+Esperado:
+```json
+{ "ok": true, "rulesProcessed": 20, "alertsCreated": N, "emailsSent": M }
+```
+
+Si `emailsSent: 0` con alertas creadas, revisar:
+- ¿`tenant.config.notifications.notify_email` está seteado en el tenant?
+- ¿El dominio está verificado en Resend?
+- Logs en Vercel → Function Logs → buscar "sendAlertEmail" o "Resend"
+
+### Sin Resend
+
+Si `RESEND_API_KEY` no está configurado, `lib/alerts/email.ts` cae a logging — el cron sigue funcionando y crea alertas en DB, solo no manda emails. Útil para desarrollo local.
 
 ---
 
