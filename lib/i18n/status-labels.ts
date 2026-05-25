@@ -103,3 +103,19 @@ export const ALERT_ENTITY_TYPE_LABELS: Record<string, string> = {
   CONTRACT: 'Contrato',
   LICENSE: 'Licencia',
 };
+
+// BrandHistory change_type → user-visible label
+export const BRAND_CHANGE_TYPE_LABELS: Record<string, string> = {
+  CREATED: 'Marca creada',
+  UPDATED: 'Marca actualizada',
+  STATUS_CHANGED: 'Cambio de estado',
+  RENEWED: 'Marca renovada',
+  EXPIRED: 'Marca expirada',
+  CANCELLED: 'Marca cancelada',
+  REGISTERED: 'Marca registrada',
+  HOLDER_LINKED: 'Titular vinculado',
+  HOLDER_UNLINKED: 'Titular desvinculado',
+  CLASS_ADDED: 'Clase agregada',
+  CLASS_REMOVED: 'Clase removida',
+  DOCUMENT_ATTACHED: 'Documento adjuntado',
+};
