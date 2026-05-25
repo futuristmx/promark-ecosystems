@@ -5,6 +5,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { ALERT_ENTITY_TYPE_LABELS } from '@/lib/i18n/status-labels';
 
 interface ClientAlert {
   id: string;
@@ -83,7 +84,7 @@ export function ClientAlertsView({ tenantId, alerts: initial }: ClientAlertsView
                     <p className="text-sm font-medium text-slate-900">
                       {alert.entity_name}
                     </p>
-                    <p className="text-xs text-slate-500">{alert.entity_type}</p>
+                    <p className="text-xs text-slate-500">{ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}</p>
                   </div>
                   <Button
                     size="sm"
@@ -119,7 +120,7 @@ export function ClientAlertsView({ tenantId, alerts: initial }: ClientAlertsView
                 }</Badge>
                 <div className="flex-1">
                   <p className="text-sm text-slate-900">{alert.entity_name}</p>
-                  <p className="text-xs text-slate-500">{alert.entity_type}</p>
+                  <p className="text-xs text-slate-500">{ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}</p>
                 </div>
               </div>
             ))}

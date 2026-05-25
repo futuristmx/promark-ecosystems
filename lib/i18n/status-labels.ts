@@ -75,3 +75,31 @@ export const CONTRACT_CHANGE_TYPE_LABELS: Record<string, string> = {
   LICENSE_DERIVED: 'Licencia derivada',
   DOCUMENT_ATTACHED: 'Documento adjuntado',
 };
+
+export const BRAND_STATUS_LABELS: Record<string, string> = {
+  APPLIED: 'Solicitada',
+  REGISTERED: 'Registrada',
+  RENEWED: 'Renovada',
+  EXPIRED: 'Expirada',
+  ABANDONED: 'Abandonada',
+  CANCELLED: 'Cancelada',
+  OPPOSED: 'Impugnada',
+};
+
+export const BRAND_TYPE_LABELS: Record<string, string> = {
+  WORDMARK: 'Nominativa',
+  FIGURATIVE: 'Figurativa',
+  MIXED: 'Mixta',
+  THREE_D: 'Tridimensional',
+  SOUND: 'Sonora',
+  HOLOGRAPHIC: 'Holográfica',
+  OLFACTORY: 'Olfativa',
+};
+
+// Alert entity_type → user-visible label
+export const ALERT_ENTITY_TYPE_LABELS: Record<string, string> = {
+  BRAND: 'Marca',
+  DOCUMENT: 'Documento',
+  CONTRACT: 'Contrato',
+  LICENSE: 'Licencia',
+};
