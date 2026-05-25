@@ -65,12 +65,12 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
             Vigencias por vencer y eventos detectados en tu catálogo.
           </p>
         </div>
-        {session.role !== 'CLIENT_VIEWER' && (
-          <ExportMenu
-            endpoint={`/api/client/${tenantSlug}/alerts/export`}
-            hint="Exporta las alertas pendientes con plazo de vencimiento."
-          />
-        )}
+        {/* session.role ya está narrowed a 'CLIENT_ADMIN' | 'CLIENT_LEGAL_REP'
+            por el guard de VIEWER arriba; siempre mostrar el botón. */}
+        <ExportMenu
+          endpoint={`/api/client/${tenantSlug}/alerts/export`}
+          hint="Exporta las alertas pendientes con plazo de vencimiento."
+        />
       </div>
 
       <ClientAlertsView
