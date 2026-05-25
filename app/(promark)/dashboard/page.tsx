@@ -200,9 +200,10 @@ export default async function DashboardPage() {
         </DsCard>
       </div>
 
-      <div className="mt-10">
-        <RecentActivity items={activity} />
-      </div>
+      <RecentActivity
+        items={activity}
+        hint={`Últimos ${activity.length} eventos`}
+      />
     </div>
   );
 }

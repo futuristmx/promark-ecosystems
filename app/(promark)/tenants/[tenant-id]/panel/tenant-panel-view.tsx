@@ -125,9 +125,7 @@ export function TenantPanelView({
           <ImpiClassBar data={aggregates.impiClasses} />
         </DsCard>
 
-        <DsCard variant="standard">
-          <RecentActivity items={aggregates.recentActivity} />
-        </DsCard>
+        <RecentActivity items={aggregates.recentActivity} />
       </TabsContent>
 
       <TabsContent value="graph" className="pt-4">

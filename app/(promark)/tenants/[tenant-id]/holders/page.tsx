@@ -8,15 +8,13 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { HOLDER_STATUS_LABELS } from '@/lib/i18n/status-labels';
-import { PageTitle, EmptyState } from '@/components/ds';
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from '@/components/ui/table';
+  PageTitle,
+  EmptyState,
+  DsDataTable,
+  StatusBadge,
+} from '@/components/ds';
+import type { DsColumn } from '@/components/ds';
 
 interface HoldersPageProps {
   params: Promise<{ 'tenant-id': string }>;
@@ -111,69 +109,65 @@ export default function HoldersPage({ params }: HoldersPageProps) {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#3E6AE1]" />
-          </div>
-        ) : filteredHolders.length === 0 ? (
-          <div className="py-20 text-center">
-            <Users className="mx-auto mb-3 h-10 w-10 text-slate-300" />
-            <p className="text-sm font-medium text-slate-600">
-              Sin titulares registrados
-            </p>
-            <p className="mt-1 text-sm text-slate-400">
-              Crea un nuevo titular para comenzar.
-            </p>
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="px-4">Nombre</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>RFC</TableHead>
-                <TableHead>Estado</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredHolders.map((holder) => (
-                <TableRow
-                  key={holder.id}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    router.push(
-                      `/tenants/${tenantId}/holders/${holder.id}`
-                    )
-                  }
-                >
-                  <TableCell className="px-4 font-medium text-slate-900">
-                    {holder.name}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{holder.holder_type}</Badge>
-                  </TableCell>
-                  <TableCell className="text-slate-500">
-                    {holder.rfc || '-'}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        holder.status === 'ACTIVE'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-slate-100 text-slate-600'
-                      }`}
-                    >
-                      {HOLDER_STATUS_LABELS[holder.status] ?? holder.status}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+      <DsDataTable<HolderItem>
+        columns={[
+          {
+            key: 'name',
+            header: 'Nombre',
+            sortable: true,
+            cell: (h) => (
+              <strong className="text-slate-900">{h.name}</strong>
+            ),
+          },
+          {
+            key: 'holder_type',
+            header: 'Tipo',
+            sortable: true,
+            cell: (h) => <Badge variant="secondary">{h.holder_type}</Badge>,
+          },
+          {
+            key: 'rfc',
+            header: 'RFC',
+            cell: (h) => (
+              <span className="font-mono text-xs text-slate-500">
+                {h.rfc || '—'}
+              </span>
+            ),
+          },
+          {
+            key: 'status',
+            header: 'Estado',
+            cell: (h) => (
+              <StatusBadge
+                tone={h.status === 'ACTIVE' ? 'success' : 'muted'}
+                label={HOLDER_STATUS_LABELS[h.status] ?? h.status}
+              />
+            ),
+          },
+        ]}
+        rows={filteredHolders}
+        getRowId={(h) => h.id}
+        loading={loading}
+        empty={{
+          icon: <Users className="size-6" />,
+          title: 'Sin titulares registrados',
+          description: 'Crea un nuevo titular para comenzar.',
+          ...(canCreate && {
+            action: (
+              <Link
+                href={`/tenants/${tenantId}/holders/new`}
+                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+              >
+                <Plus className="size-4" />
+                Nuevo titular
+              </Link>
+            ),
+          }),
+        }}
+        onRowClick={(h) =>
+          router.push(`/tenants/${tenantId}/holders/${h.id}`)
+        }
+      />
     </div>
   );
 }
