@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma/client';
+import type { Prisma } from '@prisma/client';
 import { requirePromarkApiAuth, isErrorResponse } from '@/lib/auth/api-helpers';
 
 interface BrandingPatch {
@@ -89,8 +90,8 @@ export async function PATCH(
       data: {
         tenant_id: tenantId,
         version_number: versionCount + 1,
-        config_snapshot: currentConfig as object,
-        modules_snapshot: (tenant.active_modules ?? {}) as object,
+        config_snapshot: currentConfig as Prisma.InputJsonValue,
+        modules_snapshot: (tenant.active_modules ?? {}) as Prisma.InputJsonValue,
         status: 'DRAFT',
         pushed_at: new Date(),
         pushed_by: session.id,
@@ -101,7 +102,7 @@ export async function PATCH(
       where: { id: tenantId },
       data: {
         ...(body.name ? { name: body.name } : {}),
-        config: nextConfig,
+        config: nextConfig as Prisma.InputJsonValue,
       },
       select: { id: true, name: true, slug: true, config: true },
     });
