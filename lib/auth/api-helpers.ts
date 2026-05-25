@@ -93,7 +93,9 @@ export async function requireClientApiAuth(
             return [key, val.join('=')];
           })
         );
-        token = cookies['client-token'] || null;
+        // Cookie name must match what /api/auth/client-pin sets and
+        // lib/auth/client-session.ts reads ('promark-client-token').
+        token = cookies['promark-client-token'] || null;
       }
     }
 
