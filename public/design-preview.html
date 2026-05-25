@@ -459,9 +459,41 @@
       color: var(--text-soft);
       font-weight: 600;
     }
+
+    /* Theme switcher */
+    .theme-switcher {
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .theme-switcher a {
+      padding: 4px 12px;
+      border-radius: 999px;
+      color: var(--text-soft);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .theme-switcher a.active {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-header);
+    }
   </style>
 </head>
 <body>
+  <div class="theme-switcher">
+    <a href="design-preview.html" class="active">Dark</a>
+    <a href="design-preview-light.html">Light</a>
+  </div>
+
   <div class="page-shell">
 
     <!-- ───── SIDEBAR ───── -->
