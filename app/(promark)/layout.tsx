@@ -9,9 +9,9 @@ export default async function PromarkLayout({
   const session = await requirePromarkAuth();
 
   return (
-    <div className="flex h-full min-h-screen">
+    <div className="flex h-full min-h-screen bg-background">
       <PromarkSidebar userName={session.full_name} userRole={session.role} />
-      <main className="flex-1 overflow-y-auto bg-slate-50 p-8">
+      <main className="flex-1 overflow-y-auto px-10 py-8">
         {children}
       </main>
     </div>
