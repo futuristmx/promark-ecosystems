@@ -8,6 +8,16 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ds';
+import type { StatusTone } from '@/components/ds';
+
+const LICENSE_STATUS_TONE: Record<string, StatusTone> = {
+  ACTIVE: 'success',
+  DRAFT: 'muted',
+  EXPIRED: 'error',
+  TERMINATED: 'muted',
+  SUSPENDED: 'warning',
+};
 import { LICENSE_TYPE_LABELS, LICENSE_STATUS_LABELS } from '@/lib/i18n/status-labels';
 
 interface Props {
@@ -35,18 +45,25 @@ export default async function LicenseDetailPage({ params }: Props) {
         { label: 'Licencias', href: `/tenants/${tenantId}/licencias` },
         { label: license.licensee_name },
       ]} />
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0066FF]">
+            Licencia · {LICENSE_TYPE_LABELS[license.license_type]}
+          </p>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{license.licensee_name}</h1>
-            <Badge variant="secondary">{LICENSE_TYPE_LABELS[license.license_type]}</Badge>
-            <Badge>{LICENSE_STATUS_LABELS[license.status]}</Badge>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {license.licensee_name}
+            </h1>
+            <StatusBadge
+              tone={LICENSE_STATUS_TONE[license.status] ?? 'muted'}
+              label={LICENSE_STATUS_LABELS[license.status] ?? license.status}
+            />
           </div>
         </div>
         {canEdit && (
           <Link href={`/tenants/${tenantId}/licencias/${license.id}/editar`}
             className={buttonVariants({ variant: 'outline' })}>
-            <Pencil className="h-4 w-4" />Editar
+            <Pencil className="size-4" />Editar
           </Link>
         )}
       </div>

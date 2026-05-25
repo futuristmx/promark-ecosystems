@@ -10,6 +10,17 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { VigencyDot } from '@/components/vigency-badge';
 import { DocumentsPanel } from '@/components/documents-panel';
+import { StatusBadge } from '@/components/ds';
+import type { StatusTone } from '@/components/ds';
+
+const CONTRACT_STATUS_TONE: Record<string, StatusTone> = {
+  ACTIVE: 'success',
+  DRAFT: 'muted',
+  EXPIRED: 'error',
+  TERMINATED: 'muted',
+  RENEWED: 'success',
+  UNDER_REVIEW: 'warning',
+};
 import {
   CONTRACT_TYPE_LABELS, CONTRACT_STATUS_LABELS,
   CONTRACT_CHANGE_TYPE_LABELS,
@@ -111,29 +122,36 @@ export function ContractDetailView({ tenantId, userRole, contract: initial, avai
         { label: contract.title },
       ]} />
 
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0066FF]">
+            Contrato · {CONTRACT_TYPE_LABELS[contract.contract_type]}
+          </p>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">{contract.title}</h1>
-            <Badge variant="secondary">{CONTRACT_TYPE_LABELS[contract.contract_type]}</Badge>
-            <Badge>{CONTRACT_STATUS_LABELS[contract.status]}</Badge>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {contract.title}
+            </h1>
+            <StatusBadge
+              tone={CONTRACT_STATUS_TONE[contract.status] ?? 'muted'}
+              label={CONTRACT_STATUS_LABELS[contract.status] ?? contract.status}
+            />
           </div>
         </div>
         <div className="flex gap-2">
           {canWrite && contract.status !== 'TERMINATED' && (
             <Button variant="outline" onClick={terminateContract}>
-              <X className="h-4 w-4" />Terminar contrato
+              <X className="size-4" />Terminar
             </Button>
           )}
           {canWrite && (
             <Link href={`/tenants/${tenantId}/contratos/${contract.id}/editar`}
               className={buttonVariants({ variant: 'outline' })}>
-              <Pencil className="h-4 w-4" />Editar
+              <Pencil className="size-4" />Editar
             </Link>
           )}
           {canWrite && (
             <Button variant="outline" onClick={deleteContract}>
-              <Trash2 className="h-4 w-4" />Eliminar
+              <Trash2 className="size-4" />Eliminar
             </Button>
           )}
         </div>
