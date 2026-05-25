@@ -13,6 +13,7 @@ import {
   Bell,
   Scroll,
   KeyRound,
+  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -102,6 +103,11 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           href: `/tenants/${tenantId}/alerts`,
           label: 'Alertas',
           icon: <Bell className="h-4 w-4" />,
+        },
+        {
+          href: `/tenants/${tenantId}/actividad`,
+          label: 'Actividad',
+          icon: <Activity className="h-4 w-4" />,
         },
       ]
     : [];
