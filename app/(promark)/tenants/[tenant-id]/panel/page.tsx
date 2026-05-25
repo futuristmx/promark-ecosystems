@@ -4,6 +4,7 @@ import { requirePromarkAuth } from '@/lib/auth/promark';
 import { computeTenantAggregates } from '@/lib/dashboard/tenant-aggregates';
 import { computeTenantGraph } from '@/lib/dashboard/tenant-graph';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { PageTitle } from '@/components/ds';
 import { TenantPanelView } from './tenant-panel-view';
 
 interface PanelPageProps {
@@ -67,14 +68,12 @@ export default async function TenantPanelPage({ params }: PanelPageProps) {
         ]}
       />
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">
-          Panel — {tenant.name}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Indicadores, grafo relacional y estructura del cliente
-        </p>
-      </div>
+      <PageTitle
+        eyebrow="Cliente"
+        title={tenant.name}
+        subtitle="Indicadores, grafo relacional y estructura del cliente"
+      />
+
 
       <TenantPanelView
         tenantId={tenantId}

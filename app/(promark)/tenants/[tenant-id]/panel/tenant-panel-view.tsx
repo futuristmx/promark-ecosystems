@@ -2,8 +2,7 @@
 
 import { Tag, Clock, AlertTriangle, Scroll, Bell } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { KpiCard } from '@/components/dashboard/kpi-card';
-import { KpiGrid } from '@/components/dashboard/kpi-grid';
+import { KpiCard, KpiGrid, DsCard } from '@/components/ds';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { StatusDonut } from '@/components/dashboard/charts/status-donut';
 import { VigencyTimeline } from '@/components/dashboard/charts/vigency-timeline';
@@ -79,52 +78,56 @@ export function TenantPanelView({
       </TabsList>
 
       <TabsContent value="overview" className="space-y-6 pt-4">
-        {/* F11: grid responsive — 2 cols mobile, 3 cols tablet, 5 cols 2xl screens.
-            Antes lg:grid-cols-5 truncaba labels en pantallas estándar. */}
-        <KpiGrid className="grid-cols-2 md:grid-cols-3 2xl:grid-cols-5">
+        <KpiGrid>
           <KpiCard
             label="Total marcas"
             value={aggregates.totals.brands}
-            icon={<Tag className="h-4 w-4" />}
+            icon={<Tag className="size-4" />}
           />
           <KpiCard
             label="Por vencer (90d)"
             value={aggregates.totals.expiringSoon}
-            icon={<Clock className="h-4 w-4" />}
+            icon={<Clock className="size-4" />}
             tone="warning"
           />
           <KpiCard
             label="Vencidas"
             value={aggregates.totals.expired}
-            icon={<AlertTriangle className="h-4 w-4" />}
+            icon={<AlertTriangle className="size-4" />}
             tone="danger"
           />
           <KpiCard
             label="Contratos vigentes"
             value={aggregates.totals.activeContracts}
-            icon={<Scroll className="h-4 w-4" />}
+            icon={<Scroll className="size-4" />}
           />
-          {/* F10: label aclarado para distinguir del badge del sidebar.
-              El KPI cuenta PENDING <=30d. El sidebar cuenta TODAS las PENDING. */}
           <KpiCard
             label="Alertas próximas (30d)"
             value={aggregates.totals.criticalAlerts}
-            icon={<Bell className="h-4 w-4" />}
+            icon={<Bell className="size-4" />}
             tone={aggregates.totals.criticalAlerts > 0 ? 'danger' : 'default'}
           />
         </KpiGrid>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <StatusDonut data={donutData} title="Distribución por estado legal" />
-          <VigencyTimeline
-            data={aggregates.expirationsByMonth}
-            title="Vencimientos próximos (24 meses)"
-          />
+          <DsCard variant="standard">
+            <StatusDonut data={donutData} title="Distribución por estado legal" />
+          </DsCard>
+          <DsCard variant="standard">
+            <VigencyTimeline
+              data={aggregates.expirationsByMonth}
+              title="Vencimientos próximos (24 meses)"
+            />
+          </DsCard>
         </div>
 
-        <ImpiClassBar data={aggregates.impiClasses} />
+        <DsCard variant="standard">
+          <ImpiClassBar data={aggregates.impiClasses} />
+        </DsCard>
 
-        <RecentActivity items={aggregates.recentActivity} />
+        <DsCard variant="standard">
+          <RecentActivity items={aggregates.recentActivity} />
+        </DsCard>
       </TabsContent>
 
       <TabsContent value="graph" className="pt-4">
