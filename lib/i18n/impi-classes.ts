@@ -1,0 +1,55 @@
+// Catálogo abreviado de las 45 clases de Niza (estándar IMPI).
+// Descripciones cortas para mostrar en UI cuando el row de BrandClass
+// no trae class_description propia. Fuente: WIPO Nice Classification.
+
+export const NICE_CLASS_DESCRIPTIONS: Record<number, string> = {
+  1: 'Productos químicos',
+  2: 'Pinturas y barnices',
+  3: 'Cosméticos y aseo',
+  4: 'Aceites y combustibles',
+  5: 'Productos farmacéuticos',
+  6: 'Metales comunes',
+  7: 'Máquinas y herramientas eléctricas',
+  8: 'Herramientas manuales',
+  9: 'Electrónica y software',
+  10: 'Instrumentos médicos',
+  11: 'Aparatos de iluminación y refrigeración',
+  12: 'Vehículos',
+  13: 'Armas de fuego',
+  14: 'Joyería y relojería',
+  15: 'Instrumentos musicales',
+  16: 'Papelería y publicaciones',
+  17: 'Caucho y plásticos semielaborados',
+  18: 'Artículos de cuero y maletas',
+  19: 'Materiales de construcción no metálicos',
+  20: 'Muebles',
+  21: 'Utensilios de cocina y vidrio',
+  22: 'Cuerdas, redes, tiendas',
+  23: 'Hilos y fibras textiles',
+  24: 'Tejidos y telas',
+  25: 'Ropa, calzado, sombrerería',
+  26: 'Encajes, bordados, cierres',
+  27: 'Alfombras y tapetes',
+  28: 'Juegos y juguetes',
+  29: 'Carnes, pescados, lácteos',
+  30: 'Café, té, harinas, dulces',
+  31: 'Productos agrícolas y forestales',
+  32: 'Bebidas no alcohólicas',
+  33: 'Bebidas alcohólicas (excepto cervezas)',
+  34: 'Tabaco y artículos para fumadores',
+  35: 'Publicidad y gestión de negocios',
+  36: 'Servicios financieros y seguros',
+  37: 'Construcción y reparación',
+  38: 'Telecomunicaciones',
+  39: 'Transporte y almacenaje',
+  40: 'Tratamiento de materiales',
+  41: 'Educación y entretenimiento',
+  42: 'Servicios científicos y tecnológicos',
+  43: 'Servicios de comida y hospedaje',
+  44: 'Servicios médicos y de belleza',
+  45: 'Servicios jurídicos y de seguridad',
+};
+
+export function getNiceClassLabel(num: number): string {
+  return NICE_CLASS_DESCRIPTIONS[num] ?? `Clase ${num}`;
+}

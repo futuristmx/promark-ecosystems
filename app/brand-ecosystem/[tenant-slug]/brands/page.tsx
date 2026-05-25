@@ -134,7 +134,7 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Marcas</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Catalogo de marcas registradas.
+          Catálogo de marcas registradas.
           {filteredBrands.length > 0 && (
             <span className="ml-1 text-slate-400">
               ({filteredBrands.length} marca{filteredBrands.length !== 1 ? 's' : ''})
@@ -163,7 +163,7 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
                 <TableHead>Empresa</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>No. Registro</TableHead>
-                <TableHead>Expiracion</TableHead>
+                <TableHead>Expiración</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

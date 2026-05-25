@@ -20,6 +20,7 @@ import {
   Type,
 } from 'lucide-react';
 import { DocumentsPanel } from '@/components/documents-panel';
+import { getNiceClassLabel } from '@/lib/i18n/impi-classes';
 
 interface BrandDetailPageProps {
   params: Promise<{ 'tenant-slug': string; 'brand-id': string }>;
@@ -188,7 +189,11 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
           >
             {STATUS_LABELS[brand.legal_status] ?? brand.legal_status}
           </Badge>
-          <p className="mt-1 text-xs text-slate-400">{vigencyInfo.label}</p>
+          {/* G5: solo mostrar vigencyInfo si añade información (no duplica el badge) */}
+          {vigencyInfo.label &&
+            vigencyInfo.label !== STATUS_LABELS[brand.legal_status] && (
+              <p className="mt-1 text-xs text-slate-400">{vigencyInfo.label}</p>
+            )}
         </div>
       </div>
 
@@ -221,18 +226,24 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
         />
         <InfoCard
           icon={<Calendar className="size-4" />}
-          label="Fecha de expiracion"
+          label="Fecha de expiración"
           value={formatDate(brand.expiration_date)}
         />
-        <InfoCard
-          icon={<Building2 className="size-4" />}
-          label="Empresa"
-          value={brand.company.legal_name ?? brand.company.name}
-        />
+        {/* G4: Empresa ya está en el subtítulo del header (línea ~178);
+            omitir el InfoCard duplicado. Si el legal_name difiere del
+            display name, mostrarlo entonces para que tenga valor extra. */}
+        {brand.company.legal_name &&
+          brand.company.legal_name !== brand.company.name && (
+            <InfoCard
+              icon={<Building2 className="size-4" />}
+              label="Razón social"
+              value={brand.company.legal_name}
+            />
+          )}
         {brand.renewal_date && (
           <InfoCard
             icon={<Calendar className="size-4" />}
-            label="Fecha de renovacion"
+            label="Fecha de renovación"
             value={formatDate(brand.renewal_date)}
           />
         )}
@@ -242,7 +253,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
       {brand.description && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Descripcion</CardTitle>
+            <CardTitle>Descripción</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-slate-600">{brand.description}</p>
@@ -267,7 +278,8 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
                     {cls.class_number}
                   </span>
                   <span className="text-sm text-slate-600">
-                    {cls.class_description ?? 'Sin descripcion'}
+                    {cls.class_description ??
+                      getNiceClassLabel(cls.class_number)}
                   </span>
                 </div>
               ))}
