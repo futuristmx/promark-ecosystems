@@ -79,20 +79,22 @@ export function TenantPanelView({
       </TabsList>
 
       <TabsContent value="overview" className="space-y-6 pt-4">
-        <KpiGrid className="lg:grid-cols-5">
+        {/* F11: grid responsive — 2 cols mobile, 3 cols tablet, 5 cols 2xl screens.
+            Antes lg:grid-cols-5 truncaba labels en pantallas estándar. */}
+        <KpiGrid className="grid-cols-2 md:grid-cols-3 2xl:grid-cols-5">
           <KpiCard
             label="Total marcas"
             value={aggregates.totals.brands}
             icon={<Tag className="h-4 w-4" />}
           />
           <KpiCard
-            label="Marcas por vencer"
+            label="Por vencer (90d)"
             value={aggregates.totals.expiringSoon}
             icon={<Clock className="h-4 w-4" />}
             tone="warning"
           />
           <KpiCard
-            label="Marcas vencidas"
+            label="Vencidas"
             value={aggregates.totals.expired}
             icon={<AlertTriangle className="h-4 w-4" />}
             tone="danger"
@@ -102,8 +104,10 @@ export function TenantPanelView({
             value={aggregates.totals.activeContracts}
             icon={<Scroll className="h-4 w-4" />}
           />
+          {/* F10: label aclarado para distinguir del badge del sidebar.
+              El KPI cuenta PENDING <=30d. El sidebar cuenta TODAS las PENDING. */}
           <KpiCard
-            label="Alertas críticas"
+            label="Alertas próximas (30d)"
             value={aggregates.totals.criticalAlerts}
             icon={<Bell className="h-4 w-4" />}
             tone={aggregates.totals.criticalAlerts > 0 ? 'danger' : 'default'}
