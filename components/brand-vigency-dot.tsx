@@ -26,7 +26,7 @@ function getVigencyInfo(
   }
 
   if (!expirationDate) {
-    return { color: '#9ca3af', label: 'Sin fecha de expiracion' };
+    return { color: '#9ca3af', label: 'Sin fecha de expiración' };
   }
 
   const now = new Date();
