@@ -186,14 +186,101 @@ Para usar directamente como className cuando no se quiere importar un componente
 
 ---
 
+### `<DsDataTable>`
+
+Tabla premium con sort, empty state, loading, row actions integrados.
+
+```tsx
+import { DsDataTable, type DsColumn } from '@/components/ds';
+
+const columns: DsColumn<Brand>[] = [
+  { key: 'name', header: 'Marca', sortable: true, cell: (r) => <strong>{r.name}</strong> },
+  { key: 'status', header: 'Estado', cell: (r) => <StatusBadge tone="success" label={r.status} /> },
+];
+
+<DsDataTable
+  columns={columns}
+  rows={brands}
+  getRowId={(r) => r.id}
+  rowActions={[
+    { label: 'Ver', href: (r) => `/brands/${r.id}` },
+    { label: 'Eliminar', destructive: true, onClick: (r) => deleteBrand(r) },
+  ]}
+  empty={{ title: 'No hay marcas', icon: <Tag /> }}
+  loading={isLoading}
+/>
+```
+
+Props clave: `loading`, `empty.{title,description,icon,action}`, `rowActions[]`, `onRowClick`.
+
+### `<DsTimeline>`
+
+Timeline vertical premium para historiales (BrandHistory, ContractHistory, AuditLog).
+
+```tsx
+import { DsTimeline, type TimelineEvent } from '@/components/ds';
+
+const events: TimelineEvent[] = [
+  {
+    id: '1',
+    timestamp: '2026-05-25T10:00:00Z',
+    title: 'Marca registrada',
+    description: 'NortePremium aprobada por IMPI.',
+    actor: 'M. Cadena',
+    category: 'Marca',
+    tone: 'success',
+    href: '/brands/123',
+  },
+];
+
+<DsTimeline events={events} />
+```
+
+Tones disponibles: `active`, `success`, `warning`, `error`, `info`, `progress`, `muted`. Cada evento puede tener `href` (toda la card clickeable).
+
+### `<DsNodeCard>` + `<DsWorkflowCanvas>`
+
+Para visualizar flujos lineales (pipelines, agents, AI workflows).
+
+```tsx
+import { DsNodeCard, DsWorkflowCanvas } from '@/components/ds';
+
+<DsWorkflowCanvas
+  title="Pipeline de detección"
+  variant="horizontal"  // o "vertical"
+>
+  <DsNodeCard type="input"   title="Catálogo" subtitle="Supabase" />
+  <DsNodeCard type="process" title="Detector" subtitle="Cron" />
+  <DsNodeCard type="output"  title="Alertas"  subtitle="Resend" />
+</DsWorkflowCanvas>
+```
+
+**3 tipos visuales:**
+- `input` cyan — sources, datasets
+- `process` electric blue — agents, transformaciones
+- `output` orange — sinks, resultados
+
+Para flujos complejos (ramificaciones, drag-and-drop, ciclos), usar `@xyflow/react` directamente. `DsWorkflowCanvas` es para flujos editorial simples.
+
+---
+
+## Storybook / Ladle docs
+
+```bash
+npm run ds:dev     # Levanta Ladle local en http://localhost:61000
+npm run ds:build   # Build estático en /build
+```
+
+Stories en `src/stories/*.stories.tsx`. Cada componente DS tiene su propio archivo con variantes y ejemplos en contexto. Recomendado correr Ladle al desarrollar nuevos componentes para iterar visualmente sin la app completa.
+
+---
+
 ## Roadmap
 
 Pendientes para futuras olas:
 
-- [ ] `<PromptBox>` para inputs AI
-- [ ] `<DataTable>` premium (sobre `<Table>` shadcn)
-- [ ] `<Timeline>` para historiales
-- [ ] `<NodeCard>` para canvas / workflows
+- [ ] `<PromptBox>` para inputs AI con gradient atmospheric
 - [ ] Dark mode toggle (paleta dark ya en `globals.css` bajo `.dark`)
-- [ ] Storybook con todos los componentes
-- [ ] Visual regression tests
+- [ ] Visual regression tests con Chromatic o Percy
+- [ ] Sistema de iconos custom Promark (jaguar)
+- [ ] `<DataTable>` con paginación server-side
