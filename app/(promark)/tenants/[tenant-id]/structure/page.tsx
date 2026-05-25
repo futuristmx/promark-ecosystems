@@ -6,6 +6,7 @@ import { requirePromarkAuth } from '@/lib/auth/promark';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
+import { PageTitle, EmptyState } from '@/components/ds';
 import {
   HOLDING_STATUS_LABELS,
   COMPANY_STATUS_LABELS,
@@ -60,25 +61,22 @@ export default async function StructurePage({ params }: StructurePageProps) {
         ]}
       />
 
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Estructura Corporativa
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Holdings, empresas y distribución de marcas de {tenant.name}
-          </p>
-        </div>
-        {canEdit && (
-          <Link
+      <PageTitle
+        eyebrow="Cliente"
+        title="Estructura Corporativa"
+        subtitle={`Holdings, empresas y distribución de marcas de ${tenant.name}.`}
+        actions={
+          canEdit ? (
+            <Link
               href={`/tenants/${tenantId}/structure?action=new-holding`}
-              className={buttonVariants()}
+              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
               Nuevo Holding
-          </Link>
-        )}
-      </div>
+            </Link>
+          ) : null
+        }
+      />
 
       {holdings.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">

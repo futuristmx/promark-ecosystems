@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma/client';
 import { type Alert } from '@prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { PageTitle } from '@/components/ds';
 import { AlertsView } from './alerts-view';
 
 interface AlertsPageProps {
@@ -50,12 +51,11 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
         ]}
       />
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Centro de Alertas</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Vigencias, vencimientos y eventos detectados automáticamente.
-        </p>
-      </div>
+      <PageTitle
+        eyebrow="Cliente"
+        title="Centro de Alertas"
+        subtitle="Vigencias, vencimientos y eventos detectados automáticamente."
+      />
 
       <AlertsView
         tenantId={tenantId}
