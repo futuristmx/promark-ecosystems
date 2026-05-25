@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { Users, Tag, Scroll, Bell } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
-import { KpiCard } from '@/components/dashboard/kpi-card';
-import { KpiGrid } from '@/components/dashboard/kpi-grid';
+import { PageTitle, KpiCard, KpiGrid, DsCard, EmptyState } from '@/components/ds';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { StatusDonut } from '@/components/dashboard/charts/status-donut';
 import { TopTenantsBar } from '@/components/dashboard/charts/top-tenants-bar';
@@ -134,78 +133,76 @@ export default async function DashboardPage() {
 
   if (allEmpty) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Bienvenido, {session.full_name}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Vista general de todos los clientes
-          </p>
-        </div>
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-12 text-center">
-          <p className="text-base font-medium text-slate-700">
-            Sin datos disponibles aún
-          </p>
-          <p className="mt-2 text-sm text-slate-500">
-            Comienza creando tu primer cliente para registrar marcas, contratos y alertas.
-          </p>
-          <Link
-            href="/tenants"
-            className="mt-4 inline-flex items-center rounded-md bg-[#3E6AE1] px-4 py-2 text-sm font-medium text-white hover:bg-[#3458bd]"
-          >
-            Crear primera marca
-          </Link>
-        </div>
+      <div>
+        <PageTitle
+          eyebrow="Panel ejecutivo"
+          title={`Bienvenido, ${session.full_name}`}
+          subtitle="Vista general de todos los clientes"
+        />
+        <EmptyState
+          icon={<Users className="size-6" />}
+          title="Sin datos disponibles aún"
+          description="Comienza creando tu primer cliente para registrar marcas, contratos y alertas."
+          action={
+            <Link
+              href="/tenants/new"
+              className="ds-btn-primary inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium"
+            >
+              + Crear primer cliente
+            </Link>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">
-          Bienvenido, {session.full_name}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Vista general de todos los clientes
-        </p>
-      </div>
+    <div>
+      <PageTitle
+        eyebrow="Panel ejecutivo"
+        title={`Bienvenido, ${session.full_name}`}
+        subtitle="Vista general de todos los clientes"
+      />
 
       <KpiGrid>
         <KpiCard
           label="Clientes activos"
           value={totalTenants}
-          icon={<Users className="h-4 w-4" />}
+          icon={<Users className="size-4" />}
         />
         <KpiCard
           label="Total de marcas"
           value={totalBrands}
-          icon={<Tag className="h-4 w-4" />}
-          tone="success"
+          icon={<Tag className="size-4" />}
         />
         <KpiCard
           label="Contratos vigentes"
           value={activeContracts}
-          icon={<Scroll className="h-4 w-4" />}
+          icon={<Scroll className="size-4" />}
         />
         <KpiCard
           label="Alertas críticas"
           value={pendingAlerts}
-          icon={<Bell className="h-4 w-4" />}
+          icon={<Bell className="size-4" />}
           tone={pendingAlerts > 0 ? 'danger' : 'default'}
         />
       </KpiGrid>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <StatusDonut
-          data={statusDistribution}
-          title="Distribución por estado legal"
-        />
-        <TopTenantsBar data={topTenants} />
+      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <DsCard variant="standard">
+          <StatusDonut
+            data={statusDistribution}
+            title="Distribución por estado legal"
+          />
+        </DsCard>
+        <DsCard variant="standard">
+          <TopTenantsBar data={topTenants} />
+        </DsCard>
       </div>
 
-      <RecentActivity items={activity} />
+      <div className="mt-10">
+        <RecentActivity items={activity} />
+      </div>
     </div>
   );
 }
