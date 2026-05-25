@@ -54,9 +54,10 @@ export default async function ActivityPage({ params, searchParams }: Props) {
           select: {
             id: true,
             change_type: true,
-            summary: true,
+            event_type: true,
+            description: true,
             created_at: true,
-            changed_by_user_type: true,
+            actor_type: true,
             brand: { select: { id: true, name: true } },
           },
         });
@@ -99,12 +100,12 @@ export default async function ActivityPage({ params, searchParams }: Props) {
     ...brandHistory.map((h) => ({
       id: `bh-${h.id}`,
       timestamp: h.created_at.toISOString(),
-      actorType: h.changed_by_user_type,
+      actorType: h.actor_type,
       entityType: 'BRAND' as const,
       entityId: h.brand.id,
       entityName: h.brand.name,
-      action: h.change_type,
-      summary: h.summary,
+      action: h.change_type ?? h.event_type,
+      summary: h.description,
       href: `/tenants/${tenantId}/brands/${h.brand.id}`,
     })),
     ...contractHistory.map((h) => ({
