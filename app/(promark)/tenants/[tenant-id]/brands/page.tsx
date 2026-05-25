@@ -8,6 +8,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { VigencyBadge, VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { BRAND_STATUS_LABELS } from '@/lib/i18n/status-labels';
 import {
   Table,
   TableHeader,
@@ -211,7 +212,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
           <option value="">Todos los estados</option>
           {LEGAL_STATUSES.map((s) => (
             <option key={s} value={s}>
-              {s}
+              {BRAND_STATUS_LABELS[s] ?? s}
             </option>
           ))}
         </select>
@@ -295,7 +296,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${getLegalStatusColor(brand.legal_status)}`}
                     >
-                      {brand.legal_status}
+                      {BRAND_STATUS_LABELS[brand.legal_status] ?? brand.legal_status}
                     </span>
                   </TableCell>
                   <TableCell className="text-slate-500">

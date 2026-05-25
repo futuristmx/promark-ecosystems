@@ -14,6 +14,7 @@ interface ClientSidebarProps {
   userName: string;
   userRoleLabel: string | null;
   showContracts?: boolean;
+  showAlerts?: boolean;
 }
 
 interface NavItem {
@@ -31,6 +32,7 @@ export function ClientSidebar({
   userName,
   userRoleLabel,
   showContracts = false,
+  showAlerts = true,
 }: ClientSidebarProps) {
   const pathname = usePathname();
   const basePath = `/brand-ecosystem/${tenantSlug}`;
@@ -53,7 +55,7 @@ export function ClientSidebar({
   const navItems: NavItem[] = [
     { label: 'Panel', href: `${basePath}/panel`, icon: LayoutDashboard },
     { label: 'Marcas', href: `${basePath}/brands`, icon: Tag },
-    { label: 'Alertas', href: `${basePath}/alerts`, icon: Bell },
+    ...(showAlerts ? [{ label: 'Alertas', href: `${basePath}/alerts`, icon: Bell }] : []),
     { label: 'Documentos', href: `${basePath}/documents`, icon: FileText },
     ...(showContracts ? [{ label: 'Contratos', href: `${basePath}/contratos`, icon: ScrollText }] : []),
   ];
