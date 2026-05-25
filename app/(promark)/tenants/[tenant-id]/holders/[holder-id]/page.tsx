@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { VigencyDot } from '@/components/vigency-badge';
-import { buttonVariants } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ds';
 import { Badge } from '@/components/ui/badge';
 import { HOLDER_STATUS_LABELS } from '@/lib/i18n/status-labels';
 import {
@@ -64,31 +64,28 @@ export default async function HolderDetailPage({
       />
 
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0066FF]">
+            Titular · {holder.holder_type}
+          </p>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
               {holder.name}
             </h1>
-            <Badge variant="secondary">{holder.holder_type}</Badge>
-            <span
-              className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                holder.status === 'ACTIVE'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-slate-100 text-slate-600'
-              }`}
-            >
-              {HOLDER_STATUS_LABELS[holder.status] ?? holder.status}
-            </span>
+            <StatusBadge
+              tone={holder.status === 'ACTIVE' ? 'success' : 'muted'}
+              label={HOLDER_STATUS_LABELS[holder.status] ?? holder.status}
+            />
           </div>
         </div>
         {canEdit && (
           <Link
-              href={`/tenants/${tenantId}/holders/${holder.id}?action=edit`}
-              className={buttonVariants({ variant: "outline" })}
-            >
-              <Pencil className="h-4 w-4" />
-              Editar
+            href={`/tenants/${tenantId}/holders/${holder.id}?action=edit`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <Pencil className="size-4" />
+            Editar
           </Link>
         )}
       </div>

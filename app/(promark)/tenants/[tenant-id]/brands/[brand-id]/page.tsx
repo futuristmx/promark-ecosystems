@@ -108,24 +108,33 @@ export default async function BrandDetailPage({
         ]}
       />
 
-      {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
+      {/* Header con eyebrow + nombre + meta */}
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0066FF]">
+            Marca · {brand.company.name}
+          </p>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">{brand.name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {brand.name}
+            </h1>
             <VigencyBadge
               expirationDate={brand.expiration_date}
               legalStatus={brand.legal_status}
             />
           </div>
-          <p className="mt-1 text-sm text-slate-500">
-            {brand.company.name} &middot; {brand.brand_type}
+          <p className="mt-1.5 text-sm text-slate-500">
+            {brand.brand_type}
+            {brand.registration_number && ` · No. ${brand.registration_number}`}
           </p>
         </div>
         {canEdit && (
-          <Link href={`/tenants/${tenantId}/brands/${brand.id}/edit`} className={buttonVariants()}>
-              <Pencil className="h-4 w-4" />
-              Editar marca
+          <Link
+            href={`/tenants/${tenantId}/brands/${brand.id}/edit`}
+            className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+          >
+            <Pencil className="size-4" />
+            Editar marca
           </Link>
         )}
       </div>
