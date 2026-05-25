@@ -106,7 +106,7 @@ export async function GET(
       rows,
       { title: `${tenant.name} — Contratos vigentes (${todayLabel})` }
     );
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -128,7 +128,7 @@ export async function GET(
     ],
     rows,
   });
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(buffer), {
     status: 200,
     headers: {
       'Content-Type': 'application/pdf',
