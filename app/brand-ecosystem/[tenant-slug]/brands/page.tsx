@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { BrandFilters } from './brand-filters';
+import { ExportMenu } from '@/components/export-menu';
 import type { LegalStatus } from '@prisma/client';
 
 interface BrandsPageProps {
@@ -131,16 +132,22 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
   return (
     <div className="px-6 py-6">
       {/* Page header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Marcas</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Catálogo de marcas registradas.
-          {filteredBrands.length > 0 && (
-            <span className="ml-1 text-slate-400">
-              ({filteredBrands.length} marca{filteredBrands.length !== 1 ? 's' : ''})
-            </span>
-          )}
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Marcas</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Catálogo de marcas registradas.
+            {filteredBrands.length > 0 && (
+              <span className="ml-1 text-slate-400">
+                ({filteredBrands.length} marca{filteredBrands.length !== 1 ? 's' : ''})
+              </span>
+            )}
+          </p>
+        </div>
+        <ExportMenu
+          endpoint={`/api/client/${tenantSlug}/brands/export`}
+          hint="Descarga el catálogo completo según tus permisos."
+        />
       </div>
 
       {/* Filters */}
