@@ -105,7 +105,7 @@ export async function GET(
       { title: `${tenant.name} — Catálogo de Marcas (${todayLabel})` }
     );
 
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -131,7 +131,7 @@ export async function GET(
     rows,
   });
 
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(buffer), {
     status: 200,
     headers: {
       'Content-Type': 'application/pdf',
