@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Tag, FileText, ScrollText, Bell, LayoutDashboard } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Tag, FileText, ScrollText, Bell, LayoutDashboard, LogOut } from 'lucide-react';
 
 interface ClientSidebarProps {
   tenantSlug: string;
@@ -35,7 +36,20 @@ export function ClientSidebar({
   showAlerts = true,
 }: ClientSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const basePath = `/brand-ecosystem/${tenantSlug}`;
+
+  async function handleLogout() {
+    try {
+      await fetch('/api/auth/client-pin/logout', { method: 'POST' });
+    } catch {
+      /* aún sin red, limpia cookie manualmente abajo */
+    }
+    // Borrar cookie del lado cliente por si el endpoint falla.
+    document.cookie = 'promark-client-token=; path=/; max-age=0; SameSite=Lax';
+    router.push(`/brand-ecosystem/${tenantSlug}/login`);
+    router.refresh();
+  }
 
   const [pendingAlerts, setPendingAlerts] = useState<number>(0);
 
@@ -128,14 +142,27 @@ export function ClientSidebar({
         </ul>
       </nav>
 
-      {/* User info footer */}
+      {/* User info footer + logout */}
       <div className="border-t border-slate-200 px-4 py-3">
-        <p className="truncate text-sm font-medium text-slate-900">
-          {userName}
-        </p>
-        {userRoleLabel && (
-          <p className="text-xs text-slate-500">{userRoleLabel}</p>
-        )}
+        <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-slate-900">
+              {userName}
+            </p>
+            {userRoleLabel && (
+              <p className="text-xs text-slate-500">{userRoleLabel}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Cerrar sesión"
+            aria-label="Cerrar sesión"
+            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          >
+            <LogOut className="size-4" />
+          </button>
+        </div>
       </div>
     </aside>
   );
