@@ -4,44 +4,88 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Promark® Design System — Light v2
+
+   Paleta canónica: ver public/design-preview-light.html para mockup.
+   - bg-app:      #FAFBFC (off-white)
+   - bg-card:     #EDEFF3 (gris azulado claro — cards "asentadas")
+   - accent-blue: #2C3445 (navy estructural)
+   - accent-electric: #0066FF (CTAs, focus, active states)
+   - text-header: #0A0E15
+
+   Tokens shadcn (--primary, --background, etc) mapean a la paleta light v2
+   para que todos los componentes ui/* hereden automáticamente.
+   ───────────────────────────────────────────────────────────────────────── */
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   /* Font stack del design system: DM Sans (primaria) -> Open Sans (fallback)
      -> Manrope (fallback) -> sistema. next/font cubre antialiasing y swap. */
   --font-sans: var(--font-dm-sans), var(--font-open-sans), var(--font-manrope),
                -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-dm-sans), var(--font-open-sans), var(--font-manrope), sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+
+  /* ── Color tokens shadcn (mapean al design system) ── */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Design system semantic tokens (uso directo en componentes ds/*) ── */
+  --color-accent-blue: var(--ds-accent-blue);
+  --color-accent-electric: var(--ds-accent-electric);
+  --color-accent-cyan: var(--ds-accent-cyan);
+  --color-accent-pink: var(--ds-accent-pink);
+  --color-accent-orange: var(--ds-accent-orange);
+
+  --color-status-active: var(--ds-status-active);
+  --color-status-progress: var(--ds-status-progress);
+  --color-status-success: var(--ds-status-success);
+  --color-status-warning: var(--ds-status-warning);
+  --color-status-error: var(--ds-status-error);
+  --color-status-muted: var(--ds-status-muted);
+
+  --color-text-header: var(--ds-text-header);
+  --color-text-body: var(--ds-text-body);
+  --color-text-muted: var(--ds-text-muted);
+  --color-text-soft: var(--ds-text-soft);
+
+  --color-bg-app: var(--ds-bg-app);
+  --color-bg-sidebar: var(--ds-bg-sidebar);
+  --color-bg-panel: var(--ds-bg-panel);
+  --color-bg-card: var(--ds-bg-card);
+  --color-bg-card-soft: var(--ds-bg-card-soft);
+  --color-bg-input: var(--ds-bg-input);
+
+  /* ── Radius ── */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,75 +93,124 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── Shadows (clave en light mode) ── */
+  --shadow-ds-sm: 0 1px 2px rgba(10, 14, 21, 0.04), 0 1px 3px rgba(10, 14, 21, 0.05);
+  --shadow-ds-md: 0 4px 6px rgba(10, 14, 21, 0.04), 0 2px 4px rgba(10, 14, 21, 0.03);
+  --shadow-ds-lg: 0 10px 15px rgba(10, 14, 21, 0.06), 0 4px 6px rgba(10, 14, 21, 0.04);
+  --shadow-ds-xl: 0 20px 25px rgba(10, 14, 21, 0.08), 0 8px 10px rgba(10, 14, 21, 0.04);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* ── Design system base palette ── */
+  --ds-text-header: #0A0E15;
+  --ds-text-body:   #1A2030;
+  --ds-text-muted:  #4E576A;
+  --ds-text-soft:   #8892A0;
+
+  --ds-bg-app:       #FAFBFC;
+  --ds-bg-sidebar:   #FFFFFF;
+  --ds-bg-panel:     #FFFFFF;
+  --ds-bg-card:      #EDEFF3;
+  --ds-bg-card-soft: #E4E8EE;
+  --ds-bg-input:     #FFFFFF;
+
+  --ds-accent-blue:     #2C3445;   /* navy estructural */
+  --ds-accent-electric: #0066FF;   /* electric blue — CTAs */
+  --ds-accent-cyan:     #0284C7;
+  --ds-accent-pink:     #DB2777;
+  --ds-accent-orange:   #EA580C;
+
+  --ds-status-active:   #0066FF;
+  --ds-status-progress: #2C3445;
+  --ds-status-success:  #16A34A;
+  --ds-status-warning:  #EA580C;
+  --ds-status-error:    #DC2626;
+  --ds-status-muted:    #8892A0;
+
+  /* ── Shadcn semantic tokens (mapean a la paleta) ── */
+  --background: #FAFBFC;
+  --foreground: #1A2030;
+  --card: #EDEFF3;
+  --card-foreground: #0A0E15;
+  --popover: #FFFFFF;
+  --popover-foreground: #0A0E15;
+  --primary: #0066FF;            /* electric blue para botones primarios */
+  --primary-foreground: #FFFFFF;
+  --secondary: #E4E8EE;          /* bg-card-soft */
+  --secondary-foreground: #2C3445;
+  --muted: #EDEFF3;
+  --muted-foreground: #4E576A;
+  --accent: #E4E8EE;
+  --accent-foreground: #2C3445;
+  --destructive: #DC2626;
+  --border: rgba(10, 14, 21, 0.10);
+  --input: rgba(10, 14, 21, 0.10);
+  --ring: #0066FF;
+
+  /* Chart palette para Recharts — usa accents del design system */
+  --chart-1: #0066FF;            /* electric */
+  --chart-2: #2C3445;            /* navy */
+  --chart-3: #0284C7;            /* cyan */
+  --chart-4: #EA580C;            /* orange */
+  --chart-5: #16A34A;            /* success */
+
+  /* Sidebar slot (Promark side — white premium) */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1A2030;
+  --sidebar-primary: #0066FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(0, 102, 255, 0.08);
+  --sidebar-accent-foreground: #0066FF;
+  --sidebar-border: rgba(10, 14, 21, 0.06);
+  --sidebar-ring: #0066FF;
 }
 
+/* ── Dark mode (Promark internal command center variant) ──
+   Mantiene la paleta del mockup dark — se puede activar con html.dark.
+   Por ahora solo light está activo por default. */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --ds-text-header: #FFFFFF;
+  --ds-text-body:   #E0E4EB;
+  --ds-text-muted:  #BFC6D4;
+  --ds-text-soft:   #667085;
+
+  --ds-bg-app:       #0A0E15;
+  --ds-bg-sidebar:   #11151C;
+  --ds-bg-panel:     #161A22;
+  --ds-bg-card:      #181D26;
+  --ds-bg-card-soft: #212631;
+  --ds-bg-input:     #121720;
+
+  --background: #0A0E15;
+  --foreground: #E0E4EB;
+  --card: #181D26;
+  --card-foreground: #FFFFFF;
+  --popover: #181D26;
+  --popover-foreground: #FFFFFF;
+  --primary: #0066FF;
+  --primary-foreground: #FFFFFF;
+  --secondary: #212631;
+  --secondary-foreground: #E0E4EB;
+  --muted: #212631;
+  --muted-foreground: #BFC6D4;
+  --accent: #212631;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --border: rgba(224, 228, 235, 0.10);
+  --input: rgba(224, 228, 235, 0.10);
+  --ring: #0066FF;
+
+  --sidebar: #11151C;
+  --sidebar-foreground: #E0E4EB;
+  --sidebar-primary: #0066FF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(109, 93, 251, 0.16);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(224, 228, 235, 0.10);
+  --sidebar-ring: #0066FF;
 }
 
 @layer base {
@@ -126,8 +219,91 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
   }
   html {
     @apply font-sans;
+  }
+
+  /* Headings con tracking apretado para el feel premium */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+  h1 { letter-spacing: -0.025em; }
+}
+
+/* ─── Design system component classes ─────────────────────────────────
+   Usadas por components/ds/* para variantes que no son shadcn primitives.
+   Apply via @apply en componentes o directamente como className.
+   ─────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  /* Premium card: gradient navy (top-left) + electric blue (bottom-right) */
+  .ds-card-premium {
+    background:
+      radial-gradient(circle at top left, rgba(44, 52, 69, 0.18), transparent 45%),
+      radial-gradient(circle at bottom right, rgba(0, 102, 255, 0.10), transparent 50%),
+      var(--ds-bg-card);
+    border: 1px solid rgba(10, 14, 21, 0.12);
+    border-radius: 1.5rem;
+    padding: 1.75rem;
+  }
+
+  /* Atmospheric card: gradients pink + orange + electric (AI/highlight) */
+  .ds-card-atmospheric {
+    background:
+      radial-gradient(circle at bottom left, rgba(219, 39, 119, 0.10), transparent 40%),
+      radial-gradient(circle at bottom center, rgba(234, 88, 12, 0.08), transparent 36%),
+      radial-gradient(circle at right center, rgba(0, 102, 255, 0.10), transparent 40%),
+      var(--ds-bg-card);
+    border: 1px solid rgba(10, 14, 21, 0.12);
+    border-radius: 1.5rem;
+    padding: 1.75rem;
+  }
+
+  /* Card estándar (flat, sin gradient) */
+  .ds-card {
+    background: var(--ds-bg-card);
+    border: 1px solid rgba(10, 14, 21, 0.06);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    transition: all 220ms ease-out;
+  }
+  .ds-card:hover {
+    background: var(--ds-bg-card-soft);
+    border-color: rgba(10, 14, 21, 0.12);
+  }
+
+  /* Botón primario electric (gradient navy → electric blue) */
+  .ds-btn-primary {
+    background: linear-gradient(135deg, var(--ds-accent-blue), var(--ds-accent-electric));
+    color: #FFFFFF;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 2px rgba(0, 102, 255, 0.28);
+    transition: all 220ms ease-out;
+  }
+  .ds-btn-primary:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 6px 16px rgba(0, 102, 255, 0.32);
+    transform: translateY(-1px);
+  }
+
+  /* Label uppercase pequeño (para títulos de sección y kpi labels) */
+  .ds-label-uc {
+    font-size: 0.6875rem;       /* 11px */
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ds-text-soft);
+    font-weight: 600;
+  }
+
+  /* Status dot (genérico — usa color via inline style o variant class) */
+  .ds-status-dot {
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    margin-right: 0.375rem;
+    background: currentColor;
   }
 }
