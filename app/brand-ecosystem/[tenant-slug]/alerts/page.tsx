@@ -2,6 +2,7 @@ import type { Prisma, Alert } from '@prisma/client';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
 import { ClientAlertsView } from './client-alerts-view';
+import { ExportMenu } from '@/components/export-menu';
 
 interface ClientAlertsPageProps {
   params: Promise<{ 'tenant-slug': string }>;
@@ -57,11 +58,19 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
 
   return (
     <div className="px-6 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Alertas</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Vigencias por vencer y eventos detectados en tu catálogo.
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Alertas</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Vigencias por vencer y eventos detectados en tu catálogo.
+          </p>
+        </div>
+        {session.role !== 'CLIENT_VIEWER' && (
+          <ExportMenu
+            endpoint={`/api/client/${tenantSlug}/alerts/export`}
+            hint="Exporta las alertas pendientes con plazo de vencimiento."
+          />
+        )}
       </div>
 
       <ClientAlertsView

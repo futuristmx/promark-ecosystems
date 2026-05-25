@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
 import { CONTRACT_TYPE_LABELS, CONTRACT_STATUS_LABELS } from '@/lib/i18n/status-labels';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { ExportMenu } from '@/components/export-menu';
 
 interface ContractItem {
   id: string;
@@ -32,8 +33,19 @@ export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-bold text-slate-900">Contratos</h1>
-      <p className="mb-6 text-sm text-slate-500">{contracts.length} contrato{contracts.length !== 1 && 's'} vigente{contracts.length !== 1 && 's'}</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Contratos</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {contracts.length} contrato{contracts.length !== 1 && 's'} vigente
+            {contracts.length !== 1 && 's'}
+          </p>
+        </div>
+        <ExportMenu
+          endpoint={`/api/client/${tenantSlug}/contracts/export`}
+          hint="Exporta contratos vigentes y marcas vinculadas."
+        />
+      </div>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         {loading ? (
