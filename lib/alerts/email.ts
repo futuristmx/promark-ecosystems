@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { ALERT_ENTITY_TYPE_LABELS } from '@/lib/i18n/status-labels';
 
 export interface AlertEmailParams {
   to: string;
@@ -7,6 +8,7 @@ export interface AlertEmailParams {
   expiryDate: Date;
   daysRemaining: number;
   portalUrl: string;
+  tenantName?: string;
 }
 
 function isExpired(days: number): boolean {
@@ -57,8 +59,12 @@ function buildHtml(p: AlertEmailParams): string {
                 </tr>
                 <tr>
                   <td style="padding:8px 0;font-size:13px;color:#64748b;">Tipo</td>
-                  <td style="padding:8px 0;font-size:13px;color:#0f172a;font-weight:500;">${p.entityType}</td>
+                  <td style="padding:8px 0;font-size:13px;color:#0f172a;font-weight:500;">${ALERT_ENTITY_TYPE_LABELS[p.entityType] ?? p.entityType}</td>
                 </tr>
+                ${p.tenantName ? `<tr>
+                  <td style="padding:8px 0;font-size:13px;color:#64748b;">Cliente</td>
+                  <td style="padding:8px 0;font-size:13px;color:#0f172a;font-weight:500;">${p.tenantName}</td>
+                </tr>` : ''}
                 <tr>
                   <td style="padding:8px 0;font-size:13px;color:#64748b;">Vencimiento</td>
                   <td style="padding:8px 0;font-size:13px;color:#0f172a;font-weight:500;">${p.expiryDate.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</td>

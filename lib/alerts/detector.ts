@@ -199,19 +199,26 @@ export async function runAlertDetector(): Promise<DetectorResult> {
             // Resolve notify_email recipient from tenant config
             const tenantConfig = await prisma.tenant.findUnique({
               where: { id: rule.tenant_id },
-              select: { config: true, slug: true },
+              select: { config: true, slug: true, name: true },
             });
             const cfg = tenantConfig?.config as
               | { notifications?: { notify_email?: string | null } }
               | undefined;
             const recipient = cfg?.notifications?.notify_email;
             const slug = tenantConfig?.slug ?? '';
+            const tenantName = tenantConfig?.name ?? undefined;
 
             if (recipient) {
               const daysRemaining = Math.ceil(
                 (candidate.expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
               );
-              const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/brand-ecosystem/${slug}/${rule.entity_type === 'BRAND' ? 'brands' : 'documents'}/${candidate.id}`;
+              // Map entity_type -> portal sub-route. Contracts use Spanish path
+              // (sprint-6 convention); brands and documents use English.
+              const entityPath =
+                rule.entity_type === 'BRAND' ? 'brands'
+                  : rule.entity_type === 'CONTRACT' ? 'contratos'
+                    : 'documents';
+              const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/brand-ecosystem/${slug}/${entityPath}/${candidate.id}`;
               const emailResult = await sendAlertEmail({
                 to: recipient,
                 entityName: candidate.name,
@@ -219,6 +226,7 @@ export async function runAlertDetector(): Promise<DetectorResult> {
                 expiryDate: candidate.expiry,
                 daysRemaining,
                 portalUrl,
+                tenantName,
               });
               if (emailResult.sent) {
                 result.emailsSent++;
