@@ -195,8 +195,59 @@ export async function POST(
         errors.push(`Fila ${i + 2}: ${(e as Error).message}`);
       }
     }
+  } else if (type === 'brands') {
+    const nameIdx = headers.indexOf('nombre');
+    const companyIdx = headers.indexOf('empresa');
+    const idIdx = headers.indexOf('id');
+    if (nameIdx < 0 || companyIdx < 0) {
+      return NextResponse.json({ error: 'Columnas requeridas: nombre, empresa' }, { status: 400 });
+    }
+    // Pre-fetch companies map
+    const companies = await prisma.company.findMany({ where: { tenant_id: tenantId }, select: { id: true, name: true } });
+    const companyMap = new Map(companies.map((c) => [c.name.toLowerCase(), c.id]));
+
+    const VALID_LEGAL: Set<string> = new Set(['APPLIED','PUBLISHED','REGISTERED','RENEWED','EXPIRED','CANCELLED','OPPOSED','IN_LITIGATION']);
+    const VALID_TYPE: Set<string> = new Set(['WORDMARK','FIGURATIVE','MIXED','THREE_D','SOUND','HOLOGRAM','TRADE_DRESS']);
+
+    for (let i = 0; i < dataRows.length; i++) {
+      const row = dataRows[i];
+      try {
+        const id = idIdx >= 0 ? row[idIdx]?.trim() : '';
+        const name = row[nameIdx]?.trim();
+        const companyName = row[companyIdx]?.trim() ?? '';
+        const companyId = companyMap.get(companyName.toLowerCase());
+
+        if (!name) { errors.push(`Fila ${i + 2}: nombre requerido.`); continue; }
+        if (!id && !companyId) { errors.push(`Fila ${i + 2}: Empresa "${companyName}" no encontrada.`); continue; }
+
+        const brandTypeRaw = (row[headers.indexOf('tipo')]?.trim() || 'WORDMARK').toUpperCase();
+        const legalRaw = (row[headers.indexOf('estado_legal')]?.trim() || 'APPLIED').toUpperCase();
+        const brand_type = VALID_TYPE.has(brandTypeRaw) ? brandTypeRaw : 'WORDMARK';
+        const legal_status = VALID_LEGAL.has(legalRaw) ? legalRaw : 'APPLIED';
+        const regNum = row[headers.indexOf('numero_registro')]?.trim() || undefined;
+        const expStr = row[headers.indexOf('fecha_vencimiento')]?.trim();
+        const expiration_date = expStr ? new Date(expStr) : undefined;
+
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+        if (id) {
+          await prisma.brand.update({
+            where: { id },
+            data: { name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date },
+          });
+          updated++;
+        } else {
+          await prisma.brand.create({
+            data: { tenant_id: tenantId, company_id: companyId!, name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date },
+          });
+          created++;
+        }
+      } catch (e) {
+        errors.push(`Fila ${i + 2}: ${(e as Error).message}`);
+      }
+    }
   } else {
-    return NextResponse.json({ error: 'Import de marcas no soportado aún via CSV. Use la interfaz.' }, { status: 400 });
+    return NextResponse.json({ error: 'Tipo no soportado.' }, { status: 400 });
   }
 
   return NextResponse.json({ created, updated, errors });

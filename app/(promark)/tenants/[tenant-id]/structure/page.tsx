@@ -7,7 +7,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Suspense } from 'react';
-import { PageTitle, EmptyState } from '@/components/ds';
+import { PageTitle, EmptyState, CsvToolbar } from '@/components/ds';
 import {
   HOLDING_STATUS_LABELS,
   COMPANY_STATUS_LABELS,
@@ -69,32 +69,39 @@ export default async function StructurePage({ params }: StructurePageProps) {
         subtitle={`Holdings, empresas y distribución de marcas de ${tenant.name}.`}
         actions={
           canEdit ? (
-            <div className="flex items-center gap-2">
-              <a
-                href={`/api/tenants/${tenantId}/csv?type=holdings`}
-                target="_blank"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
-              >
-                CSV Holdings
-              </a>
-              <a
-                href={`/api/tenants/${tenantId}/csv?type=companies`}
-                target="_blank"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
-              >
-                CSV Empresas
-              </a>
-              <Link
-                href={`/tenants/${tenantId}/structure?action=new-holding`}
-                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
-              >
-                <Plus className="size-4" />
-                Nuevo Holding
-              </Link>
-            </div>
+            <Link
+              href={`/tenants/${tenantId}/structure?action=new-holding`}
+              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+            >
+              <Plus className="size-4" />
+              Nuevo Holding
+            </Link>
           ) : null
         }
       />
+
+      {canEdit && (
+        <div className="mt-4 space-y-2">
+          <CsvToolbar
+            endpoint={`/api/tenants/${tenantId}/csv?type=holdings`}
+            templateColumns={['nombre', 'razon_social', 'rfc', 'pais', 'notas']}
+            templateExample={['Mi Holding', 'Mi Holding S.A. de C.V.', 'MHO123456ABC', 'México', '']}
+            entityLabel="holdings"
+          />
+          <CsvToolbar
+            endpoint={`/api/tenants/${tenantId}/csv?type=companies`}
+            templateColumns={['nombre', 'razon_social', 'holding', 'tipo', 'rfc', 'pais', 'estado_entidad']}
+            templateExample={['Mi Empresa', 'Mi Empresa S.A. de C.V.', 'Mi Holding', 'SUBSIDIARY', 'MEM123456ABC', 'México', 'CDMX']}
+            entityLabel="empresas"
+          />
+          <CsvToolbar
+            endpoint={`/api/tenants/${tenantId}/csv?type=brands`}
+            templateColumns={['nombre', 'empresa', 'tipo', 'estado_legal', 'numero_registro', 'fecha_vencimiento']}
+            templateExample={['Mi Marca', 'Mi Empresa', 'WORDMARK', 'APPLIED', '', '']}
+            entityLabel="marcas"
+          />
+        </div>
+      )}
 
       {holdings.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
