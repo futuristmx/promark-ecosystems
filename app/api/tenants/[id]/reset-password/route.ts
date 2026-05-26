@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma/client';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { hashPin } from '@/lib/auth/client-pin';
 import {
   requireApiAuth,
   isErrorResponse,
@@ -10,8 +10,8 @@ import {
 
 /**
  * POST /api/tenants/[id]/reset-password
- * Superadmin resets the client user's password for a given tenant.
- * Body: { newPassword: string }
+ * Superadmin resets a client user's PIN for a given tenant.
+ * Body: { userId: string, newPin: string }
  */
 export async function POST(
   request: Request,
@@ -20,7 +20,6 @@ export async function POST(
   const session = await requireApiAuth(request);
   if (isErrorResponse(session)) return session;
 
-  // Only superadmins can reset client passwords
   const userType = getSessionUserType(session);
   const role = getSessionRole(session);
   if (userType !== 'PROMARK' || role !== 'SUPERADMIN') {
@@ -28,37 +27,42 @@ export async function POST(
   }
 
   const { id: tenantId } = await params;
-  const { newPassword } = await request.json();
+  const { userId, newPin } = await request.json();
 
-  if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
+  if (!newPin || typeof newPin !== 'string' || newPin.length < 4) {
     return NextResponse.json(
-      { error: 'La contraseña debe tener al menos 6 caracteres.' },
+      { error: 'El PIN debe tener al menos 4 caracteres.' },
       { status: 400 }
     );
   }
 
-  // Find the client user linked to this tenant
-  const clientUser = await prisma.user.findFirst({
-    where: { tenant_id: tenantId, user_type: 'CLIENT' },
-    select: { id: true, auth_id: true, email: true },
-  });
+  // If userId provided, reset that specific user; otherwise reset the first ADMIN client
+  let targetUser;
+  if (userId) {
+    targetUser = await prisma.userClient.findFirst({
+      where: { id: userId, tenant_id: tenantId },
+      select: { id: true, full_name: true, email: true },
+    });
+  } else {
+    targetUser = await prisma.userClient.findFirst({
+      where: { tenant_id: tenantId, role: 'ADMIN' },
+      select: { id: true, full_name: true, email: true },
+    });
+  }
 
-  if (!clientUser || !clientUser.auth_id) {
+  if (!targetUser) {
     return NextResponse.json(
       { error: 'No se encontró usuario cliente para este tenant.' },
       { status: 404 }
     );
   }
 
-  // Use Supabase admin to update the user's password
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.admin.updateUserById(clientUser.auth_id, {
-    password: newPassword,
+  const pin_hash = await hashPin(newPin);
+
+  await prisma.userClient.update({
+    where: { id: targetUser.id },
+    data: { pin_hash, pin_generated_at: new Date() },
   });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  return NextResponse.json({ ok: true, email: clientUser.email });
+  return NextResponse.json({ ok: true, email: targetUser.email, name: targetUser.full_name });
 }
