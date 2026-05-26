@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutGrid, List, Network, BarChart3, Settings } from 'lucide-react';
+import { LayoutGrid, List, BarChart3, Settings } from 'lucide-react';
 import { DsDataTable, StatusBadge } from '@/components/ds';
 import type { StatusTone, DsColumn } from '@/components/ds';
 import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
@@ -137,15 +137,6 @@ function CardsView({ tenants, isSuperAdmin }: TenantsViewProps) {
             onClick={(e) => e.preventDefault()}
           >
             <Link
-              href={`/tenants/${t.id}/structure`}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors"
-              style={{ color: '#355B6F', backgroundColor: '#F5F4F1' }}
-              title="Estructura corporativa"
-            >
-              <Network className="size-3.5" />
-              Estructura
-            </Link>
-            <Link
               href={`/tenants/${t.id}/panel`}
               className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors"
               style={{ color: '#355B6F', backgroundColor: '#F5F4F1' }}
@@ -237,12 +228,6 @@ function ListView({ tenants, isSuperAdmin }: TenantsViewProps) {
       rows={tenants}
       getRowId={(t) => t.id}
       rowActions={[
-        {
-          label: 'Estructura',
-          icon: <Network className="size-4" />,
-          href: (t) => `/tenants/${t.id}/structure`,
-          quickAction: true,
-        },
         {
           label: 'Panel',
           icon: <BarChart3 className="size-4" />,
