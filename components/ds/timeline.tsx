@@ -70,7 +70,7 @@ export function DsTimeline({
     return (
       <div
         className={cn(
-          'rounded-2xl border border-dashed py-10 text-center text-sm',
+          'rounded-xl border border-dashed py-10 text-center text-sm',
           className
         )}
         style={{ borderColor: '#E2DED6', background: '#F1EDE3', color: '#355B6F' }}

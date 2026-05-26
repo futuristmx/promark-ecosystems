@@ -26,10 +26,10 @@ const DELTA_COLOR: Record<string, string> = {
 };
 
 /**
- * KPI Card del design system. Para grids de métricas en dashboards.
+ * KPI Card premium — flat, sin borde visible, layout sofisticado.
  *
- * Layout: label uppercase pequeño → valor grande → delta opcional.
- * `tone` colorea el valor numérico para semaforización rápida.
+ * Diseño: label uppercase arriba-izq, icon arriba-derecho,
+ * valor grande abajo-izq. Sin outline, fondo sutil.
  */
 export function KpiCard({
   label,
@@ -41,12 +41,8 @@ export function KpiCard({
 }: KpiCardProps) {
   return (
     <div
-      className={cn(
-        'rounded-2xl border p-5 transition-colors',
-        className
-      )}
+      className={cn('rounded-xl p-6', className)}
       style={{
-        borderColor: '#E2DED6',
         background: '#F1EDE3',
       }}
     >
@@ -60,14 +56,14 @@ export function KpiCard({
         {icon && <span style={{ color: '#C8C4B9' }}>{icon}</span>}
       </div>
       <p
-        className="mt-2 text-3xl font-bold tracking-tight"
+        className="mt-4 text-4xl font-bold tracking-tight"
         style={{ color: VALUE_COLOR[tone] }}
       >
         {value}
       </p>
       {delta && (
         <p
-          className="mt-1 text-xs"
+          className="mt-1.5 text-xs"
           style={{ color: DELTA_COLOR[delta.tone ?? 'neutral'] }}
         >
           {delta.text}
@@ -83,14 +79,13 @@ interface KpiGridProps {
 }
 
 /**
- * Grid responsive para KPI cards. 2 cols mobile, 3 tablet, 5 2xl.
- * Resuelve F11 del audit (labels truncadas en lg:grid-cols-5).
+ * Grid responsive para KPI cards. 2 cols mobile, 3 tablet, 4 desktop.
  */
 export function KpiGrid({ children, className }: KpiGridProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-2 gap-4 md:grid-cols-3 2xl:grid-cols-5',
+        'grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4',
         className
       )}
     >
