@@ -25,9 +25,9 @@ export function SectionHeader({
       )}
     >
       <div className="flex items-baseline gap-3">
-        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        <h2 className="text-base font-semibold" style={{ color: '#1A1E23' }}>{title}</h2>
         {hint && (
-          <span className="text-sm text-slate-500">{hint}</span>
+          <span className="text-sm" style={{ color: '#355B6F' }}>{hint}</span>
         )}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}

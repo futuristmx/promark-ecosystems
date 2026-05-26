@@ -15,7 +15,7 @@ interface TopTenantsBarProps {
 }
 
 const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: '#0A0E15',
+  backgroundColor: '#0B1F2A',
   border: 'none',
   borderRadius: 10,
   padding: '8px 14px',
@@ -48,8 +48,8 @@ export function TopTenantsBar({
             >
               <defs>
                 <linearGradient id="bar-grad-tenants" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#0066FF" stopOpacity={0.85} />
-                  <stop offset="100%" stopColor="#0066FF" stopOpacity={1} />
+                  <stop offset="0%" stopColor="#1C3F55" stopOpacity={0.85} />
+                  <stop offset="100%" stopColor="#1C3F55" stopOpacity={1} />
                 </linearGradient>
               </defs>
               <XAxis

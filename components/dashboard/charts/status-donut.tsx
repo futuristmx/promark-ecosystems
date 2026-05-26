@@ -14,7 +14,7 @@ interface StatusDonutProps {
 }
 
 const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: '#0A0E15',
+  backgroundColor: '#0B1F2A',
   border: 'none',
   borderRadius: 10,
   padding: '8px 14px',

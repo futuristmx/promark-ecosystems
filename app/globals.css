@@ -5,22 +5,20 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Promark® Design System — Light v2
+   Promark® Design System — Chromatic System v2
 
-   Paleta canónica: ver public/design-preview-light.html para mockup.
-   - bg-app:      #FAFBFC (off-white)
-   - bg-card:     #EDEFF3 (gris azulado claro — cards "asentadas")
-   - accent-blue: #2C3445 (navy estructural)
-   - accent-electric: #0066FF (CTAs, focus, active states)
-   - text-header: #0A0E15
+   Paleta oficial: sistema cromático premium para inteligencia marcaria.
+   Inspirado en azules profundos, neutros cálidos y acentos ámbar.
 
-   Tokens shadcn (--primary, --background, etc) mapean a la paleta light v2
-   para que todos los componentes ui/* hereden automáticamente.
+   Jerarquía visual:
+   - 60–75% marfil / neutros cálidos
+   - 15–25% azul marino / azul pizarra
+   - 5–10% gris cálido
+   - 3–8% ámbar
+   - <2% estados críticos
    ───────────────────────────────────────────────────────────────────────── */
 
 @theme inline {
-  /* Font stack del design system: DM Sans (primaria) -> Open Sans (fallback)
-     -> Manrope (fallback) -> sistema. next/font cubre antialiasing y swap. */
   --font-sans: var(--font-dm-sans), var(--font-open-sans), var(--font-manrope),
                -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
@@ -94,123 +92,169 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* ── Shadows (clave en light mode) ── */
-  --shadow-ds-sm: 0 1px 2px rgba(10, 14, 21, 0.04), 0 1px 3px rgba(10, 14, 21, 0.05);
-  --shadow-ds-md: 0 4px 6px rgba(10, 14, 21, 0.04), 0 2px 4px rgba(10, 14, 21, 0.03);
-  --shadow-ds-lg: 0 10px 15px rgba(10, 14, 21, 0.06), 0 4px 6px rgba(10, 14, 21, 0.04);
-  --shadow-ds-xl: 0 20px 25px rgba(10, 14, 21, 0.08), 0 8px 10px rgba(10, 14, 21, 0.04);
+  /* ── Shadows (cálidas, casi imperceptibles) ── */
+  --shadow-ds-sm: 0 1px 2px rgba(26, 30, 35, 0.03), 0 1px 3px rgba(26, 30, 35, 0.04);
+  --shadow-ds-md: 0 4px 6px rgba(26, 30, 35, 0.03), 0 2px 4px rgba(26, 30, 35, 0.02);
+  --shadow-ds-lg: 0 8px 24px rgba(26, 30, 35, 0.04);
+  --shadow-ds-xl: 0 20px 25px rgba(26, 30, 35, 0.06), 0 8px 10px rgba(26, 30, 35, 0.03);
 }
 
 :root {
   --radius: 0.625rem;
 
-  /* ── Design system base palette ── */
-  --ds-text-header: #0A0E15;
-  --ds-text-body:   #1A2030;
-  --ds-text-muted:  #4E576A;
-  --ds-text-soft:   #8892A0;
+  /* ══════════════════════════════════════════════════════════════════════
+     PROMARK® OFFICIAL COLOR PALETTE
+     ══════════════════════════════════════════════════════════════════════ */
 
-  --ds-bg-app:       #FAFBFC;
-  --ds-bg-sidebar:   #FFFFFF;
-  --ds-bg-panel:     #FFFFFF;
-  --ds-bg-card:      #EDEFF3;
-  --ds-bg-card-soft: #E4E8EE;
+  /* ── 1. Primarios — azules profundos ── */
+  --azul-noche:           #0B1F2A;
+  --azul-marino-profundo: #0F2E3D;
+  --indigo-estrategico:   #1C3F55;
+
+  /* ── 2. Secundarios — azules suaves y datos ── */
+  --azul-pizarra:         #355B6F;
+  --azul-niebla:          #8FB6C7;
+  --azul-hielo:           #DDEAF2;
+
+  /* ── 3. Neutros cálidos — fondos, cards y superficies ── */
+  --marfil-calido:        #FBF6EC;
+  --hueso:                #F1EDE3;
+  --gris-arena:           #E2DED6;
+  --gris-piedra-calido:   #C8C4B9;
+
+  /* ── 4. Acentos ── */
+  --carbon:               #1A1E23;
+  --ambar-sutil:          #D39A2B;
+
+  /* ── 5. Estados ── */
+  --estado-critico:       #B42318;
+  --estado-critico-bg:    #F9E8E5;
+  --estado-exito:         #2F6B4F;
+  --estado-exito-bg:      #E7F1EA;
+  --estado-info-bg:       #DDEAF2;
+  --estado-info-text:     #1C3F55;
+
+  /* ── 6. Gradientes oficiales ── */
+  --gradient-noche-marino:         linear-gradient(135deg, #0B1F2A 0%, #0F2E3D 100%);
+  --gradient-marino-indigo:        linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%);
+  --gradient-indigo-pizarra:       linear-gradient(135deg, #1C3F55 0%, #355B6F 100%);
+  --gradient-niebla-hielo:         linear-gradient(135deg, #8FB6C7 0%, #DDEAF2 100%);
+  --gradient-marfil-arena:         linear-gradient(135deg, #FBF6EC 0%, #E2DED6 100%);
+  --gradient-arena-piedra:         linear-gradient(135deg, #E2DED6 0%, #C8C4B9 100%);
+  --gradient-azulgris-niebla:      linear-gradient(135deg, #B5C4CC 0%, #E6EEF2 100%);
+  --gradient-ambar-oro:            linear-gradient(135deg, #D39A2B 0%, #F2C16A 100%);
+  --gradient-ocre-amarillo-palido: linear-gradient(135deg, #C7851F 0%, #F5DEA2 100%);
+  --gradient-oro-marfil:           linear-gradient(135deg, #E8C36A 0%, #FBF6EC 100%);
+
+  /* ══════════════════════════════════════════════════════════════════════
+     DESIGN SYSTEM TOKENS (mapped from official palette)
+     ══════════════════════════════════════════════════════════════════════ */
+
+  --ds-text-header: var(--carbon);
+  --ds-text-body:   var(--carbon);
+  --ds-text-muted:  var(--azul-pizarra);
+  --ds-text-soft:   var(--gris-piedra-calido);
+
+  --ds-bg-app:       var(--marfil-calido);
+  --ds-bg-sidebar:   var(--azul-marino-profundo);
+  --ds-bg-panel:     var(--marfil-calido);
+  --ds-bg-card:      var(--hueso);
+  --ds-bg-card-soft: var(--gris-arena);
   --ds-bg-input:     #FFFFFF;
 
-  --ds-accent-blue:     #2C3445;   /* navy estructural */
-  --ds-accent-electric: #0066FF;   /* electric blue — CTAs */
-  --ds-accent-cyan:     #0284C7;
-  --ds-accent-pink:     #DB2777;
-  --ds-accent-orange:   #EA580C;
+  --ds-accent-blue:     var(--azul-marino-profundo);
+  --ds-accent-electric: var(--ambar-sutil);
+  --ds-accent-cyan:     var(--azul-pizarra);
+  --ds-accent-pink:     var(--estado-critico);
+  --ds-accent-orange:   var(--ambar-sutil);
 
-  --ds-status-active:   #0066FF;
-  --ds-status-progress: #2C3445;
-  --ds-status-success:  #16A34A;
-  --ds-status-warning:  #EA580C;
-  --ds-status-error:    #DC2626;
-  --ds-status-muted:    #8892A0;
+  --ds-status-active:   var(--indigo-estrategico);
+  --ds-status-progress: var(--azul-marino-profundo);
+  --ds-status-success:  var(--estado-exito);
+  --ds-status-warning:  var(--ambar-sutil);
+  --ds-status-error:    var(--estado-critico);
+  --ds-status-muted:    var(--gris-piedra-calido);
 
-  /* ── Shadcn semantic tokens (mapean a la paleta) ── */
-  --background: #f5f5eb;
-  --foreground: #1A2030;
-  --card: #EDEFF3;
-  --card-foreground: #0A0E15;
+  /* ── Shadcn semantic tokens (mapean a la paleta oficial) ── */
+  --background: var(--marfil-calido);
+  --foreground: var(--carbon);
+  --card: var(--hueso);
+  --card-foreground: var(--carbon);
   --popover: #FFFFFF;
-  --popover-foreground: #0A0E15;
-  --primary: #0066FF;            /* electric blue para botones primarios */
+  --popover-foreground: var(--carbon);
+  --primary: var(--ambar-sutil);
   --primary-foreground: #FFFFFF;
-  --secondary: #E4E8EE;          /* bg-card-soft */
-  --secondary-foreground: #2C3445;
-  --muted: #EDEFF3;
-  --muted-foreground: #4E576A;
-  --accent: #E4E8EE;
-  --accent-foreground: #2C3445;
-  --destructive: #DC2626;
-  --border: rgba(10, 14, 21, 0.10);
-  --input: rgba(10, 14, 21, 0.10);
-  --ring: #0066FF;
+  --secondary: var(--gris-arena);
+  --secondary-foreground: var(--azul-marino-profundo);
+  --muted: var(--hueso);
+  --muted-foreground: var(--azul-pizarra);
+  --accent: var(--gris-arena);
+  --accent-foreground: var(--azul-marino-profundo);
+  --destructive: var(--estado-critico);
+  --border: var(--gris-arena);
+  --input: var(--gris-arena);
+  --ring: var(--ambar-sutil);
 
-  /* Chart palette para Recharts — usa accents del design system */
-  --chart-1: #0066FF;            /* electric */
-  --chart-2: #2C3445;            /* navy */
-  --chart-3: #0284C7;            /* cyan */
-  --chart-4: #EA580C;            /* orange */
-  --chart-5: #16A34A;            /* success */
+  /* Chart palette — secuencia cromática oficial */
+  --chart-1: var(--azul-marino-profundo);
+  --chart-2: var(--indigo-estrategico);
+  --chart-3: var(--azul-pizarra);
+  --chart-4: var(--azul-niebla);
+  --chart-5: var(--ambar-sutil);
 
-  /* Sidebar slot (Promark side — white premium) */
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1A2030;
-  --sidebar-primary: #0066FF;
+  /* Sidebar slot (dark premium) */
+  --sidebar: var(--azul-marino-profundo);
+  --sidebar-foreground: var(--marfil-calido);
+  --sidebar-primary: var(--ambar-sutil);
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: rgba(0, 102, 255, 0.08);
-  --sidebar-accent-foreground: #0066FF;
-  --sidebar-border: rgba(10, 14, 21, 0.06);
-  --sidebar-ring: #0066FF;
+  --sidebar-accent: rgba(251, 246, 236, 0.08);
+  --sidebar-accent-foreground: var(--marfil-calido);
+  --sidebar-border: rgba(251, 246, 236, 0.12);
+  --sidebar-ring: var(--ambar-sutil);
 }
 
-/* ── Dark mode (Promark internal command center variant) ──
-   Mantiene la paleta del mockup dark — se puede activar con html.dark.
-   Por ahora solo light está activo por default. */
+/* ── Dark mode ──
+   Mantiene la paleta del mockup dark — se puede activar con html.dark. */
 .dark {
   --ds-text-header: #FFFFFF;
   --ds-text-body:   #E0E4EB;
-  --ds-text-muted:  #BFC6D4;
-  --ds-text-soft:   #667085;
+  --ds-text-muted:  var(--azul-niebla);
+  --ds-text-soft:   var(--gris-piedra-calido);
 
-  --ds-bg-app:       #0A0E15;
-  --ds-bg-sidebar:   #11151C;
-  --ds-bg-panel:     #161A22;
-  --ds-bg-card:      #181D26;
-  --ds-bg-card-soft: #212631;
-  --ds-bg-input:     #121720;
+  --ds-bg-app:       var(--azul-noche);
+  --ds-bg-sidebar:   #0A1820;
+  --ds-bg-panel:     #0F1E28;
+  --ds-bg-card:      #142632;
+  --ds-bg-card-soft: #1A3040;
+  --ds-bg-input:     #0F1E28;
 
-  --background: #0A0E15;
+  --background: var(--azul-noche);
   --foreground: #E0E4EB;
-  --card: #181D26;
+  --card: #142632;
   --card-foreground: #FFFFFF;
-  --popover: #181D26;
+  --popover: #142632;
   --popover-foreground: #FFFFFF;
-  --primary: #0066FF;
+  --primary: var(--ambar-sutil);
   --primary-foreground: #FFFFFF;
-  --secondary: #212631;
+  --secondary: #1A3040;
   --secondary-foreground: #E0E4EB;
-  --muted: #212631;
-  --muted-foreground: #BFC6D4;
-  --accent: #212631;
+  --muted: #1A3040;
+  --muted-foreground: var(--azul-niebla);
+  --accent: #1A3040;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
-  --border: rgba(224, 228, 235, 0.10);
-  --input: rgba(224, 228, 235, 0.10);
-  --ring: #0066FF;
+  --border: rgba(251, 246, 236, 0.10);
+  --input: rgba(251, 246, 236, 0.10);
+  --ring: var(--ambar-sutil);
 
-  --sidebar: #11151C;
+  --sidebar: #0A1820;
   --sidebar-foreground: #E0E4EB;
-  --sidebar-primary: #0066FF;
+  --sidebar-primary: var(--ambar-sutil);
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: rgba(109, 93, 251, 0.16);
+  --sidebar-accent: rgba(211, 154, 43, 0.16);
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(224, 228, 235, 0.10);
-  --sidebar-ring: #0066FF;
+  --sidebar-border: rgba(251, 246, 236, 0.10);
+  --sidebar-ring: var(--ambar-sutil);
 }
 
 @layer base {
@@ -234,70 +278,70 @@
 
 /* ─── Design system component classes ─────────────────────────────────
    Usadas por components/ds/* para variantes que no son shadcn primitives.
-   Apply via @apply en componentes o directamente como className.
    ─────────────────────────────────────────────────────────────────── */
 
 @layer components {
-  /* Premium card: gradient navy (top-left) + electric blue (bottom-right) */
+  /* Premium card: gradient marino-indigo con glow sutil */
   .ds-card-premium {
     background:
-      radial-gradient(circle at top left, rgba(44, 52, 69, 0.18), transparent 45%),
-      radial-gradient(circle at bottom right, rgba(0, 102, 255, 0.10), transparent 50%),
+      radial-gradient(circle at top left, rgba(15, 46, 61, 0.12), transparent 45%),
+      radial-gradient(circle at bottom right, rgba(211, 154, 43, 0.06), transparent 50%),
       var(--ds-bg-card);
-    border: 1px solid rgba(10, 14, 21, 0.12);
-    border-radius: 1.5rem;
+    border: 1px solid var(--gris-arena);
+    border-radius: 0.875rem;
     padding: 1.75rem;
   }
 
-  /* Atmospheric card: gradients pink + orange + electric (AI/highlight) */
+  /* Atmospheric card: gradients sutiles azul-ámbar (para módulos AI/highlight) */
   .ds-card-atmospheric {
     background:
-      radial-gradient(circle at bottom left, rgba(219, 39, 119, 0.10), transparent 40%),
-      radial-gradient(circle at bottom center, rgba(234, 88, 12, 0.08), transparent 36%),
-      radial-gradient(circle at right center, rgba(0, 102, 255, 0.10), transparent 40%),
+      radial-gradient(circle at bottom left, rgba(28, 63, 85, 0.08), transparent 40%),
+      radial-gradient(circle at bottom center, rgba(211, 154, 43, 0.06), transparent 36%),
+      radial-gradient(circle at right center, rgba(53, 91, 111, 0.08), transparent 40%),
       var(--ds-bg-card);
-    border: 1px solid rgba(10, 14, 21, 0.12);
-    border-radius: 1.5rem;
+    border: 1px solid var(--gris-arena);
+    border-radius: 0.875rem;
     padding: 1.75rem;
   }
 
-  /* Card estándar (flat, sin gradient) */
+  /* Card estándar (flat, superficie hueso) */
   .ds-card {
     background: var(--ds-bg-card);
-    border: 1px solid rgba(10, 14, 21, 0.06);
-    border-radius: 1.25rem;
+    border: 1px solid var(--gris-arena);
+    border-radius: 0.875rem;
     padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(26, 30, 35, 0.04);
     transition: all 220ms ease-out;
   }
   .ds-card:hover {
     background: var(--ds-bg-card-soft);
-    border-color: rgba(10, 14, 21, 0.12);
+    border-color: var(--gris-piedra-calido);
   }
 
-  /* Botón primario electric (gradient navy → electric blue) */
+  /* Botón primario: gradient ámbar-oro (CTA principal) */
   .ds-btn-primary {
-    background: linear-gradient(135deg, var(--ds-accent-blue), var(--ds-accent-electric));
+    background: var(--gradient-ambar-oro);
     color: #FFFFFF;
     border: 1px solid transparent;
-    box-shadow: 0 1px 2px rgba(0, 102, 255, 0.28);
+    box-shadow: 0 1px 2px rgba(211, 154, 43, 0.28);
     transition: all 220ms ease-out;
   }
   .ds-btn-primary:hover {
-    filter: brightness(1.06);
-    box-shadow: 0 6px 16px rgba(0, 102, 255, 0.32);
+    filter: brightness(0.96);
+    box-shadow: 0 6px 16px rgba(211, 154, 43, 0.32);
     transform: translateY(-1px);
   }
 
-  /* Label uppercase pequeño (para títulos de sección y kpi labels) */
+  /* Label uppercase pequeño */
   .ds-label-uc {
-    font-size: 0.6875rem;       /* 11px */
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--ds-text-soft);
+    color: var(--azul-pizarra);
     font-weight: 600;
   }
 
-  /* Status dot (genérico — usa color via inline style o variant class) */
+  /* Status dot */
   .ds-status-dot {
     display: inline-block;
     width: 0.375rem;

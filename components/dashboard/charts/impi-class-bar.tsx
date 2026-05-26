@@ -15,7 +15,7 @@ interface ImpiClassBarProps {
 }
 
 const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: '#0A0E15',
+  backgroundColor: '#0B1F2A',
   border: 'none',
   borderRadius: 10,
   padding: '8px 14px',
@@ -50,8 +50,8 @@ export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClas
             >
               <defs>
                 <linearGradient id="bar-grad-impi" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#2C3445" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="#0284C7" stopOpacity={1} />
+                  <stop offset="0%" stopColor="#0F2E3D" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#355B6F" stopOpacity={1} />
                 </linearGradient>
               </defs>
               <XAxis

@@ -28,13 +28,13 @@ export function StatusBadge({
   className,
 }: StatusBadgeProps) {
   const toneStyles: Record<StatusTone, { bg: string; border: string; color: string }> = {
-    active:   { bg: 'rgba(0, 102, 255, 0.08)',  border: 'rgba(0, 102, 255, 0.22)',  color: '#0066FF' },
-    progress: { bg: 'rgba(44, 52, 69, 0.08)',   border: 'rgba(44, 52, 69, 0.22)',   color: '#2C3445' },
-    success:  { bg: 'rgba(22, 163, 74, 0.08)',  border: 'rgba(22, 163, 74, 0.22)',  color: '#16A34A' },
-    warning:  { bg: 'rgba(234, 88, 12, 0.08)',  border: 'rgba(234, 88, 12, 0.22)',  color: '#EA580C' },
-    error:    { bg: 'rgba(220, 38, 38, 0.08)',  border: 'rgba(220, 38, 38, 0.22)',  color: '#DC2626' },
-    info:     { bg: 'rgba(2, 132, 199, 0.08)',  border: 'rgba(2, 132, 199, 0.22)',  color: '#0284C7' },
-    muted:    { bg: 'rgba(136, 146, 160, 0.10)', border: 'rgba(136, 146, 160, 0.22)', color: '#4E576A' },
+    active:   { bg: 'rgba(28, 63, 85, 0.08)',    border: 'rgba(28, 63, 85, 0.22)',    color: '#1C3F55' },
+    progress: { bg: 'rgba(15, 46, 61, 0.08)',     border: 'rgba(15, 46, 61, 0.22)',    color: '#0F2E3D' },
+    success:  { bg: 'rgba(47, 107, 79, 0.08)',    border: 'rgba(47, 107, 79, 0.22)',   color: '#2F6B4F' },
+    warning:  { bg: 'rgba(211, 154, 43, 0.08)',   border: 'rgba(211, 154, 43, 0.22)',  color: '#D39A2B' },
+    error:    { bg: 'rgba(180, 35, 24, 0.08)',    border: 'rgba(180, 35, 24, 0.22)',   color: '#B42318' },
+    info:     { bg: 'rgba(221, 234, 242, 0.50)',  border: 'rgba(28, 63, 85, 0.18)',    color: '#1C3F55' },
+    muted:    { bg: 'rgba(200, 196, 185, 0.10)',  border: 'rgba(200, 196, 185, 0.22)', color: '#355B6F' },
   };
 
   const style = toneStyles[tone];

@@ -25,7 +25,6 @@ interface NavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
-  /** Additional path prefixes that mark this item as active */
   activeAlso?: string[];
 }
 
@@ -45,7 +44,6 @@ const mainNav: NavItem[] = [
 export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
   const pathname = usePathname();
 
-  // Detect tenant context: /tenants/[tenant-id]/...
   const tenantMatch = pathname.match(/^\/tenants\/([^/]+)\//);
   const tenantId = tenantMatch ? tenantMatch[1] : null;
 
@@ -84,7 +82,6 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           href: `/tenants/${tenantId}/portfolio`,
           label: 'Portafolio',
           icon: <Briefcase className="h-4 w-4" />,
-          // Old individual routes also count as "Portafolio" active
           activeAlso: [
             `/tenants/${tenantId}/brands`,
             `/tenants/${tenantId}/holders`,
@@ -121,24 +118,37 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
   }
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-slate-200/60 bg-white">
+    <aside
+      className="sticky top-0 flex h-screen w-64 shrink-0 flex-col"
+      style={{
+        background: 'linear-gradient(135deg, #0B1F2A 0%, #0F2E3D 100%)',
+        borderRight: '1px solid rgba(251, 246, 236, 0.12)',
+      }}
+    >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 border-b border-slate-200/60 px-5 py-4">
+      <div
+        className="flex items-center gap-2.5 px-5 py-4"
+        style={{ borderBottom: '1px solid rgba(251, 246, 236, 0.10)' }}
+      >
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div
             aria-hidden
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold text-white shadow-sm"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold shadow-sm"
             style={{
-              background: 'linear-gradient(135deg, #2C3445, #0066FF)',
+              background: 'linear-gradient(135deg, #D39A2B 0%, #F2C16A 100%)',
+              color: '#0B1F2A',
             }}
           >
             P
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-base font-bold tracking-tight text-slate-900">
-              Promark<span className="text-slate-400">®</span>
+            <span className="text-base font-bold tracking-tight" style={{ color: '#FBF6EC' }}>
+              Promark<span style={{ color: 'rgba(251, 246, 236, 0.5)' }}>®</span>
             </span>
-            <span className="mt-0.5 text-[10px] uppercase tracking-wider text-slate-400">
+            <span
+              className="mt-0.5 text-[10px] uppercase tracking-wider"
+              style={{ color: 'rgba(251, 246, 236, 0.58)' }}
+            >
               Inteligencia marcaria
             </span>
           </div>
@@ -147,7 +157,10 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
 
       {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-        <p className="mb-1 mt-1 px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+        <p
+          className="mb-1 mt-1 px-3 text-[10px] font-semibold uppercase tracking-[0.08em]"
+          style={{ color: 'rgba(251, 246, 236, 0.45)' }}
+        >
           Workspace
         </p>
         {mainNav.map((item) => (
@@ -162,7 +175,10 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
 
         {tenantId && tenantSubNav.length > 0 && (
           <>
-            <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+            <p
+              className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.08em]"
+              style={{ color: 'rgba(251, 246, 236, 0.45)' }}
+            >
               {tenantName || 'Cliente'}
             </p>
             {tenantSubNav.map((item) => (
@@ -180,20 +196,31 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
       </nav>
 
       {/* User footer */}
-      <div className="border-t border-slate-200/60 p-3 space-y-1.5">
+      <div className="p-3 space-y-1.5" style={{ borderTop: '1px solid rgba(251, 246, 236, 0.10)' }}>
         <Link
           href="/settings/profile"
-          className="group flex items-center gap-2.5 rounded-lg border border-slate-200/60 px-3 py-2.5 transition-all duration-200 hover:border-[#0066FF]/30 hover:bg-[#0066FF]/[0.06] hover:shadow-sm"
-          style={{ background: 'rgba(0, 102, 255, 0.03)' }}
+          className="group flex items-center gap-2.5 rounded-lg px-3 py-2.5 transition-all duration-200"
+          style={{
+            border: '1px solid rgba(251, 246, 236, 0.10)',
+            background: 'rgba(251, 246, 236, 0.04)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(251, 246, 236, 0.08)';
+            e.currentTarget.style.borderColor = 'rgba(211, 154, 43, 0.30)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(251, 246, 236, 0.04)';
+            e.currentTarget.style.borderColor = 'rgba(251, 246, 236, 0.10)';
+          }}
         >
-          <UserCircle className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-hover:text-[#0066FF]" />
+          <UserCircle className="h-5 w-5 shrink-0 transition-colors" style={{ color: 'rgba(251, 246, 236, 0.5)' }} />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-900">{userName}</p>
-            <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <p className="truncate text-sm font-semibold" style={{ color: '#FBF6EC' }}>{userName}</p>
+            <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'rgba(251, 246, 236, 0.5)' }}>
               {userRole}
             </p>
           </div>
-          <Settings className="h-3.5 w-3.5 text-slate-300 transition-colors group-hover:text-[#0066FF]" />
+          <Settings className="h-3.5 w-3.5 transition-colors" style={{ color: 'rgba(251, 246, 236, 0.35)' }} />
         </Link>
         <button
           type="button"
@@ -201,7 +228,16 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
             await fetch('/api/auth/logout', { method: 'POST' });
             window.location.href = '/login';
           }}
-          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+          style={{ color: 'rgba(251, 246, 236, 0.45)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(180, 35, 24, 0.15)';
+            e.currentTarget.style.color = '#F9E8E5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'rgba(251, 246, 236, 0.45)';
+          }}
         >
           <LogOut className="h-4 w-4" />
           Cerrar sesión
@@ -228,29 +264,41 @@ function NavLinkItem({
     <Link
       href={href}
       className={cn(
-        'group flex items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-all duration-200',
-        isActive
-          ? 'text-[#0066FF]'
-          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+        'group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
       )}
       style={
         isActive
           ? {
-              background:
-                'linear-gradient(90deg, rgba(0, 102, 255, 0.08), rgba(0, 102, 255, 0.02))',
-              borderColor: 'rgba(0, 102, 255, 0.20)',
+              background: 'rgba(251, 246, 236, 0.10)',
+              color: '#FBF6EC',
+              borderLeft: '3px solid #D39A2B',
+              paddingLeft: '9px',
             }
-          : undefined
+          : {
+              color: 'rgba(251, 246, 236, 0.72)',
+            }
       }
+      onMouseEnter={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'rgba(251, 246, 236, 0.08)';
+          e.currentTarget.style.color = '#FBF6EC';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = 'rgba(251, 246, 236, 0.72)';
+        }
+      }}
     >
-      <span className={isActive ? 'text-[#0066FF]' : 'text-slate-400 group-hover:text-slate-700'}>
+      <span style={isActive ? { color: '#D39A2B' } : { color: 'rgba(251, 246, 236, 0.5)' }}>
         {icon}
       </span>
       <span className="flex-1">{label}</span>
       {badge !== undefined && (
         <span
-          className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-white"
-          style={{ background: '#DC2626' }}
+          className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+          style={{ background: '#B42318', color: '#FBF6EC' }}
         >
           {badge}
         </span>
