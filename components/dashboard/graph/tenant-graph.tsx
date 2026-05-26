@@ -113,7 +113,7 @@ function toFlowEdges(domainEdges: DomainEdge[]): Edge[] {
     source: e.source,
     target: e.target,
     type: 'smoothstep',
-    style: { stroke: '#94a3b8', strokeWidth: 1 },
+    style: { stroke: '#C8C4B9', strokeWidth: 1 },
   }));
 }
 
@@ -169,7 +169,7 @@ function TenantGraphInner({ nodes, edges }: TenantGraphProps) {
   };
 
   return (
-    <div className="flex h-[70vh] w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white">
+    <div className="flex h-[70vh] w-full flex-col overflow-hidden rounded-xl border" style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}>
       <GraphToolbar
         showHolders={showHolders}
         showContracts={showContracts}
@@ -182,12 +182,12 @@ function TenantGraphInner({ nodes, edges }: TenantGraphProps) {
       />
       <div className="relative flex-1">
         {nodes.length === 0 && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+          <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ background: 'rgba(251,246,236,0.85)' }}>
             <div className="text-center">
-              <p className="text-sm font-medium text-slate-600">
+              <p className="text-sm font-medium" style={{ color: '#355B6F' }}>
                 Sin nodos para mostrar
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs" style={{ color: '#C8C4B9' }}>
                 Registra holdings, empresas o marcas para construir el grafo.
               </p>
             </div>
@@ -202,7 +202,7 @@ function TenantGraphInner({ nodes, edges }: TenantGraphProps) {
           onNodeClick={onNodeClick}
           minZoom={0.1}
         >
-          <Background gap={16} color="#e2e8f0" />
+          <Background gap={16} color="#E2DED6" />
           <Controls showInteractive={false} />
           <MiniMap pannable zoomable />
         </ReactFlow>

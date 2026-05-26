@@ -30,12 +30,12 @@ function Toggle({
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+      className="rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+      style={
         active
-          ? 'border-blue-500 bg-blue-500 text-white'
-          : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50'
-      )}
+          ? { borderColor: '#0F2E3D', background: '#0F2E3D', color: '#ffffff' }
+          : { borderColor: '#E2DED6', background: '#FBF6EC', color: '#355B6F' }
+      }
     >
       {children}
     </button>
@@ -55,14 +55,14 @@ export function GraphToolbar({
   const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-3">
+    <div className="flex flex-wrap items-center gap-2 border-b p-3" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
       <Input
         value={search}
         onChange={(e) => onSearch(e.target.value)}
         placeholder="Buscar en el grafo..."
         className="h-8 w-48 text-xs"
       />
-      <div className="mx-1 h-6 w-px bg-slate-200" />
+      <div className="mx-1 h-6 w-px" style={{ background: '#E2DED6' }} />
       <Toggle active={showHolders} onClick={() => onToggleHolders(!showHolders)}>
         Mostrar titulares
       </Toggle>

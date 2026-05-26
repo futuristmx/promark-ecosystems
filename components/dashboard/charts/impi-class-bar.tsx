@@ -26,19 +26,19 @@ const TOOLTIP_STYLE: React.CSSProperties = {
 };
 
 export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClassBarProps) {
-  const formatted = data.slice(0, 10).map((d) => ({
+  const formatted = data.map((d) => ({
     ...d,
     label: `Clase ${d.class_number}`,
   }));
 
   return (
     <div>
-      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
         {title}
       </h3>
       <div className="h-72">
         {formatted.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          <div className="flex h-full items-center justify-center text-sm" style={{ color: '#C8C4B9' }}>
             Sin clases registradas
           </div>
         ) : (
@@ -57,14 +57,14 @@ export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClas
               <XAxis
                 type="number"
                 allowDecimals={false}
-                tick={{ fontSize: 10, fill: '#94A3B8' }}
+                tick={{ fontSize: 10, fill: '#C8C4B9' }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
                 type="category"
                 dataKey="label"
-                tick={{ fontSize: 11, fill: '#475569', fontWeight: 500 }}
+                tick={{ fontSize: 11, fill: '#355B6F', fontWeight: 500 }}
                 tickLine={false}
                 axisLine={false}
                 width={80}
@@ -73,7 +73,7 @@ export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClas
                 formatter={(value) => [String(value), 'Marcas']}
                 contentStyle={TOOLTIP_STYLE}
                 itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
-                cursor={{ fill: '#F1F5F9', radius: 6 }}
+                cursor={{ fill: 'rgba(226,222,214,0.25)', radius: 6 }}
               />
               <Bar
                 dataKey="count"

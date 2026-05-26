@@ -88,7 +88,7 @@ export function VigencyTimeline({ data, title }: VigencyTimelineProps) {
                 formatter={(value) => [String(value), 'Vencimientos']}
                 contentStyle={TOOLTIP_STYLE}
                 itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
-                cursor={{ fill: '#F1F5F9', radius: 4 }}
+                cursor={{ fill: 'rgba(226,222,214,0.25)', radius: 4 }}
               />
               <Bar
                 dataKey="count"
