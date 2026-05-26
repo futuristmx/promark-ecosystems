@@ -19,10 +19,10 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 @theme inline {
-  --font-sans: var(--font-dm-sans), var(--font-open-sans), var(--font-manrope),
+  --font-sans: var(--font-manrope), var(--font-dm-sans), var(--font-open-sans),
                -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-dm-sans), var(--font-open-sans), var(--font-manrope), sans-serif;
+  --font-heading: var(--font-manrope), var(--font-dm-sans), var(--font-open-sans), sans-serif;
 
   /* ── Color tokens shadcn (mapean al design system) ── */
   --color-background: var(--background);

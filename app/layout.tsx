@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Open_Sans, Manrope, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-// Font stack del design system: DM Sans primaria, Open Sans + Manrope
+// Font stack del design system: Manrope primaria, DM Sans + Open Sans
 // como fallbacks. Cada una con su CSS variable propia para que se pueda
 // referenciar selectivamente desde globals.css y component styles.
 const dmSans = DM_Sans({

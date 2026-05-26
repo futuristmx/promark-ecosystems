@@ -34,7 +34,7 @@ const TOOLTIP_STYLE: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
   color: '#F1F5F9',
   fontSize: 12,
-  fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)',
+  fontFamily: 'var(--font-manrope, Manrope, sans-serif)',
 };
 
 export function VigencyTimeline({ data, title }: VigencyTimelineProps) {
