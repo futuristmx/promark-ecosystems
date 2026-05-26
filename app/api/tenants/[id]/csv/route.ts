@@ -176,19 +176,19 @@ export async function POST(
           errors.push(`Fila ${i + 2}: Holding "${holdingName}" no encontrado.`);
           continue;
         }
-        const data: Record<string, unknown> = {
-          name: row[nameIdx].trim(),
-          legal_name: row[legalIdx].trim(),
+        const name = row[nameIdx].trim();
+        const legal_name = row[legalIdx].trim();
+        const extra = {
           rfc: row[headers.indexOf('rfc')]?.trim() || undefined,
           company_type: row[headers.indexOf('tipo')]?.trim() || 'SUBSIDIARY',
           country: row[headers.indexOf('pais')]?.trim() || undefined,
           state: row[headers.indexOf('estado_entidad')]?.trim() || undefined,
         };
         if (id) {
-          await prisma.company.update({ where: { id }, data });
+          await prisma.company.update({ where: { id }, data: { name, legal_name, ...extra } });
           updated++;
         } else {
-          await prisma.company.create({ data: { tenant_id: tenantId, holding_id: holdingId!, ...data } });
+          await prisma.company.create({ data: { tenant_id: tenantId, holding_id: holdingId!, name, legal_name, ...extra } });
           created++;
         }
       } catch (e) {
