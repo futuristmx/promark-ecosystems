@@ -230,13 +230,13 @@ export default async function DashboardPage() {
 
 function UserAvatarBlock({ avatar, name }: { avatar: unknown; name: string }) {
   let src: string | null = null;
-  if (typeof avatar === 'string' && avatar.startsWith('data:')) src = avatar;
+  if (typeof avatar === 'string' && (avatar.startsWith('data:') || avatar.startsWith('http'))) src = avatar;
   else if (Array.isArray(avatar) && avatar.length > 0) {
     const first = avatar[0];
     src = typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
   } else if (avatar && typeof avatar === 'object') {
     const obj = avatar as Record<string, unknown>;
-    src = (obj.url ?? obj.data ?? obj.image) as string | null;
+    src = (obj.url ?? obj.dataUrl ?? obj.data ?? obj.image) as string | null;
   }
 
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -245,9 +245,9 @@ function UserAvatarBlock({ avatar, name }: { avatar: unknown; name: string }) {
     <div className="relative shrink-0">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={name} className="h-16 w-16 rounded-2xl object-cover" style={{ border: '3px solid #E2DED6' }} />
+        <img src={src} alt={name} className="h-16 w-16 rounded-full object-cover" style={{ border: '3px solid #E2DED6' }} />
       ) : (
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-xl font-bold" style={{ background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)', color: '#FBF6EC', border: '3px solid #E2DED6' }}>
+        <div className="flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold" style={{ background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)', color: '#FBF6EC', border: '3px solid #E2DED6' }}>
           {initials}
         </div>
       )}

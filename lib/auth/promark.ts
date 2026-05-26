@@ -32,7 +32,17 @@ export async function getPromarkSession(): Promise<PromarkSession | null> {
 
   if (!promarkUser) return null;
 
-  return promarkUser;
+  // If no avatar in DB, try Supabase auth metadata
+  let avatar = promarkUser.avatar;
+  if (!avatar) {
+    const metaAvatar =
+      user.user_metadata?.avatar_url ??
+      user.user_metadata?.picture ??
+      null;
+    if (metaAvatar) avatar = metaAvatar;
+  }
+
+  return { ...promarkUser, avatar };
 }
 
 export async function requirePromarkAuth(): Promise<PromarkSession> {

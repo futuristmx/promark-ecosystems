@@ -25,14 +25,14 @@ interface PromarkSidebarProps {
 
 function extractAvatarSrc(avatar: unknown): string | null {
   if (!avatar) return null;
-  if (typeof avatar === 'string' && avatar.startsWith('data:')) return avatar;
+  if (typeof avatar === 'string' && (avatar.startsWith('data:') || avatar.startsWith('http'))) return avatar;
   if (Array.isArray(avatar) && avatar.length > 0) {
     const first = avatar[0];
     return typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
   }
   if (typeof avatar === 'object' && avatar !== null) {
     const obj = avatar as Record<string, unknown>;
-    return (obj.url ?? obj.data ?? obj.image) as string | null;
+    return (obj.url ?? obj.dataUrl ?? obj.data ?? obj.image) as string | null;
   }
   return null;
 }
