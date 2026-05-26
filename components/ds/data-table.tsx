@@ -141,7 +141,7 @@ export function DsDataTable<T>({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-2xl border',
+        'overflow-x-auto rounded-2xl border',
         className
       )}
       style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
