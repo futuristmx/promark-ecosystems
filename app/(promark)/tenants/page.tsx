@@ -33,7 +33,7 @@ export default async function TenantsPage() {
       <PageTitle
         eyebrow="Workspace"
         title="Clientes"
-        subtitle="Gestiona los tenants y sus configuraciones."
+        subtitle="Gestiona los clientes y sus configuraciones."
         actions={
           user.role === 'SUPERADMIN' ? (
             <Link

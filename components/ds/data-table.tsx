@@ -236,35 +236,41 @@ export function DsDataTable<T>({
                     <td className="px-2 py-3 text-right" data-table-action>
                       <div className="inline-flex items-center gap-0.5">
                         {quickActions.map((action) => (
-                          <button
-                            key={action.label}
-                            type="button"
-                            title={action.label}
-                            className="inline-flex size-7 items-center justify-center rounded-md transition-colors"
-                            style={{ color: '#C8C4B9' }}
-                            onMouseEnter={(e) => {
-                              if (action.destructive) {
-                                e.currentTarget.style.color = '#B42318';
-                                e.currentTarget.style.background = 'rgba(180,35,24,0.06)';
-                              } else {
-                                e.currentTarget.style.color = '#1A1E23';
-                                e.currentTarget.style.background = '#E2DED6';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.color = '#C8C4B9';
-                              e.currentTarget.style.background = '';
-                            }}
-                            onClick={() => {
-                              if (action.href) {
-                                window.location.href = action.href(row);
-                              } else {
-                                action.onClick?.(row);
-                              }
-                            }}
-                          >
-                            {action.icon ?? <span className="text-xs">{action.label[0]}</span>}
-                          </button>
+                          <div key={action.label} className="group/tip relative">
+                            <button
+                              type="button"
+                              className="inline-flex size-7 items-center justify-center rounded-md transition-colors"
+                              style={{ color: '#C8C4B9' }}
+                              onMouseEnter={(e) => {
+                                if (action.destructive) {
+                                  e.currentTarget.style.color = '#B42318';
+                                  e.currentTarget.style.background = 'rgba(180,35,24,0.06)';
+                                } else {
+                                  e.currentTarget.style.color = '#1A1E23';
+                                  e.currentTarget.style.background = '#E2DED6';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = '#C8C4B9';
+                                e.currentTarget.style.background = '';
+                              }}
+                              onClick={() => {
+                                if (action.href) {
+                                  window.location.href = action.href(row);
+                                } else {
+                                  action.onClick?.(row);
+                                }
+                              }}
+                            >
+                              {action.icon ?? <span className="text-xs">{action.label[0]}</span>}
+                            </button>
+                            <span
+                              className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium opacity-0 transition-opacity group-hover/tip:opacity-100"
+                              style={{ background: '#0B1F2A', color: '#FBF6EC' }}
+                            >
+                              {action.label}
+                            </span>
+                          </div>
                         ))}
                         {overflowActions.length > 0 && (
                           <DropdownMenu>
