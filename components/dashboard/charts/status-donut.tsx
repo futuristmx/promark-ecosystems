@@ -185,7 +185,7 @@ export function StatusDonut({
                 />
                 <span
                   className="mt-2 text-[10px] font-semibold uppercase tracking-widest"
-                  style={{ color: '#C8C4B9' }}
+                  style={{ color: '#355B6F' }}
                 >
                   {statusCount} estados legales
                 </span>
