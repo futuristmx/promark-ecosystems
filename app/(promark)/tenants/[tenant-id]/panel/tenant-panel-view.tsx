@@ -77,7 +77,7 @@ export function TenantPanelView({
         <TabsTrigger value="tree">Vista de árbol</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="overview" className="space-y-6 pt-4">
+      <TabsContent value="overview" className="space-y-12 pt-6">
         <KpiGrid>
           <KpiCard
             label="Total marcas"

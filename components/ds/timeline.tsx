@@ -44,13 +44,8 @@ const TONE_COLOR: Record<StatusTone, string> = {
 /**
  * Timeline vertical premium para historiales.
  *
- * Cada evento es un nodo con:
- * - Dot izquierdo con tone color
- * - Línea conectora vertical
- * - Card derecha con title + description + actor + timestamp
- *
- * Apto para BrandHistory, ContractHistory, AuditLog, etc.
- * Si pasas `href`, toda la card se vuelve clickeable.
+ * Diseño compacto: dot + línea conectora + contenido inline.
+ * Sin cards envolventes — info fluye directamente.
  */
 export function DsTimeline({
   events,
@@ -64,7 +59,7 @@ export function DsTimeline({
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex gap-4">
             <div className="size-2 mt-2 rounded-full" style={{ background: '#C8C4B9' }} />
-            <div className="flex-1 h-16 animate-pulse rounded-xl" style={{ background: '#F1EDE3' }} />
+            <div className="flex-1 h-10 animate-pulse rounded-lg" style={{ background: '#F1EDE3' }} />
           </div>
         ))}
       </div>
@@ -75,10 +70,10 @@ export function DsTimeline({
     return (
       <div
         className={cn(
-          'rounded-2xl border border-dashed bg-white py-12 text-center text-sm',
+          'rounded-2xl border border-dashed py-10 text-center text-sm',
           className
         )}
-        style={{ borderColor: '#E2DED6', color: '#355B6F' }}
+        style={{ borderColor: '#E2DED6', background: '#F1EDE3', color: '#355B6F' }}
       >
         {emptyMessage}
       </div>
@@ -90,32 +85,29 @@ export function DsTimeline({
       {events.map((event, index) => {
         const isLast = index === events.length - 1;
         const dotColor = TONE_COLOR[event.tone ?? 'muted'];
+
         const content = (
-          <div
-            className="flex-1 rounded-xl border bg-white px-4 py-3 transition-colors"
-            style={{ borderColor: '#E2DED6' }}
-          >
+          <div className="flex-1 pb-1">
             <div className="flex flex-wrap items-center gap-2">
               {event.category && (
                 <span
-                  className="rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                  className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
                   style={{
-                    borderColor: `${dotColor}33`,
-                    background: `${dotColor}10`,
+                    background: `${dotColor}14`,
                     color: dotColor,
                   }}
                 >
                   {event.category}
                 </span>
               )}
-              <p className="text-sm font-semibold" style={{ color: '#1A1E23' }}>
+              <span className="text-sm font-medium" style={{ color: '#1A1E23' }}>
                 {event.title}
-              </p>
+              </span>
             </div>
             {event.description && (
-              <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>{event.description}</p>
+              <p className="mt-0.5 text-xs" style={{ color: '#355B6F' }}>{event.description}</p>
             )}
-            <p className="mt-1.5 text-[11px]" style={{ color: '#C8C4B9' }}>
+            <p className="mt-1 text-[11px]" style={{ color: '#C8C4B9' }}>
               {formatRelativeTime(event.timestamp)}
               {event.actor && <> · {event.actor}</>}
             </p>
@@ -125,34 +117,27 @@ export function DsTimeline({
         return (
           <li
             key={event.id}
-            className="group relative flex gap-4 pb-4 last:pb-0"
+            className="group relative flex gap-3 pb-5 last:pb-0"
+            style={!isLast ? { borderLeft: 'none' } : undefined}
           >
             {/* Connector line */}
             {!isLast && (
               <span
                 aria-hidden
-                className="absolute left-[7px] top-5 h-full w-px"
+                className="absolute left-[5px] top-4 h-full w-px"
                 style={{ background: '#E2DED6' }}
               />
             )}
             {/* Dot */}
             <span
-              className="relative z-10 mt-2 flex size-4 shrink-0 items-center justify-center rounded-full"
+              className="relative z-10 mt-1.5 flex size-3 shrink-0 items-center justify-center rounded-full"
               style={{ background: dotColor }}
             >
-              <span
-                aria-hidden
-                className="size-1.5 rounded-full bg-white"
-              />
-              {event.icon && (
-                <span className="absolute inset-0 flex items-center justify-center text-white">
-                  {event.icon}
-                </span>
-              )}
+              <span aria-hidden className="size-1 rounded-full bg-white" />
             </span>
             {/* Content */}
             {event.href ? (
-              <Link href={event.href} className="flex-1">
+              <Link href={event.href} className="flex-1 hover:opacity-80 transition-opacity">
                 {content}
               </Link>
             ) : (

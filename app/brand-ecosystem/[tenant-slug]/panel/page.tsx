@@ -102,7 +102,7 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
   }));
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-12 p-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">
           Panel — {tenant.name}

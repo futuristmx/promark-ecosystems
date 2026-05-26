@@ -157,7 +157,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div>
+    <div className="space-y-12">
       <PageTitle
         eyebrow="Panel ejecutivo"
         title={`Bienvenido, ${session.full_name}`}
@@ -188,20 +188,16 @@ export default async function DashboardPage() {
         />
       </KpiGrid>
 
-      <div className="mt-10">
-        <DsCard variant="standard">
-          <StatusDonut
-            data={statusDistribution}
-            title="Distribución por estado legal"
-          />
-        </DsCard>
-      </div>
+      <DsCard variant="standard">
+        <StatusDonut
+          data={statusDistribution}
+          title="Distribución por estado legal"
+        />
+      </DsCard>
 
-      <div className="mt-4">
-        <DsCard variant="standard">
-          <TopTenantsBar data={topTenants} />
-        </DsCard>
-      </div>
+      <DsCard variant="standard">
+        <TopTenantsBar data={topTenants} />
+      </DsCard>
 
       <RecentActivity
         items={activity}
