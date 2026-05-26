@@ -20,3 +20,4 @@ export type { TimelineEvent } from './timeline';
 export { DsNodeCard } from './node-card';
 export type { NodeType } from './node-card';
 export { DsWorkflowCanvas } from './workflow-canvas';
+export { CsvToolbar } from './csv-toolbar';
