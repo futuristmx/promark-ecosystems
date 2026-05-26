@@ -102,8 +102,8 @@ Referencia tecnica completa del design system. Todos los valores son exactos, ex
 
 | Token           | Stack                                                                          |
 |------------------|--------------------------------------------------------------------------------|
-| `--font-sans`    | DM Sans, Open Sans, Manrope, -apple-system, BlinkMacSystemFont, Segoe UI      |
-| `--font-heading` | DM Sans, Open Sans, Manrope, sans-serif                                        |
+| `--font-sans`    | Manrope, DM Sans, Open Sans, -apple-system, BlinkMacSystemFont, Segoe UI      |
+| `--font-heading` | Manrope, DM Sans, Open Sans, sans-serif                                        |
 | `--font-mono`    | Geist Mono                                                                     |
 
 **Feature settings:** `font-feature-settings: "ss01", "cv11"` en body.
@@ -786,7 +786,7 @@ padding: 8px 14px;
 box-shadow: 0 8px 32px rgba(0,0,0,0.18);
 color: #FBF6EC (o #F1F5F9 en vigency/impi);
 font-size: 12px;
-font-family: var(--font-dm-sans, DM Sans, sans-serif);
+font-family: var(--font-manrope, Manrope, sans-serif);
 ```
 
 Item style: color `#DDEAF2` (o `#E2E8F0`), fontSize 12.
