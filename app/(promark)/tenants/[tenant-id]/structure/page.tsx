@@ -6,6 +6,7 @@ import { requirePromarkAuth } from '@/lib/auth/promark';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
+import { Suspense } from 'react';
 import { PageTitle, EmptyState } from '@/components/ds';
 import {
   HOLDING_STATUS_LABELS,
@@ -18,6 +19,7 @@ import {
   CardContent,
   CardAction,
 } from '@/components/ui/card';
+import { StructureSheets } from './structure-sheets';
 
 interface StructurePageProps {
   params: Promise<{ 'tenant-id': string }>;
@@ -182,6 +184,12 @@ export default async function StructurePage({ params }: StructurePageProps) {
           ))}
         </div>
       )}
+      <Suspense fallback={null}>
+        <StructureSheets
+          tenantId={tenantId}
+          holdings={holdings.map((h) => ({ id: h.id, name: h.name }))}
+        />
+      </Suspense>
     </div>
   );
 }
