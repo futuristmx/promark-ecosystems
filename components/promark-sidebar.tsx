@@ -14,6 +14,7 @@ import {
   KeyRound,
   Activity,
   Settings,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -182,15 +183,19 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
 
       {/* User info footer */}
       <div className="border-t border-slate-200/60 p-3">
-        <div
-          className="rounded-lg border border-slate-200/60 px-3 py-2.5"
+        <Link
+          href="/settings/profile"
+          className="flex items-center gap-2.5 rounded-lg border border-slate-200/60 px-3 py-2.5 transition-colors hover:border-[#0066FF]/20 hover:bg-[rgba(0,102,255,0.04)]"
           style={{ background: 'rgba(0, 102, 255, 0.04)' }}
         >
-          <p className="truncate text-sm font-semibold text-slate-900">{userName}</p>
-          <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-slate-500">
-            {userRole}
-          </p>
-        </div>
+          <UserCircle className="h-5 w-5 shrink-0 text-slate-400" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-slate-900">{userName}</p>
+            <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-slate-500">
+              {userRole}
+            </p>
+          </div>
+        </Link>
       </div>
     </aside>
   );

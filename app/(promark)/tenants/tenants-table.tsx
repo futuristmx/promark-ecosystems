@@ -3,6 +3,7 @@
 import { DsDataTable, StatusBadge } from '@/components/ds';
 import type { StatusTone, DsColumn } from '@/components/ds';
 import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
+import { Network, BarChart3, Settings } from 'lucide-react';
 
 const STATUS_TONE: Record<string, StatusTone> = {
   ACTIVE: 'success',
@@ -67,13 +68,25 @@ export function TenantsTable({ tenants, isSuperAdmin }: TenantsTableProps) {
       rows={tenants}
       getRowId={(t) => t.id}
       rowActions={[
-        { label: 'Gestionar', href: (t) => `/tenants/${t.id}/structure` },
-        { label: 'Ver panel', href: (t) => `/tenants/${t.id}/panel` },
+        {
+          label: 'Estructura',
+          icon: <Network className="size-4" />,
+          href: (t) => `/tenants/${t.id}/structure`,
+          quickAction: true,
+        },
+        {
+          label: 'Panel',
+          icon: <BarChart3 className="size-4" />,
+          href: (t) => `/tenants/${t.id}/panel`,
+          quickAction: true,
+        },
         ...(isSuperAdmin
           ? [
               {
                 label: 'Configurar',
+                icon: <Settings className="size-4" /> as React.ReactNode,
                 href: (t: TenantRow) => `/tenants/${t.id}/configuracion`,
+                quickAction: true,
               },
             ]
           : []),

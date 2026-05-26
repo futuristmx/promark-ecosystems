@@ -31,6 +31,10 @@ export interface DsRowAction<T> {
   onClick?: (row: T) => void;
   href?: (row: T) => string;
   destructive?: boolean;
+  /** Lucide icon element for this action */
+  icon?: React.ReactNode;
+  /** Show as inline quick-action icon instead of inside the overflow menu */
+  quickAction?: boolean;
 }
 
 interface DsDataTableProps<T> {
@@ -211,20 +215,23 @@ export function DsDataTable<T>({
                     </td>
                   );
                 })}
-                {rowActions && rowActions.length > 0 && (
-                  <td className="px-2 py-3 text-right" data-table-action>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        className="inline-flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700"
-                        aria-label="Acciones"
-                      >
-                        <MoreVertical className="size-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44">
-                        {rowActions.map((action) => (
-                          <DropdownMenuItem
+                {rowActions && rowActions.length > 0 && (() => {
+                  const quickActions = rowActions.filter((a) => a.quickAction);
+                  const overflowActions = rowActions.filter((a) => !a.quickAction);
+                  return (
+                    <td className="px-2 py-3 text-right" data-table-action>
+                      <div className="inline-flex items-center gap-0.5">
+                        {quickActions.map((action) => (
+                          <button
                             key={action.label}
-                            variant={action.destructive ? 'destructive' : 'default'}
+                            type="button"
+                            title={action.label}
+                            className={cn(
+                              'inline-flex size-7 items-center justify-center rounded-md transition-colors',
+                              action.destructive
+                                ? 'text-slate-400 hover:bg-red-50 hover:text-red-600'
+                                : 'text-slate-400 hover:bg-slate-200/60 hover:text-slate-700'
+                            )}
                             onClick={() => {
                               if (action.href) {
                                 window.location.href = action.href(row);
@@ -233,13 +240,41 @@ export function DsDataTable<T>({
                               }
                             }}
                           >
-                            {action.label}
-                          </DropdownMenuItem>
+                            {action.icon ?? <span className="text-xs">{action.label[0]}</span>}
+                          </button>
                         ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                )}
+                        {overflowActions.length > 0 && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger
+                              className="inline-flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700"
+                              aria-label="Más acciones"
+                            >
+                              <MoreVertical className="size-4" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                              {overflowActions.map((action) => (
+                                <DropdownMenuItem
+                                  key={action.label}
+                                  variant={action.destructive ? 'destructive' : 'default'}
+                                  onClick={() => {
+                                    if (action.href) {
+                                      window.location.href = action.href(row);
+                                    } else {
+                                      action.onClick?.(row);
+                                    }
+                                  }}
+                                >
+                                  {action.icon && <span className="mr-2">{action.icon}</span>}
+                                  {action.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </div>
+                    </td>
+                  );
+                })()}
               </tr>
             );
           })}
