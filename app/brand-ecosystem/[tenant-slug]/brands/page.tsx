@@ -1,31 +1,7 @@
-import Link from 'next/link';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
-import { BrandVigencyDot } from '@/components/brand-vigency-dot';
-import { BrandFilters } from './brand-filters';
-import { ExportMenu } from '@/components/export-menu';
-import type { LegalStatus } from '@prisma/client';
-
-const VISUAL_BRAND_TYPES = ['FIGURATIVE', 'MIXED', 'THREE_D', 'TRADE_DRESS', 'HOLOGRAM'];
-
-function BrandLogoThumb({ logos, brandType }: { logos: unknown; brandType: string }) {
-  if (!VISUAL_BRAND_TYPES.includes(brandType)) return <div className="h-10 w-10" />;
-  let src: string | null = null;
-  if (typeof logos === 'string' && logos.startsWith('data:')) src = logos;
-  else if (Array.isArray(logos) && logos.length > 0) {
-    const first = logos[0];
-    src = typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
-  } else if (logos && typeof logos === 'object' && !Array.isArray(logos)) {
-    const obj = logos as Record<string, unknown>;
-    src = (obj.url ?? obj.data ?? obj.image) as string | null;
-  }
-  if (!src) return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-medium"
-      style={{ background: 'rgba(143,182,199,0.12)', color: '#8FB6C7' }}>IMG</div>
-  );
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="Logo" className="h-10 w-10 rounded-lg object-contain" style={{ background: '#FBF6EC' }} />;
-}
+import { BrandCatalogView } from './brand-catalog-view';
+import type { SerializedBrand } from './brand-catalog-view';
 
 interface BrandsPageProps {
   params: Promise<{ 'tenant-slug': string }>;
@@ -36,28 +12,6 @@ interface BrandsPageProps {
     vigency?: string;
   }>;
 }
-
-const STATUS_LABELS: Record<string, string> = {
-  APPLIED: 'Solicitada',
-  PUBLISHED: 'Publicada',
-  REGISTERED: 'Registrada',
-  RENEWED: 'Renovada',
-  EXPIRED: 'Expirada',
-  CANCELLED: 'Cancelada',
-  OPPOSED: 'Opuesta',
-  IN_LITIGATION: 'En litigio',
-};
-
-const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
-  APPLIED: { bg: 'rgba(143,182,199,0.12)', color: '#355B6F', border: 'rgba(143,182,199,0.3)' },
-  PUBLISHED: { bg: 'rgba(53,91,111,0.1)', color: '#355B6F', border: 'rgba(53,91,111,0.25)' },
-  REGISTERED: { bg: 'rgba(15,46,61,0.08)', color: '#0F2E3D', border: 'rgba(15,46,61,0.2)' },
-  RENEWED: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F', border: 'rgba(47,107,79,0.2)' },
-  EXPIRED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318', border: 'rgba(180,35,24,0.2)' },
-  CANCELLED: { bg: 'rgba(200,196,185,0.2)', color: '#C8C4B9', border: 'rgba(200,196,185,0.4)' },
-  OPPOSED: { bg: 'rgba(211,154,43,0.1)', color: '#D39A2B', border: 'rgba(211,154,43,0.25)' },
-  IN_LITIGATION: { bg: 'rgba(11,31,42,0.08)', color: '#0B1F2A', border: 'rgba(11,31,42,0.2)' },
-};
 
 function getVigencyBucket(expirationDate: Date | null, legalStatus: string): string {
   if (
@@ -144,136 +98,25 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
 
   const basePath = `/brand-ecosystem/${tenantSlug}/brands`;
 
-  return (
-    <div className="px-8 py-8">
-      {/* Page header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
-            Catálogo
-          </p>
-          <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Marcas</h1>
-          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
-            Catálogo de marcas registradas.
-            {filteredBrands.length > 0 && (
-              <span className="ml-1" style={{ color: '#C8C4B9' }}>
-                ({filteredBrands.length} marca{filteredBrands.length !== 1 ? 's' : ''})
-              </span>
-            )}
-          </p>
-        </div>
-        <ExportMenu
-          endpoint={`/api/client/${tenantSlug}/brands/export`}
-          hint="Descarga el catálogo completo según tus permisos."
-        />
-      </div>
-
-      {/* Filters */}
-      <div className="mb-6">
-        <BrandFilters companies={companies} basePath={basePath} />
-      </div>
-
-      {/* Table */}
-      {filteredBrands.length === 0 ? (
-        <div
-          className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16"
-          style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
-        >
-          <p className="text-sm" style={{ color: '#C8C4B9' }}>No se encontraron marcas.</p>
-        </div>
-      ) : (
-        <div
-          className="overflow-hidden rounded-2xl border"
-          style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
-        >
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
-                <th className="w-10 px-4 py-3" />
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
-                  Logo
-                </th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
-                  Nombre
-                </th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
-                  Empresa
-                </th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
-                  Estado
-                </th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
-                  No. Registro
-                </th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
-                  Expiración
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBrands.map((brand, i) => (
-                <tr
-                  key={brand.id}
-                  className="group transition-colors hover:bg-[rgba(226,222,214,0.35)]"
-                  style={{
-                    borderBottom: i < filteredBrands.length - 1 ? '1px solid #E2DED6' : undefined,
-                  }}
-                >
-                  <td className="px-4 py-3">
-                    <BrandVigencyDot
-                      expirationDate={brand.expiration_date}
-                      legalStatus={brand.legal_status}
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <BrandLogoThumb logos={brand.logos} brandType={brand.brand_type} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`${basePath}/${brand.id}`}
-                      className="font-semibold text-[#0F2E3D] transition-colors hover:text-[var(--tenant-primary,#D39A2B)]"
-                    >
-                      {brand.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3" style={{ color: '#355B6F' }}>
-                    {brand.company.name}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={brand.legal_status} />
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs" style={{ color: '#355B6F' }}>
-                    {brand.registration_number ?? '---'}
-                  </td>
-                  <td className="px-4 py-3" style={{ color: '#355B6F' }}>
-                    {brand.expiration_date
-                      ? brand.expiration_date.toLocaleDateString('es-MX', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })
-                      : '---'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: LegalStatus }) {
-  const label = STATUS_LABELS[status] ?? status;
-  const s = STATUS_STYLE[status] ?? STATUS_STYLE.APPLIED;
+  // Serialize brands for client component (dates → ISO strings)
+  const serializedBrands: SerializedBrand[] = filteredBrands.map((b) => ({
+    id: b.id,
+    name: b.name,
+    brand_type: b.brand_type,
+    legal_status: b.legal_status,
+    registration_number: b.registration_number,
+    expiration_date: b.expiration_date ? b.expiration_date.toISOString() : null,
+    logos: b.logos,
+    company: b.company,
+  }));
 
   return (
-    <span
-      className="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-      style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}` }}
-    >
-      {label}
-    </span>
+    <BrandCatalogView
+      brands={serializedBrands}
+      companies={companies}
+      basePath={basePath}
+      exportEndpoint={`/api/client/${tenantSlug}/brands/export`}
+      count={filteredBrands.length}
+    />
   );
 }

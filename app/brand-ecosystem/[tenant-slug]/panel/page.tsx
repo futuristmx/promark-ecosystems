@@ -58,16 +58,25 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
 
     return (
       <div className="space-y-10 p-8">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
-            Panel de consulta
-          </p>
-          <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>
-            {tenant.name}
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
-            Resumen de tus marcas asignadas
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--tenant-primary, #D39A2B)' }}>
+              Panel de consulta
+            </p>
+            <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>
+              {tenant.name}
+            </h1>
+            <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
+              Resumen de tus marcas asignadas
+            </p>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border px-3 py-2" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40" style={{ background: '#2F6B4F' }} />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: '#2F6B4F' }} />
+            </span>
+            <span className="text-[11px] font-semibold" style={{ color: '#2F6B4F' }}>Portafolio sincronizado</span>
+          </div>
         </div>
         <KpiGrid className="md:grid-cols-2 lg:grid-cols-2">
           <KpiCard
@@ -82,32 +91,6 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
             tone={alertsCount > 0 ? 'danger' : 'default'}
           />
         </KpiGrid>
-
-        <div
-          className="flex items-center gap-4 rounded-2xl border p-5"
-          style={{ borderColor: '#E2DED6', background: 'linear-gradient(135deg, #F1EDE3 0%, #FBF6EC 100%)' }}
-        >
-          <div className="relative flex h-10 w-10 items-center justify-center">
-            <div
-              className="absolute inset-0 animate-ping rounded-full opacity-20"
-              style={{ background: '#2F6B4F' }}
-            />
-            <div
-              className="relative flex h-10 w-10 items-center justify-center rounded-full"
-              style={{ background: 'rgba(47,107,79,0.12)' }}
-            >
-              <div className="h-3 w-3 rounded-full" style={{ background: '#2F6B4F' }} />
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
-              Portafolio conectado y actualizado
-            </p>
-            <p className="text-xs" style={{ color: '#8FB6C7' }}>
-              Base de datos sincronizada con Promark® · Monitoreo activo
-            </p>
-          </div>
-        </div>
       </div>
     );
   }
@@ -131,18 +114,27 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
 
   return (
     <div className="space-y-10 p-8">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
-          Panel ejecutivo
-        </p>
-        <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>
-          {tenant.name}
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
-          {session.role === 'CLIENT_LEGAL_REP'
-            ? 'Indicadores de las marcas a tu cargo'
-            : 'Indicadores del ecosistema de marcas'}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--tenant-primary, #D39A2B)' }}>
+            Panel ejecutivo
+          </p>
+          <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>
+            {tenant.name}
+          </h1>
+          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
+            {session.role === 'CLIENT_LEGAL_REP'
+              ? 'Indicadores de las marcas a tu cargo'
+              : 'Indicadores del ecosistema de marcas'}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border px-3 py-2" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-40" style={{ background: '#2F6B4F' }} />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: '#2F6B4F' }} />
+          </span>
+          <span className="text-[11px] font-semibold" style={{ color: '#2F6B4F' }}>Portafolio sincronizado</span>
+        </div>
       </div>
 
       <KpiGrid className="md:grid-cols-2 lg:grid-cols-2">
@@ -159,32 +151,6 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
           href={`${hrefPrefix}/contratos`}
         />
       </KpiGrid>
-
-      <div
-        className="flex items-center gap-4 rounded-2xl border p-5"
-        style={{ borderColor: '#E2DED6', background: 'linear-gradient(135deg, #F1EDE3 0%, #FBF6EC 100%)' }}
-      >
-        <div className="relative flex h-10 w-10 items-center justify-center">
-          <div
-            className="absolute inset-0 animate-ping rounded-full opacity-20"
-            style={{ background: '#2F6B4F' }}
-          />
-          <div
-            className="relative flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ background: 'rgba(47,107,79,0.12)' }}
-          >
-            <div className="h-3 w-3 rounded-full" style={{ background: '#2F6B4F' }} />
-          </div>
-        </div>
-        <div>
-          <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
-            Portafolio conectado y actualizado
-          </p>
-          <p className="text-xs" style={{ color: '#8FB6C7' }}>
-            Base de datos sincronizada con Promark® · Monitoreo activo
-          </p>
-        </div>
-      </div>
 
       <DsCard variant="standard">
         <StatusDonut data={donutData} title="Distribución por estado legal" />

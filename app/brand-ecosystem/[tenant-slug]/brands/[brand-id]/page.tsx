@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { DocumentsPanel } from '@/components/documents-panel';
 import { getNiceClassLabel } from '@/lib/i18n/impi-classes';
+import NizaBoard from '@/components/niza-board';
 
 interface BrandDetailPageProps {
   params: Promise<{ 'tenant-slug': string; 'brand-id': string }>;
@@ -173,8 +174,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
       {/* Back link */}
       <Link
         href={basePath}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-        style={{ color: '#8FB6C7' }}
+        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-[#355B6F] transition-colors hover:text-[#0F2E3D]"
       >
         <ArrowLeft className="size-4" />
         Volver a marcas
@@ -265,31 +265,30 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
         </Section>
       )}
 
-      {/* Nice classes */}
-      {brand.classes.length > 0 && (
-        <Section title="Clases de Niza" className="mb-8">
-          <div className="space-y-2">
+      {/* Nice classes — visual 45-class board */}
+      <Section title="Clases de Niza" className="mb-8">
+        <NizaBoard registeredClasses={brand.classes.map((c) => c.class_number)} />
+        {brand.classes.length > 0 && (
+          <div className="mt-4 space-y-1.5">
             {brand.classes.map((cls) => (
               <div
                 key={cls.id}
-                className="flex items-start gap-3 rounded-xl border px-4 py-3"
-                style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                className="flex items-center gap-2.5 text-xs"
               >
                 <span
-                  className="inline-flex h-6 min-w-6 items-center justify-center rounded-lg text-xs font-bold"
-                  style={{ background: 'rgba(15,46,61,0.08)', color: '#0F2E3D' }}
+                  className="inline-flex h-5 min-w-5 items-center justify-center rounded text-[10px] font-bold"
+                  style={{ background: 'rgba(15,46,61,0.1)', color: '#0F2E3D' }}
                 >
                   {cls.class_number}
                 </span>
-                <span className="text-sm" style={{ color: '#355B6F' }}>
-                  {cls.class_description ??
-                    getNiceClassLabel(cls.class_number)}
+                <span style={{ color: '#355B6F' }}>
+                  {cls.class_description ?? getNiceClassLabel(cls.class_number)}
                 </span>
               </div>
             ))}
           </div>
-        </Section>
-      )}
+        )}
+      </Section>
 
       {/* Holders */}
       {brand.holders.length > 0 && (
@@ -305,7 +304,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
                   <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
                     {bh.holder.name}
                   </p>
-                  <p className="text-xs" style={{ color: '#8FB6C7' }}>
+                  <p className="text-xs" style={{ color: '#355B6F' }}>
                     {bh.holder.holder_type === 'INDIVIDUAL'
                       ? 'Persona física'
                       : 'Persona moral'}
@@ -393,7 +392,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
                     <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
                       {cb.contract.title}
                     </p>
-                    <p className="text-xs" style={{ color: '#8FB6C7' }}>
+                    <p className="text-xs" style={{ color: '#355B6F' }}>
                       {formatContractType(cb.contract.contract_type)} &middot;{' '}
                       {cb.contract.expiration_date
                         ? `Vence ${formatDate(cb.contract.expiration_date)}`
@@ -430,7 +429,7 @@ function InfoCard({ icon, label, value }: InfoCardProps) {
       className="rounded-xl border px-4 py-3"
       style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
     >
-      <div className="flex items-center gap-2" style={{ color: '#8FB6C7' }}>
+      <div className="flex items-center gap-2" style={{ color: '#355B6F' }}>
         {icon}
         <span className="text-[10px] font-semibold uppercase tracking-wider">{label}</span>
       </div>
