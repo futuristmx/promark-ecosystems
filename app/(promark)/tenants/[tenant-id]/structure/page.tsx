@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Plus, Pencil, ChevronDown, Building2, Network } from 'lucide-react';
+import { Plus, Pencil, Building2, Network } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import { Breadcrumb } from '@/components/breadcrumb';
@@ -58,24 +58,40 @@ export default async function StructurePage({ params }: StructurePageProps) {
       <Breadcrumb
         items={[
           { label: 'Clientes', href: '/tenants' },
-          { label: tenant.name, href: `/tenants/${tenantId}/structure` },
+          { label: tenant.name, href: `/tenants/${tenantId}/panel` },
           { label: 'Estructura Corporativa' },
         ]}
       />
 
       <PageTitle
-        eyebrow="Cliente"
+        eyebrow={tenant.name}
         title="Estructura Corporativa"
         subtitle={`Holdings, empresas y distribución de marcas de ${tenant.name}.`}
         actions={
           canEdit ? (
-            <Link
-              href={`/tenants/${tenantId}/structure?action=new-holding`}
-              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
-            >
-              <Plus className="size-4" />
-              Nuevo Holding
-            </Link>
+            <div className="flex items-center gap-2">
+              <a
+                href={`/api/tenants/${tenantId}/csv?type=holdings`}
+                target="_blank"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+              >
+                CSV Holdings
+              </a>
+              <a
+                href={`/api/tenants/${tenantId}/csv?type=companies`}
+                target="_blank"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+              >
+                CSV Empresas
+              </a>
+              <Link
+                href={`/tenants/${tenantId}/structure?action=new-holding`}
+                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+              >
+                <Plus className="size-4" />
+                Nuevo Holding
+              </Link>
+            </div>
           ) : null
         }
       />

@@ -15,6 +15,8 @@ import {
   Activity,
   Settings,
   UserCircle,
+  LogOut,
+  Briefcase,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -50,15 +52,20 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
   const tenantId = tenantMatch ? tenantMatch[1] : null;
 
   const [pendingAlerts, setPendingAlerts] = useState<number>(0);
+  const [tenantName, setTenantName] = useState<string>('');
 
   useEffect(() => {
-    if (!tenantId) return;
+    if (!tenantId) { setTenantName(''); setPendingAlerts(0); return; }
     const controller = new AbortController();
     fetch(`/api/tenants/${tenantId}/alerts?status=PENDING&limit=1`, {
       signal: controller.signal,
     })
       .then((r) => (r.ok ? r.json() : { total: 0 }))
       .then((d) => setPendingAlerts(d.total ?? 0))
+      .catch(() => {});
+    fetch(`/api/tenants/${tenantId}/info`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.name) setTenantName(d.name); })
       .catch(() => {});
     return () => controller.abort();
   }, [tenantId, pathname]);
@@ -76,24 +83,9 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           icon: <Network className="h-4 w-4" />,
         },
         {
-          href: `/tenants/${tenantId}/brands`,
-          label: 'Marcas',
-          icon: <Tag className="h-4 w-4" />,
-        },
-        {
-          href: `/tenants/${tenantId}/holders`,
-          label: 'Titulares',
-          icon: <Users className="h-4 w-4" />,
-        },
-        {
-          href: `/tenants/${tenantId}/contratos`,
-          label: 'Contratos',
-          icon: <Scroll className="h-4 w-4" />,
-        },
-        {
-          href: `/tenants/${tenantId}/licencias`,
-          label: 'Licencias',
-          icon: <KeyRound className="h-4 w-4" />,
+          href: `/tenants/${tenantId}/portfolio`,
+          label: 'Portafolio',
+          icon: <Briefcase className="h-4 w-4" />,
         },
         {
           href: `/tenants/${tenantId}/alerts`,
@@ -161,7 +153,7 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
         {tenantId && tenantSubNav.length > 0 && (
           <>
             <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
-              Cliente
+              {tenantName || 'Cliente'}
             </p>
             {tenantSubNav.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -182,7 +174,7 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
       </nav>
 
       {/* User info footer */}
-      <div className="border-t border-slate-200/60 p-3">
+      <div className="border-t border-slate-200/60 p-3 space-y-2">
         <Link
           href="/settings/profile"
           className="flex items-center gap-2.5 rounded-lg border border-slate-200/60 px-3 py-2.5 transition-colors hover:border-[#0066FF]/20 hover:bg-[rgba(0,102,255,0.04)]"
@@ -196,6 +188,17 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
             </p>
           </div>
         </Link>
+        <button
+          type="button"
+          onClick={async () => {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/login';
+          }}
+          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
+        >
+          <LogOut className="h-4 w-4" />
+          Cerrar sesión
+        </button>
       </div>
     </aside>
   );
