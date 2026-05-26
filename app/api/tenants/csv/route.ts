@@ -116,7 +116,7 @@ export async function POST(request: Request) {
         data: {
           name,
           slug,
-          status: status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
+          status: status === 'SUSPENDED' ? 'SUSPENDED' : status === 'ONBOARDING' ? 'ONBOARDING' : 'ACTIVE',
         },
       });
       created++;
