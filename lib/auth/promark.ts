@@ -9,6 +9,7 @@ export interface PromarkSession {
   full_name: string;
   role: PromarkRole;
   supabase_auth_id: string;
+  avatar: unknown;
 }
 
 export async function getPromarkSession(): Promise<PromarkSession | null> {
@@ -25,6 +26,7 @@ export async function getPromarkSession(): Promise<PromarkSession | null> {
       full_name: true,
       role: true,
       supabase_auth_id: true,
+      avatar: true,
     },
   });
 

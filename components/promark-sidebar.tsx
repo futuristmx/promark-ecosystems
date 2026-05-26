@@ -20,6 +20,21 @@ import { cn } from '@/lib/utils';
 interface PromarkSidebarProps {
   userName: string;
   userRole: string;
+  userAvatar?: unknown;
+}
+
+function extractAvatarSrc(avatar: unknown): string | null {
+  if (!avatar) return null;
+  if (typeof avatar === 'string' && avatar.startsWith('data:')) return avatar;
+  if (Array.isArray(avatar) && avatar.length > 0) {
+    const first = avatar[0];
+    return typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
+  }
+  if (typeof avatar === 'object' && avatar !== null) {
+    const obj = avatar as Record<string, unknown>;
+    return (obj.url ?? obj.data ?? obj.image) as string | null;
+  }
+  return null;
 }
 
 interface NavItem {
@@ -42,7 +57,8 @@ const mainNav: NavItem[] = [
   },
 ];
 
-export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
+export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSidebarProps) {
+  const avatarSrc = extractAvatarSrc(userAvatar);
   const pathname = usePathname();
 
   const tenantMatch = pathname.match(/^\/tenants\/([^/]+)\//);
@@ -218,7 +234,14 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
             e.currentTarget.style.borderColor = 'rgba(251, 246, 236, 0.10)';
           }}
         >
-          <UserCircle className="h-5 w-5 shrink-0 transition-colors" style={{ color: 'rgba(251, 246, 236, 0.5)' }} />
+          {avatarSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarSrc} alt={userName} className="h-8 w-8 shrink-0 rounded-full object-cover" style={{ border: '2px solid rgba(211,154,43,0.4)' }} />
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: 'rgba(211,154,43,0.2)', color: '#D39A2B' }}>
+              {userName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold" style={{ color: '#FBF6EC' }}>{userName}</p>
             <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'rgba(251, 246, 236, 0.5)' }}>
