@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import { PageTitle } from '@/components/ds';
 import { BrandingEditor } from './branding-editor';
+import { ClientPasswordReset } from './client-password-reset';
 
 interface Props {
   params: Promise<{ 'tenant-id': string }>;
@@ -78,6 +79,10 @@ export default async function TenantConfigPage({ params }: Props) {
           expiry_alert_days: cfg.notifications?.expiry_alert_days ?? 90,
         }}
       />
+
+      <div className="mt-6">
+        <ClientPasswordReset tenantId={tenantId} tenantName={tenant.name} />
+      </div>
     </div>
   );
 }

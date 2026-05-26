@@ -6,12 +6,8 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Building2,
-  Tag,
-  Users,
   Network,
   Bell,
-  Scroll,
-  KeyRound,
   Activity,
   Settings,
   UserCircle,
@@ -29,6 +25,8 @@ interface NavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
+  /** Additional path prefixes that mark this item as active */
+  activeAlso?: string[];
 }
 
 const mainNav: NavItem[] = [
@@ -86,6 +84,13 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           href: `/tenants/${tenantId}/portfolio`,
           label: 'Portafolio',
           icon: <Briefcase className="h-4 w-4" />,
+          // Old individual routes also count as "Portafolio" active
+          activeAlso: [
+            `/tenants/${tenantId}/brands`,
+            `/tenants/${tenantId}/holders`,
+            `/tenants/${tenantId}/contratos`,
+            `/tenants/${tenantId}/licencias`,
+          ],
         },
         {
           href: `/tenants/${tenantId}/alerts`,
@@ -105,9 +110,19 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
       ]
     : [];
 
+  function isItemActive(item: NavItem): boolean {
+    if (pathname === item.href || pathname.startsWith(item.href + '/')) return true;
+    if (item.activeAlso) {
+      return item.activeAlso.some(
+        (p) => pathname === p || pathname.startsWith(p + '/')
+      );
+    }
+    return false;
+  }
+
   return (
-    <aside className="flex w-64 flex-col border-r border-slate-200/60 bg-white">
-      {/* Logo block — placeholder jaguar/wordmark hasta que el usuario suba SVG */}
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-slate-200/60 bg-white">
+      {/* Logo */}
       <div className="flex items-center gap-2.5 border-b border-slate-200/60 px-5 py-4">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div
@@ -130,63 +145,55 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
         </Link>
       </div>
 
-      {/* Main Navigation */}
+      {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
         <p className="mb-1 mt-1 px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
           Workspace
         </p>
-        {mainNav.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + '/');
-          return (
-            <NavLinkItem
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              isActive={isActive}
-            />
-          );
-        })}
+        {mainNav.map((item) => (
+          <NavLinkItem
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            isActive={isItemActive(item)}
+          />
+        ))}
 
-        {/* Tenant sub-navigation */}
         {tenantId && tenantSubNav.length > 0 && (
           <>
             <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
               {tenantName || 'Cliente'}
             </p>
-            {tenantSubNav.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-              const isAlerts = item.href.endsWith('/alerts');
-              return (
-                <NavLinkItem
-                  key={item.href}
-                  href={item.href}
-                  icon={item.icon}
-                  label={item.label}
-                  isActive={isActive}
-                  badge={isAlerts && pendingAlerts > 0 ? pendingAlerts : undefined}
-                />
-              );
-            })}
+            {tenantSubNav.map((item) => (
+              <NavLinkItem
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                label={item.label}
+                isActive={isItemActive(item)}
+                badge={item.href.endsWith('/alerts') && pendingAlerts > 0 ? pendingAlerts : undefined}
+              />
+            ))}
           </>
         )}
       </nav>
 
-      {/* User info footer */}
-      <div className="border-t border-slate-200/60 p-3 space-y-2">
+      {/* User footer */}
+      <div className="border-t border-slate-200/60 p-3 space-y-1.5">
         <Link
           href="/settings/profile"
-          className="flex items-center gap-2.5 rounded-lg border border-slate-200/60 px-3 py-2.5 transition-colors hover:border-[#0066FF]/20 hover:bg-[rgba(0,102,255,0.04)]"
-          style={{ background: 'rgba(0, 102, 255, 0.04)' }}
+          className="group flex items-center gap-2.5 rounded-lg border border-slate-200/60 px-3 py-2.5 transition-all duration-200 hover:border-[#0066FF]/30 hover:bg-[#0066FF]/[0.06] hover:shadow-sm"
+          style={{ background: 'rgba(0, 102, 255, 0.03)' }}
         >
-          <UserCircle className="h-5 w-5 shrink-0 text-slate-400" />
+          <UserCircle className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-hover:text-[#0066FF]" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-slate-900">{userName}</p>
             <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-slate-500">
               {userRole}
             </p>
           </div>
+          <Settings className="h-3.5 w-3.5 text-slate-300 transition-colors group-hover:text-[#0066FF]" />
         </Link>
         <button
           type="button"
@@ -194,7 +201,7 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
             await fetch('/api/auth/logout', { method: 'POST' });
             window.location.href = '/login';
           }}
-          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
+          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
         >
           <LogOut className="h-4 w-4" />
           Cerrar sesión
