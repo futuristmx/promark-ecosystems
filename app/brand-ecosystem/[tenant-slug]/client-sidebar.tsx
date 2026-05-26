@@ -116,7 +116,7 @@ export function ClientSidebar({
           <span className="block truncate text-sm font-bold" style={{ color: '#0F2E3D' }}>
             {displayName}
           </span>
-          <span className="block text-[10px] font-medium" style={{ color: '#8FB6C7' }}>
+          <span className="block text-[10px] font-medium" style={{ color: '#355B6F' }}>
             Portal de clientes
           </span>
         </div>
@@ -201,7 +201,7 @@ export function ClientSidebar({
               {userName}
             </p>
             {userRoleLabel && (
-              <p className="text-[11px] font-medium" style={{ color: '#8FB6C7' }}>{userRoleLabel}</p>
+              <p className="text-[11px] font-medium" style={{ color: '#355B6F' }}>{userRoleLabel}</p>
             )}
           </div>
           <button

@@ -61,7 +61,7 @@ export function ClientDocumentsView({
   return (
     <div className="px-8 py-8">
       <div className="mb-8">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--tenant-primary, #D39A2B)' }}>
           Repositorio
         </p>
         <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Documentos</h1>
@@ -94,12 +94,12 @@ export function ClientDocumentsView({
           <table className="w-full text-sm">
             <thead>
               <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Archivo</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Categoría</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Vinculado a</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Subido</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Vence</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Tamaño</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Archivo</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Categoría</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Vinculado a</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Subido</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Vence</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Tamaño</th>
                 {allowDownload && <th className="px-4 py-3" />}
               </tr>
             </thead>
@@ -120,13 +120,13 @@ export function ClientDocumentsView({
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <FileText className="size-4 shrink-0" style={{ color: '#8FB6C7' }} />
+                      <FileText className="size-4 shrink-0" style={{ color: '#355B6F' }} />
                       <div className="min-w-0">
                         <p className="truncate font-medium" style={{ color: '#0F2E3D' }}>
                           {doc.file_name}
                         </p>
                         {doc.description && (
-                          <p className="truncate text-xs" style={{ color: '#8FB6C7' }}>
+                          <p className="truncate text-xs" style={{ color: '#355B6F' }}>
                             {doc.description}
                           </p>
                         )}

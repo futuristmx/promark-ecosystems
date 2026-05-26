@@ -60,7 +60,7 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
     <div className="px-8 py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--tenant-primary, #D39A2B)' }}>
             Centro de alertas
           </p>
           <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Alertas</h1>

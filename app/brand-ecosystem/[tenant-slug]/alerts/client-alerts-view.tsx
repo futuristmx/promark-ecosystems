@@ -103,7 +103,7 @@ export function ClientAlertsView({ tenantId, alerts: initial }: ClientAlertsView
                   <p className="text-sm font-semibold truncate" style={{ color: '#0F2E3D' }}>
                     {alert.entity_name}
                   </p>
-                  <p className="text-xs" style={{ color: '#8FB6C7' }}>{ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}</p>
+                  <p className="text-xs" style={{ color: '#355B6F' }}>{ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}</p>
                 </div>
                 <button
                   type="button"
@@ -157,7 +157,7 @@ export function ClientAlertsView({ tenantId, alerts: initial }: ClientAlertsView
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate" style={{ color: '#0F2E3D' }}>{alert.entity_name}</p>
-                  <p className="text-xs" style={{ color: '#8FB6C7' }}>{ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}</p>
+                  <p className="text-xs" style={{ color: '#355B6F' }}>{ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}</p>
                 </div>
               </div>
             );

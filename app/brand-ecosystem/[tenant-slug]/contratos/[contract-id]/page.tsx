@@ -62,7 +62,7 @@ export default async function ClientContractDetailPage({ params }: Props) {
       <Link
         href={`/brand-ecosystem/${tenantSlug}/contratos`}
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-        style={{ color: '#8FB6C7' }}
+        style={{ color: '#355B6F' }}
       >
         <ArrowLeft className="size-4" />
         Volver a contratos
@@ -137,7 +137,7 @@ export default async function ClientContractDetailPage({ params }: Props) {
 function F({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>{label}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>{label}</p>
       <div className="mt-0.5 text-sm font-medium" style={{ color: '#0F2E3D' }}>{children}</div>
     </div>
   );

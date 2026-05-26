@@ -259,22 +259,22 @@ function ListView({ brands, basePath }: { brands: SerializedBrand[]; basePath: s
         <thead>
           <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
             <th className="w-10 px-4 py-3" />
-            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
               Logo
             </th>
-            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
               Nombre
             </th>
-            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
               Empresa
             </th>
-            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
               Estado
             </th>
-            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
               No. Registro
             </th>
-            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+            <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
               Expiración
             </th>
           </tr>

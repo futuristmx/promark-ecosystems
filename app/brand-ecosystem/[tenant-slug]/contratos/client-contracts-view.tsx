@@ -42,7 +42,7 @@ export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
     <div className="px-8 py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--tenant-primary, #D39A2B)' }}>
             Gestión contractual
           </p>
           <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Contratos</h1>
@@ -69,11 +69,11 @@ export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Título</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Tipo</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Marcas vinculadas</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Vencimiento</th>
-                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Estado</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Título</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Tipo</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Marcas vinculadas</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Vencimiento</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>Estado</th>
               </tr>
             </thead>
             <tbody>
