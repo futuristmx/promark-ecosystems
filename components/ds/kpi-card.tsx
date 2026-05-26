@@ -49,8 +49,6 @@ export function KpiCard({
         borderColor: '#E2DED6',
         background: '#F1EDE3',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = '#E2DED6'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = '#F1EDE3'; }}
     >
       <div className="flex items-start justify-between">
         <p
