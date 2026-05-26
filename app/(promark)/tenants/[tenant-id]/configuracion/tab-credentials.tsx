@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck, User } from 'lucide-react';
+import { Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck, User, Copy, Check } from 'lucide-react';
 
 interface ClientUser {
   id: string;
@@ -30,6 +30,27 @@ const STATUS_LABEL: Record<string, { text: string; color: string; bg: string }> 
   INACTIVE: { text: 'Inactivo', color: '#B42318', bg: 'rgba(180,35,24,0.08)' },
   LOCKED: { text: 'Bloqueado', color: '#D39A2B', bg: 'rgba(211,154,43,0.1)' },
 };
+
+function CopyBtn({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }}
+      className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium transition-colors"
+      style={{ color: copied ? '#2F6B4F' : '#8FB6C7', background: copied ? 'rgba(47,107,79,0.08)' : 'transparent' }}
+      title="Copiar"
+    >
+      {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+      {copied ? 'Copiado' : 'Copiar'}
+    </button>
+  );
+}
 
 export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(
@@ -130,8 +151,11 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
                       <p className="truncate text-sm font-semibold" style={{ color: '#1A1E23' }}>
                         {user.full_name}
                       </p>
-                      <p className="truncate text-xs" style={{ color: '#355B6F' }}>
-                        {user.card_id} · {user.email}
+                      <p className="flex items-center gap-1 truncate text-xs" style={{ color: '#355B6F' }}>
+                        <span className="font-mono">{user.card_id}</span>
+                        <CopyBtn text={user.card_id} />
+                        <span style={{ color: '#C8C4B9' }}>·</span>
+                        <span className="truncate">{user.email}</span>
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
@@ -170,6 +194,20 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               Establece un nuevo PIN de acceso. El usuario deberá usar este nuevo PIN para ingresar.
             </p>
+
+            {/* Copyable credentials */}
+            <div
+              className="mt-4 flex items-center gap-4 rounded-xl px-4 py-3"
+              style={{ background: '#FBF6EC', border: '1px solid #E2DED6' }}
+            >
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>ID de tarjeta</p>
+                <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm font-bold" style={{ color: '#0F2E3D' }}>
+                  {selectedUser.card_id}
+                  <CopyBtn text={selectedUser.card_id} />
+                </p>
+              </div>
+            </div>
 
             <div className="mt-4 flex items-center gap-3">
               <div className="relative flex-1">
