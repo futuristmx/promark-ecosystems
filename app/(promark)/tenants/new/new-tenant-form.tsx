@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Upload, X, Image as ImageIcon, FileSpreadsheet,
+  Upload, X, Image as ImageIcon, FileSpreadsheet, Download,
   Paintbrush, Link2, Bell, CheckCircle2, AlertCircle,
   ChevronDown, ChevronUp, Loader2,
 } from 'lucide-react';
@@ -27,6 +27,36 @@ interface FeaturesState {
   show_graph_view: boolean;
   show_documents: boolean;
   allow_document_download: boolean;
+}
+
+/* ─── CSV Template ─── */
+const CSV_TEMPLATE_HEADERS = [
+  'nombre', 'razon_social', 'holding', 'empresa', 'tipo',
+  'estado_legal', 'numero_registro', 'fecha_vencimiento',
+  'logo_url', 'clase_impi', 'titular', 'titular_tipo', 'titular_rfc',
+  'contrato_titulo', 'contrato_tipo', 'licenciatario', 'licencia_tipo', 'territorio',
+];
+
+const CSV_TEMPLATE_ROWS = [
+  ['Grupo Ejemplo', 'Grupo Ejemplo S.A. de C.V.', '', 'Grupo Ejemplo', 'WORDMARK', 'REGISTERED', '123456', '2027-06-15', 'https://ejemplo.com/logo.png', '25', 'Juan Pérez', 'INDIVIDUAL', 'PERJ850101ABC', 'Licencia Nacional', 'LICENSE_INTERNAL', 'Distribuidor MX', 'EXCLUSIVE', 'México'],
+  ['', '', 'Grupo Ejemplo', 'Filial Norte S.A.', 'FIGURATIVE', 'APPLIED', '', '', '', '30', 'Grupo Ejemplo S.A.', 'CORPORATION', 'GEJ990101XYZ', '', '', '', '', ''],
+  ['', '', 'Grupo Ejemplo', 'Filial Sur S.A.', 'MIXED', 'PUBLISHED', '789012', '2028-03-01', 'https://ejemplo.com/logo2.svg', '35', '', '', '', 'Coexistencia Marca', 'COEXISTENCE', '', '', 'México;USA'],
+];
+
+function downloadCsvTemplate() {
+  const bom = '﻿'; // UTF-8 BOM for Excel
+  const header = CSV_TEMPLATE_HEADERS.join(',');
+  const rows = CSV_TEMPLATE_ROWS.map((r) =>
+    r.map((c) => (c.includes(',') || c.includes(';') ? `"${c}"` : c)).join(',')
+  );
+  const csv = bom + [header, ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'plantilla-master-promark.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 /* ─── Shared styles ─── */
@@ -538,14 +568,51 @@ export function NewTenantForm() {
           </div>
         )}
 
-        {/* Template hint */}
-        <div className="mt-4 rounded-xl px-4 py-3" style={{ background: 'rgba(221,234,242,0.3)', border: '1px solid rgba(28,63,85,0.1)' }}>
-          <p className="text-[11px] font-medium" style={{ color: '#1C3F55' }}>
-            Columnas esperadas del CSV master:
-          </p>
-          <p className="mt-1 font-mono text-[10px]" style={{ color: '#355B6F' }}>
-            holding, empresa, marca, tipo_marca, estado_legal, no_registro, fecha_vencimiento, titular, logo_url, clase_impi, contrato_titulo, contrato_tipo, licencia_tipo, licenciatario
-          </p>
+        {/* Template download + preview */}
+        <div className="mt-4 rounded-xl" style={{ background: 'rgba(221,234,242,0.3)', border: '1px solid rgba(28,63,85,0.1)' }}>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
+              <p className="text-[11px] font-bold" style={{ color: '#1C3F55' }}>
+                Plantilla CSV master
+              </p>
+              <p className="mt-0.5 text-[10px]" style={{ color: '#355B6F' }}>
+                Descarga la plantilla con columnas y ejemplo pre-llenado
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={downloadCsvTemplate}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-colors"
+              style={{ background: '#0F2E3D', color: '#FBF6EC' }}
+            >
+              <Download className="size-3" />
+              Descargar plantilla
+            </button>
+          </div>
+          <div className="overflow-x-auto border-t" style={{ borderColor: 'rgba(28,63,85,0.1)' }}>
+            <table className="w-full text-[10px]" style={{ color: '#355B6F' }}>
+              <thead>
+                <tr style={{ background: 'rgba(15,46,61,0.06)' }}>
+                  {CSV_TEMPLATE_HEADERS.map((h) => (
+                    <th key={h} className="whitespace-nowrap px-3 py-1.5 text-left font-semibold" style={{ color: '#1C3F55' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {CSV_TEMPLATE_ROWS.map((row, i) => (
+                  <tr key={i} style={i % 2 === 1 ? { background: 'rgba(15,46,61,0.03)' } : undefined}>
+                    {row.map((cell, j) => (
+                      <td key={j} className="whitespace-nowrap px-3 py-1.5 font-mono">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
