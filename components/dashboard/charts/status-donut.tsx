@@ -179,16 +179,6 @@ export function StatusDonut({
                 >
                   Marcas analizadas
                 </span>
-                <span
-                  className="mt-2 block h-px w-8"
-                  style={{ background: '#E2DED6' }}
-                />
-                <span
-                  className="mt-2 text-[10px] font-semibold uppercase tracking-widest"
-                  style={{ color: '#355B6F' }}
-                >
-                  {statusCount} estados legales
-                </span>
               </div>
             </div>
 
