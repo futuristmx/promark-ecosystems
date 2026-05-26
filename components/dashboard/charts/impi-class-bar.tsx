@@ -77,6 +77,7 @@ export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClas
               />
               <Bar
                 dataKey="count"
+                isAnimationActive={false}
                 fill="url(#bar-grad-impi)"
                 radius={[0, 6, 6, 0]}
                 barSize={24}

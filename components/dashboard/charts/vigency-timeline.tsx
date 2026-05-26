@@ -92,6 +92,7 @@ export function VigencyTimeline({ data, title }: VigencyTimelineProps) {
               />
               <Bar
                 dataKey="count"
+                isAnimationActive={false}
                 fill="url(#bar-grad-vigency)"
                 radius={[6, 6, 0, 0]}
                 barSize={18}

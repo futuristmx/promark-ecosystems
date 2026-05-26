@@ -68,6 +68,7 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
                   data={data}
                   dataKey="value"
                   nameKey="label"
+                  isAnimationActive={false}
                   cx="50%"
                   cy="45%"
                   innerRadius={64}

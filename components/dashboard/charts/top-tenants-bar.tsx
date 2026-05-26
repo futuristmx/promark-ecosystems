@@ -78,6 +78,7 @@ export function TopTenantsBar({
               />
               <Bar
                 dataKey="count"
+                isAnimationActive={false}
                 fill="url(#bar-grad-tenants)"
                 radius={[0, 6, 6, 0]}
                 barSize={28}
