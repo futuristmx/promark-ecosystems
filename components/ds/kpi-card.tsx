@@ -15,22 +15,22 @@ interface KpiCardProps {
 /* ── Tone-based accent gradients (left bar + subtle bg wash) ── */
 const TONE_ACCENT: Record<string, { bar: string; bg: string; value: string }> = {
   default: {
-    bar: 'linear-gradient(180deg, #0F2E3D 0%, #1C3F55 100%)',
+    bar: 'linear-gradient(180deg, #0F2E3D 0%, #1C3F55 60%, rgba(28,63,85,0.15) 100%)',
     bg: 'linear-gradient(135deg, rgba(15,46,61,0.04) 0%, rgba(28,63,85,0.02) 100%)',
     value: '#0F2E3D',
   },
   warning: {
-    bar: 'linear-gradient(180deg, #D39A2B 0%, #E8B84A 100%)',
+    bar: 'linear-gradient(180deg, #D39A2B 0%, #E8B84A 60%, rgba(232,184,74,0.15) 100%)',
     bg: 'linear-gradient(135deg, rgba(211,154,43,0.06) 0%, rgba(232,184,74,0.02) 100%)',
     value: '#D39A2B',
   },
   danger: {
-    bar: 'linear-gradient(180deg, #B42318 0%, #D04A3E 100%)',
+    bar: 'linear-gradient(180deg, #B42318 0%, #D04A3E 60%, rgba(208,74,62,0.15) 100%)',
     bg: 'linear-gradient(135deg, rgba(180,35,24,0.05) 0%, rgba(208,74,62,0.02) 100%)',
     value: '#B42318',
   },
   success: {
-    bar: 'linear-gradient(180deg, #2F6B4F 0%, #3D8A66 100%)',
+    bar: 'linear-gradient(180deg, #2F6B4F 0%, #3D8A66 60%, rgba(61,138,102,0.15) 100%)',
     bg: 'linear-gradient(135deg, rgba(47,107,79,0.05) 0%, rgba(61,138,102,0.02) 100%)',
     value: '#2F6B4F',
   },
@@ -68,7 +68,7 @@ export function KpiCard({
     >
       {/* Accent bar */}
       <div
-        className="w-1.5 shrink-0"
+        className="w-1 shrink-0"
         style={{ background: accent.bar }}
       />
       {/* Content area with subtle gradient wash */}
