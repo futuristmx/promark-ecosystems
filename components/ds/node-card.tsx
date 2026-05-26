@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@/lib/utils';
 
 export type NodeType = 'input' | 'process' | 'output';

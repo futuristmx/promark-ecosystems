@@ -214,15 +214,9 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
               {filteredBrands.map((brand, i) => (
                 <tr
                   key={brand.id}
-                  className="group transition-colors"
+                  className="group transition-colors hover:bg-[rgba(226,222,214,0.35)]"
                   style={{
                     borderBottom: i < filteredBrands.length - 1 ? '1px solid #E2DED6' : undefined,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(226,222,214,0.35)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
                   }}
                 >
                   <td className="px-4 py-3">
@@ -237,14 +231,7 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
                   <td className="px-4 py-3">
                     <Link
                       href={`${basePath}/${brand.id}`}
-                      className="font-semibold transition-colors"
-                      style={{ color: '#0F2E3D' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = 'var(--tenant-primary, #D39A2B)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#0F2E3D';
-                      }}
+                      className="font-semibold text-[#0F2E3D] transition-colors hover:text-[var(--tenant-primary,#D39A2B)]"
                     >
                       {brand.name}
                     </Link>
