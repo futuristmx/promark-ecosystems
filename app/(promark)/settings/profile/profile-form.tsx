@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Save, Loader2 } from 'lucide-react';
+import { Camera, Save, Loader2, KeyRound } from 'lucide-react';
 
 interface ProfileFormProps {
   profile: {
@@ -97,7 +97,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     .toUpperCase();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Avatar */}
       <div className="flex items-center gap-6">
         <button
@@ -164,6 +164,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </div>
       </div>
 
+      {/* Change password */}
+      <ChangePasswordSection />
+
       {/* Message */}
       {message && (
         <div
@@ -191,6 +194,97 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             <Save className="h-4 w-4" />
           )}
           {saving ? 'Guardando…' : 'Guardar cambios'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ChangePasswordSection() {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  async function handleChangePassword() {
+    setMsg(null);
+    if (newPassword.length < 6) {
+      setMsg({ type: 'error', text: 'Mínimo 6 caracteres.' });
+      return;
+    }
+    if (newPassword !== confirm) {
+      setMsg({ type: 'error', text: 'Las contraseñas no coinciden.' });
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/promark/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setMsg({ type: 'error', text: data.error ?? 'Error.' });
+        return;
+      }
+      setMsg({ type: 'success', text: 'Contraseña actualizada.' });
+      setNewPassword('');
+      setConfirm('');
+    } catch {
+      setMsg({ type: 'error', text: 'Error de red.' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="border-t border-slate-200 pt-6">
+      <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
+        <KeyRound className="h-4 w-4" />
+        Cambiar contraseña
+      </h3>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="new-pw" className="mb-1 block text-sm font-medium text-slate-700">
+            Nueva contraseña
+          </label>
+          <input
+            id="new-pw"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            minLength={6}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-[#0066FF] focus:outline-none focus:ring-1 focus:ring-[#0066FF]"
+          />
+        </div>
+        <div>
+          <label htmlFor="confirm-pw" className="mb-1 block text-sm font-medium text-slate-700">
+            Confirmar contraseña
+          </label>
+          <input
+            id="confirm-pw"
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-[#0066FF] focus:outline-none focus:ring-1 focus:ring-[#0066FF]"
+          />
+        </div>
+      </div>
+      {msg && (
+        <div className={`mt-3 rounded-lg px-3 py-2 text-sm ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+          {msg.text}
+        </div>
+      )}
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={handleChangePassword}
+          disabled={saving || !newPassword || !confirm}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+          {saving ? 'Cambiando…' : 'Cambiar contraseña'}
         </button>
       </div>
     </div>

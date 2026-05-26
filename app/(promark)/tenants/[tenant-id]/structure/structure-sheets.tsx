@@ -3,6 +3,8 @@
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { HoldingFormSheet } from './holding-form-sheet';
 import { CompanyFormSheet } from './company-form-sheet';
+import { EditHoldingSheet } from './edit-holding-sheet';
+import { EditCompanySheet } from './edit-company-sheet';
 
 interface HoldingInfo {
   id: string;
@@ -21,6 +23,7 @@ export function StructureSheets({ tenantId, holdings }: StructureSheetsProps) {
 
   const action = searchParams.get('action');
   const holdingParam = searchParams.get('holding');
+  const idParam = searchParams.get('id');
 
   function close() {
     router.replace(pathname);
@@ -44,6 +47,18 @@ export function StructureSheets({ tenantId, holdings }: StructureSheetsProps) {
           onClose={close}
         />
       )}
+      <EditHoldingSheet
+        tenantId={tenantId}
+        holdingId={idParam}
+        open={action === 'edit-holding'}
+        onClose={close}
+      />
+      <EditCompanySheet
+        tenantId={tenantId}
+        companyId={idParam}
+        open={action === 'edit-company'}
+        onClose={close}
+      />
     </>
   );
 }
