@@ -1,7 +1,6 @@
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface StatusDonutDatum {
   label: string;
@@ -14,19 +13,28 @@ interface StatusDonutProps {
   title?: string;
 }
 
+const TOOLTIP_STYLE: React.CSSProperties = {
+  backgroundColor: '#0A0E15',
+  border: 'none',
+  borderRadius: 10,
+  padding: '8px 14px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+  color: '#F1F5F9',
+  fontSize: 12,
+  fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)',
+};
+
 export function StatusDonut({ data, title }: StatusDonutProps) {
   const total = data.reduce((acc, d) => acc + d.value, 0);
 
   return (
-    <Card>
+    <div>
       {title && (
-        <CardHeader>
-          <CardTitle className="text-sm font-semibold text-slate-700">
-            {title}
-          </CardTitle>
-        </CardHeader>
+        <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+          {title}
+        </h3>
       )}
-      <CardContent className="relative h-72">
+      <div className="relative h-72">
         {total === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-slate-400">
             Sin datos
@@ -35,41 +43,73 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
           <>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
+                <defs>
+                  {data.map((entry, idx) => (
+                    <linearGradient
+                      key={idx}
+                      id={`donut-grad-${idx}`}
+                      x1="0"
+                      y1="0"
+                      x2="1"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor={entry.color} stopOpacity={1} />
+                      <stop offset="100%" stopColor={entry.color} stopOpacity={0.7} />
+                    </linearGradient>
+                  ))}
+                  <filter id="donut-shadow">
+                    <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.12" />
+                  </filter>
+                </defs>
                 <Pie
                   data={data}
                   dataKey="value"
                   nameKey="label"
                   cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={2}
+                  cy="45%"
+                  innerRadius={64}
+                  outerRadius={96}
+                  paddingAngle={3}
+                  cornerRadius={4}
+                  stroke="none"
+                  style={{ filter: 'url(#donut-shadow)' }}
                 >
-                  {data.map((entry, idx) => (
-                    <Cell key={idx} fill={entry.color} />
+                  {data.map((_, idx) => (
+                    <Cell key={idx} fill={`url(#donut-grad-${idx})`} />
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [String(value), 'Marcas']}
-                  contentStyle={{ borderRadius: 8, fontSize: 12 }}
+                  formatter={(value: number, name: string) => [
+                    `${value} (${total > 0 ? Math.round((value / total) * 100) : 0}%)`,
+                    name,
+                  ]}
+                  contentStyle={TOOLTIP_STYLE}
+                  itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
+                  cursor={false}
                 />
                 <Legend
                   verticalAlign="bottom"
                   height={36}
                   iconType="circle"
-                  wrapperStyle={{ fontSize: 11 }}
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: 11, fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)' }}
+                  formatter={(value: string) => (
+                    <span className="text-slate-600">{value}</span>
+                  )}
                 />
               </PieChart>
             </ResponsiveContainer>
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-9">
-              <span className="text-3xl font-bold text-slate-900">{total}</span>
-              <span className="text-xs uppercase tracking-wide text-slate-500">
-                Total
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-12">
+              <span className="text-4xl font-bold tracking-tight text-slate-900">
+                {total}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                Total marcas
               </span>
             </div>
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

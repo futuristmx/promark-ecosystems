@@ -5,16 +5,25 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ImpiClassBarProps {
   data: Array<{ class_number: number; count: number }>;
   title?: string;
 }
+
+const TOOLTIP_STYLE: React.CSSProperties = {
+  backgroundColor: '#0A0E15',
+  border: 'none',
+  borderRadius: 10,
+  padding: '8px 14px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+  color: '#F1F5F9',
+  fontSize: 12,
+  fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)',
+};
 
 export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClassBarProps) {
   const formatted = data.slice(0, 10).map((d) => ({
@@ -23,13 +32,11 @@ export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClas
   }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm font-semibold text-slate-700">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="h-72">
+    <div>
+      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        {title}
+      </h3>
+      <div className="h-72">
         {formatted.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-slate-400">
             Sin clases registradas
@@ -41,32 +48,43 @@ export function ImpiClassBar({ data, title = 'Marcas por clase IMPI' }: ImpiClas
               layout="vertical"
               margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <defs>
+                <linearGradient id="bar-grad-impi" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#2C3445" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#0284C7" stopOpacity={1} />
+                </linearGradient>
+              </defs>
               <XAxis
                 type="number"
                 allowDecimals={false}
-                tick={{ fontSize: 10, fill: '#64748b' }}
+                tick={{ fontSize: 10, fill: '#94A3B8' }}
                 tickLine={false}
-                axisLine={{ stroke: '#cbd5e1' }}
+                axisLine={false}
               />
               <YAxis
                 type="category"
                 dataKey="label"
-                tick={{ fontSize: 11, fill: '#475569' }}
+                tick={{ fontSize: 11, fill: '#475569', fontWeight: 500 }}
                 tickLine={false}
-                axisLine={{ stroke: '#cbd5e1' }}
+                axisLine={false}
                 width={80}
               />
               <Tooltip
                 formatter={(value) => [String(value), 'Marcas']}
-                contentStyle={{ borderRadius: 8, fontSize: 12 }}
-                cursor={{ fill: '#f1f5f9' }}
+                contentStyle={TOOLTIP_STYLE}
+                itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
+                cursor={{ fill: '#F1F5F9', radius: 6 }}
               />
-              <Bar dataKey="count" fill="#0ea5e9" radius={[0, 4, 4, 0]} />
+              <Bar
+                dataKey="count"
+                fill="url(#bar-grad-impi)"
+                radius={[0, 6, 6, 0]}
+                barSize={24}
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
