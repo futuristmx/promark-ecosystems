@@ -265,7 +265,7 @@ export function DsDataTable<T>({
                               {action.icon ?? <span className="text-xs">{action.label[0]}</span>}
                             </button>
                             <span
-                              className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium opacity-0 transition-opacity group-hover/tip:opacity-100"
+                              className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-medium opacity-0 transition-opacity group-hover/tip:opacity-100"
                               style={{ background: '#0B1F2A', color: '#FBF6EC' }}
                             >
                               {action.label}
