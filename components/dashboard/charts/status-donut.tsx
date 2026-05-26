@@ -79,9 +79,9 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string) => [
-                    `${value} (${total > 0 ? Math.round((value / total) * 100) : 0}%)`,
-                    name,
+                  formatter={(value, name) => [
+                    `${value} (${total > 0 ? Math.round((Number(value) / total) * 100) : 0}%)`,
+                    String(name),
                   ]}
                   contentStyle={TOOLTIP_STYLE}
                   itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
