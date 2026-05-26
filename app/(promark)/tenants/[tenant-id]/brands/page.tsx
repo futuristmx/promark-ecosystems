@@ -9,7 +9,7 @@ import { VigencyBadge, VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BRAND_STATUS_LABELS } from '@/lib/i18n/status-labels';
-import { PageTitle, StatusBadge, EmptyState } from '@/components/ds';
+import { PageTitle, StatusBadge, EmptyState, CsvToolbar } from '@/components/ds';
 import type { StatusTone } from '@/components/ds';
 
 const BRAND_STATUS_TONE: Record<string, StatusTone> = {
@@ -193,6 +193,17 @@ export default function BrandsPage({ params }: BrandsPageProps) {
           ) : null
         }
       />
+
+      {canCreate && (
+        <CsvToolbar
+          endpoint={`/api/tenants/${tenantId}/csv?type=brands`}
+          templateColumns={['nombre', 'empresa', 'tipo', 'estado_legal', 'numero_registro', 'fecha_vencimiento']}
+          templateExample={['Mi Marca', 'Mi Empresa', 'WORDMARK', 'APPLIED', '', '']}
+          entityLabel="marcas"
+          onImportSuccess={fetchData}
+          className="mb-4"
+        />
+      )}
 
       {/* Filters bar */}
       <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4">
