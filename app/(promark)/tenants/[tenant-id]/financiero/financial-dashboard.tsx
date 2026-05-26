@@ -98,10 +98,11 @@ export function FinancialDashboard({
                     borderRadius: 12,
                     fontSize: 12,
                   }}
-                  formatter={(value: number, name: string) => [
-                    name === 'costo' ? formatCurrency(value) : value,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  formatter={((value: any, name: string) => [
+                    name === 'costo' ? formatCurrency(Number(value)) : value,
                     name === 'costo' ? 'Costo estimado' : 'Renovaciones',
-                  ]}
+                  ]) as never}
                   isAnimationActive={false}
                 />
                 <Bar dataKey="renovaciones" fill="#0F2E3D" radius={[6, 6, 0, 0]} />
