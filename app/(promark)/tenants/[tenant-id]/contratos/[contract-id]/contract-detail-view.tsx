@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Pencil, X, Trash2 } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { buttonVariants, Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -58,6 +59,7 @@ type TabKey = typeof TABS[number];
 
 export function ContractDetailView({ tenantId, userRole, contract: initial, availableBrands }: Props) {
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const [tab, setTab] = useState<TabKey>('info');
   const [contract, setContract] = useState(initial);
   const [licenses, setLicenses] = useState<LicenseRow[]>([]);
@@ -118,6 +120,7 @@ export function ContractDetailView({ tenantId, userRole, contract: initial, avai
     <div>
       <Breadcrumb items={[
         { label: 'Clientes', href: '/tenants' },
+        { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
         { label: 'Contratos', href: `/tenants/${tenantId}/contratos` },
         { label: contract.title },
       ]} />

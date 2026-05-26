@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,6 +33,7 @@ const STATUSES = ['DRAFT','ACTIVE','SUSPENDED'];
 
 export function LicenseFormView({ tenantId, brands, contracts, initialContractId, license }: Props) {
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const [form, setForm] = useState({
     contract_id: license?.contract_id ?? initialContractId ?? '',
     brand_id: license?.brand_id ?? '',
@@ -94,6 +96,7 @@ export function LicenseFormView({ tenantId, brands, contracts, initialContractId
     <div>
       <Breadcrumb items={[
         { label: 'Clientes', href: '/tenants' },
+        { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
         { label: 'Licencias', href: `/tenants/${tenantId}/licencias` },
         { label: isEdit ? 'Editar' : 'Nueva' },
       ]} />

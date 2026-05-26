@@ -28,6 +28,11 @@ export default async function LicenseDetailPage({ params }: Props) {
   const session = await requirePromarkAuth();
   const { 'tenant-id': tenantId, 'license-id': licenseId } = await params;
 
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { name: true },
+  });
+
   const license = await prisma.license.findFirst({
     where: { id: licenseId, tenant_id: tenantId, deleted_at: null },
     include: {
@@ -42,6 +47,7 @@ export default async function LicenseDetailPage({ params }: Props) {
     <div>
       <Breadcrumb items={[
         { label: 'Clientes', href: '/tenants' },
+        { label: tenant?.name ?? tenantId, href: `/tenants/${tenantId}/structure` },
         { label: 'Licencias', href: `/tenants/${tenantId}/licencias` },
         { label: license.licensee_name },
       ]} />

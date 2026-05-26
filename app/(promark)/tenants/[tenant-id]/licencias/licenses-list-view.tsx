@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, KeyRound } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
@@ -27,6 +28,7 @@ const STATUSES = ['DRAFT','ACTIVE','EXPIRED','TERMINATED','SUSPENDED'];
 
 export function LicensesListView({ tenantId, userRole }: { tenantId: string; userRole: string }) {
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const [licenses, setLicenses] = useState<LicenseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -58,7 +60,7 @@ export function LicensesListView({ tenantId, userRole }: { tenantId: string; use
     <div>
       <Breadcrumb items={[
         { label: 'Clientes', href: '/tenants' },
-        { label: '...', href: `/tenants/${tenantId}/structure` },
+        { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
         { label: 'Licencias' },
       ]} />
       <PageTitle

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { Tag, Bell, Clock, AlertTriangle, Scroll } from 'lucide-react';
+import { Tag, Bell, Scroll } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
 import {
@@ -82,6 +82,32 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
             tone={alertsCount > 0 ? 'danger' : 'default'}
           />
         </KpiGrid>
+
+        <div
+          className="flex items-center gap-4 rounded-2xl border p-5"
+          style={{ borderColor: '#E2DED6', background: 'linear-gradient(135deg, #F1EDE3 0%, #FBF6EC 100%)' }}
+        >
+          <div className="relative flex h-10 w-10 items-center justify-center">
+            <div
+              className="absolute inset-0 animate-ping rounded-full opacity-20"
+              style={{ background: '#2F6B4F' }}
+            />
+            <div
+              className="relative flex h-10 w-10 items-center justify-center rounded-full"
+              style={{ background: 'rgba(47,107,79,0.12)' }}
+            >
+              <div className="h-3 w-3 rounded-full" style={{ background: '#2F6B4F' }} />
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
+              Portafolio conectado y actualizado
+            </p>
+            <p className="text-xs" style={{ color: '#8FB6C7' }}>
+              Base de datos sincronizada con Promark® · Monitoreo activo
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -119,25 +145,11 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
         </p>
       </div>
 
-      <KpiGrid>
+      <KpiGrid className="md:grid-cols-2 lg:grid-cols-2">
         <KpiCard
           label="Total marcas"
           value={aggregates.totals.brands}
           icon={<Tag className="size-4" />}
-          href={`${hrefPrefix}/brands`}
-        />
-        <KpiCard
-          label="Por vencer (90d)"
-          value={aggregates.totals.expiringSoon}
-          icon={<Clock className="size-4" />}
-          tone="warning"
-          href={`${hrefPrefix}/brands`}
-        />
-        <KpiCard
-          label="Vencidas"
-          value={aggregates.totals.expired}
-          icon={<AlertTriangle className="size-4" />}
-          tone="danger"
           href={`${hrefPrefix}/brands`}
         />
         <KpiCard
@@ -147,6 +159,32 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
           href={`${hrefPrefix}/contratos`}
         />
       </KpiGrid>
+
+      <div
+        className="flex items-center gap-4 rounded-2xl border p-5"
+        style={{ borderColor: '#E2DED6', background: 'linear-gradient(135deg, #F1EDE3 0%, #FBF6EC 100%)' }}
+      >
+        <div className="relative flex h-10 w-10 items-center justify-center">
+          <div
+            className="absolute inset-0 animate-ping rounded-full opacity-20"
+            style={{ background: '#2F6B4F' }}
+          />
+          <div
+            className="relative flex h-10 w-10 items-center justify-center rounded-full"
+            style={{ background: 'rgba(47,107,79,0.12)' }}
+          >
+            <div className="h-3 w-3 rounded-full" style={{ background: '#2F6B4F' }} />
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
+            Portafolio conectado y actualizado
+          </p>
+          <p className="text-xs" style={{ color: '#8FB6C7' }}>
+            Base de datos sincronizada con Promark® · Monitoreo activo
+          </p>
+        </div>
+      </div>
 
       <DsCard variant="standard">
         <StatusDonut data={donutData} title="Distribución por estado legal" />

@@ -27,6 +27,11 @@ export default async function HolderDetailPage({
   const session = await requirePromarkAuth();
   const { 'tenant-id': tenantId, 'holder-id': holderId } = await params;
 
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { name: true },
+  });
+
   const holder = await prisma.holder.findFirst({
     where: { id: holderId, tenant_id: tenantId },
     include: {
@@ -57,7 +62,7 @@ export default async function HolderDetailPage({
       <Breadcrumb
         items={[
           { label: 'Clientes', href: '/tenants' },
-          { label: '...', href: `/tenants/${tenantId}/structure` },
+          { label: tenant?.name ?? tenantId, href: `/tenants/${tenantId}/structure` },
           { label: 'Titulares', href: `/tenants/${tenantId}/holders` },
           { label: holder.name },
         ]}

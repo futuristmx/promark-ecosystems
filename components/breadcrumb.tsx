@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react';
 interface BreadcrumbItem {
   label: string;
   href?: string;
+  tooltip?: string;
 }
 
 interface BreadcrumbProps {
@@ -13,21 +14,25 @@ interface BreadcrumbProps {
 export function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6">
-      <ol className="flex items-center gap-1.5 text-sm text-slate-500">
+      <ol className="flex flex-wrap items-center gap-1.5 text-sm">
         {items.map((item, index) => (
           <li key={index} className="flex items-center gap-1.5">
             {index > 0 && (
-              <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+              <ChevronRight className="h-3.5 w-3.5 shrink-0" style={{ color: '#C8C4B9' }} />
             )}
             {item.href ? (
               <Link
                 href={item.href}
-                className="transition-colors hover:text-slate-900"
+                className="transition-colors"
+                style={{ color: '#8FB6C7' }}
+                title={item.tooltip}
+                onMouseEnter={(e) => { (e.target as HTMLElement).style.color = '#355B6F'; }}
+                onMouseLeave={(e) => { (e.target as HTMLElement).style.color = '#8FB6C7'; }}
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="font-medium text-slate-900">{item.label}</span>
+              <span className="font-semibold" style={{ color: '#0F2E3D' }}>{item.label}</span>
             )}
           </li>
         ))}

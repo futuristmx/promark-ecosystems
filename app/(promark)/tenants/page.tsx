@@ -3,7 +3,7 @@ import { requirePromarkAuth } from '@/lib/auth/promark';
 import prisma from '@/lib/prisma/client';
 import { Plus, Building2 } from 'lucide-react';
 import { PageTitle, EmptyState, CsvToolbar } from '@/components/ds';
-import { TenantsTable } from './tenants-table';
+import { TenantsView } from './tenants-view';
 
 export default async function TenantsPage() {
   const user = await requirePromarkAuth();
@@ -15,17 +15,22 @@ export default async function TenantsPage() {
       name: true,
       slug: true,
       status: true,
+      config: true,
       created_at: true,
     },
   });
 
-  const tenantRows = tenants.map((t) => ({
-    id: t.id,
-    name: t.name,
-    slug: t.slug,
-    status: t.status,
-    created_at: t.created_at.toISOString(),
-  }));
+  const tenantRows = tenants.map((t) => {
+    const cfg = t.config as { branding?: { logo_url?: string } } | null;
+    return {
+      id: t.id,
+      name: t.name,
+      slug: t.slug,
+      status: t.status,
+      created_at: t.created_at.toISOString(),
+      logoUrl: cfg?.branding?.logo_url ?? null,
+    };
+  });
 
   const isSuperAdmin = user.role === 'SUPERADMIN';
 
@@ -75,7 +80,7 @@ export default async function TenantsPage() {
           }
         />
       ) : (
-        <TenantsTable
+        <TenantsView
           tenants={tenantRows}
           isSuperAdmin={isSuperAdmin}
         />

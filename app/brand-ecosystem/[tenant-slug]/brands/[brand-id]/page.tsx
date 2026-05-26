@@ -65,6 +65,27 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }
   IN_LITIGATION: { bg: 'rgba(11,31,42,0.08)', color: '#0B1F2A', border: 'rgba(11,31,42,0.2)' },
 };
 
+const VISUAL_BRAND_TYPES = ['FIGURATIVE', 'MIXED', 'THREE_D', 'TRADE_DRESS', 'HOLOGRAM'];
+
+function BrandLogoHeader({ logos, brandType }: { logos: unknown; brandType: string }) {
+  if (!VISUAL_BRAND_TYPES.includes(brandType)) return null;
+  let src: string | null = null;
+  if (typeof logos === 'string' && logos.startsWith('data:')) src = logos;
+  else if (Array.isArray(logos) && logos.length > 0) {
+    const first = logos[0];
+    src = typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
+  } else if (logos && typeof logos === 'object' && !Array.isArray(logos)) {
+    const obj = logos as Record<string, unknown>;
+    src = (obj.url ?? obj.data ?? obj.image) as string | null;
+  }
+  if (!src) return (
+    <div className="flex h-16 w-16 items-center justify-center rounded-xl text-xs font-medium"
+      style={{ background: 'rgba(143,182,199,0.12)', color: '#8FB6C7' }}>IMG</div>
+  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt="Logo" className="h-16 w-16 rounded-xl object-contain" style={{ background: '#FBF6EC', border: '1px solid #E2DED6' }} />;
+}
+
 const BRAND_TYPE_LABELS: Record<string, string> = {
   WORDMARK: 'Nominativa',
   FIGURATIVE: 'Figurativa',
@@ -161,7 +182,9 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
 
       {/* Header */}
       <div className="mb-8 flex items-start justify-between">
-        <div>
+        <div className="flex items-center gap-4">
+          <BrandLogoHeader logos={brand.logos} brandType={brand.brand_type} />
+          <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold" style={{ color: '#0F2E3D' }}>{brand.name}</h1>
             <BrandVigencyDot
@@ -170,6 +193,7 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
             />
           </div>
           <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>{brand.company.name}</p>
+          </div>
         </div>
         <div className="text-right">
           <span

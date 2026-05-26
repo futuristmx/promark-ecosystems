@@ -13,6 +13,7 @@ import {
   UserCircle,
   LogOut,
   Briefcase,
+  DollarSign,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -93,6 +94,11 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
           href: `/tenants/${tenantId}/alerts`,
           label: 'Alertas',
           icon: <Bell className="h-4 w-4" />,
+        },
+        {
+          href: `/tenants/${tenantId}/financiero`,
+          label: 'Financiero',
+          icon: <DollarSign className="h-4 w-4" />,
         },
         {
           href: `/tenants/${tenantId}/actividad`,

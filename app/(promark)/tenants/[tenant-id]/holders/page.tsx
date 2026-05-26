@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, Users } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { HOLDER_STATUS_LABELS } from '@/lib/i18n/status-labels';
@@ -31,6 +32,7 @@ interface HolderItem {
 export default function HoldersPage({ params }: HoldersPageProps) {
   const { 'tenant-id': tenantId } = use(params);
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
 
   const [holders, setHolders] = useState<HolderItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,7 +76,7 @@ export default function HoldersPage({ params }: HoldersPageProps) {
       <Breadcrumb
         items={[
           { label: 'Clientes', href: '/tenants' },
-          { label: '...', href: `/tenants/${tenantId}/structure` },
+          { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
           { label: 'Titulares' },
         ]}
       />

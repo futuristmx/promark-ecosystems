@@ -53,6 +53,11 @@ export default async function BrandDetailPage({
   const session = await requirePromarkAuth();
   const { 'tenant-id': tenantId, 'brand-id': brandId } = await params;
 
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { name: true },
+  });
+
   const brand = await prisma.brand.findFirst({
     where: { id: brandId, tenant_id: tenantId },
     include: {
@@ -102,7 +107,7 @@ export default async function BrandDetailPage({
       <Breadcrumb
         items={[
           { label: 'Clientes', href: '/tenants' },
-          { label: '...', href: `/tenants/${tenantId}/structure` },
+          { label: tenant?.name ?? tenantId, href: `/tenants/${tenantId}/structure` },
           { label: 'Marcas', href: `/tenants/${tenantId}/brands` },
           { label: brand.name },
         ]}

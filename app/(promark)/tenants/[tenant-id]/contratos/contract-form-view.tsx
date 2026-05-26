@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,6 +40,7 @@ const STATUSES = ['DRAFT','ACTIVE','UNDER_REVIEW','RENEWED'];
 
 export function ContractFormView({ tenantId, brands, contract }: Props) {
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const initialParties = (contract?.parties ?? {}) as { otorgante?: string; receptor?: string };
   const initialFin = (contract?.financial_terms ?? {}) as { royalty_rate?: number; royalty_terms?: string };
 
@@ -113,6 +115,7 @@ export function ContractFormView({ tenantId, brands, contract }: Props) {
     <div>
       <Breadcrumb items={[
         { label: 'Clientes', href: '/tenants' },
+        { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
         { label: 'Contratos', href: `/tenants/${tenantId}/contratos` },
         { label: isEdit ? 'Editar' : 'Nuevo' },
       ]} />

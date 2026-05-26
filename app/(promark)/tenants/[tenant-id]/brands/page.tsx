@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, Tag } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { VigencyBadge, VigencyDot } from '@/components/vigency-badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -108,6 +109,7 @@ function getLegalStatusColor(status: string): string {
 export default function BrandsPage({ params }: BrandsPageProps) {
   const { 'tenant-id': tenantId } = use(params);
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
 
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -170,7 +172,7 @@ export default function BrandsPage({ params }: BrandsPageProps) {
         items={[
           { label: 'Clientes', href: '/tenants' },
           {
-            label: '...',
+            label: tenantName || tenantId,
             href: `/tenants/${tenantId}/structure`,
           },
           { label: 'Marcas' },

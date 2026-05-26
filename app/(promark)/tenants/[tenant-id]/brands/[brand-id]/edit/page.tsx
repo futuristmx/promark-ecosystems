@@ -7,6 +7,7 @@ import { z } from 'zod/v4';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2 } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -74,6 +75,7 @@ function toDateInput(val: string | null | undefined): string {
 export default function EditBrandPage({ params }: EditBrandPageProps) {
   const { 'tenant-id': tenantId, 'brand-id': brandId } = use(params);
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -209,7 +211,7 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
       <Breadcrumb
         items={[
           { label: 'Clientes', href: '/tenants' },
-          { label: '...', href: `/tenants/${tenantId}/structure` },
+          { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
           { label: 'Marcas', href: `/tenants/${tenantId}/brands` },
           { label: 'Editar marca' },
         ]}

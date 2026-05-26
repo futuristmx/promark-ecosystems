@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, Scroll } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
@@ -37,6 +38,7 @@ const STATUSES = ['DRAFT','ACTIVE','EXPIRED','TERMINATED','RENEWED','UNDER_REVIE
 
 export function ContractsListView({ tenantId, userRole }: Props) {
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const [contracts, setContracts] = useState<ContractItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -68,7 +70,7 @@ export function ContractsListView({ tenantId, userRole }: Props) {
     <div>
       <Breadcrumb items={[
         { label: 'Clientes', href: '/tenants' },
-        { label: '...', href: `/tenants/${tenantId}/structure` },
+        { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
         { label: 'Contratos' },
       ]} />
       <PageTitle

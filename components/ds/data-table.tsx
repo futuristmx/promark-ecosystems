@@ -22,6 +22,8 @@ export interface DsColumn<T> {
   sortable?: boolean;
   /** Render custom de la celda */
   cell?: (row: T) => React.ReactNode;
+  /** Tooltip para el header */
+  headerTooltip?: string;
   /** Alineación */
   align?: 'left' | 'right' | 'center';
 }
@@ -163,6 +165,7 @@ export function DsDataTable<T>({
                   !col.align && 'text-left',
                   col.sortable && 'cursor-pointer select-none'
                 )}
+                title={col.headerTooltip}
                 onClick={() => col.sortable && toggleSort(col.key)}
                 onMouseEnter={(e) => { if (col.sortable) e.currentTarget.style.color = '#1A1E23'; }}
                 onMouseLeave={(e) => { if (col.sortable) e.currentTarget.style.color = '#355B6F'; }}

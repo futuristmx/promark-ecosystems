@@ -6,6 +6,27 @@ import { BrandFilters } from './brand-filters';
 import { ExportMenu } from '@/components/export-menu';
 import type { LegalStatus } from '@prisma/client';
 
+const VISUAL_BRAND_TYPES = ['FIGURATIVE', 'MIXED', 'THREE_D', 'TRADE_DRESS', 'HOLOGRAM'];
+
+function BrandLogoThumb({ logos, brandType }: { logos: unknown; brandType: string }) {
+  if (!VISUAL_BRAND_TYPES.includes(brandType)) return <div className="h-10 w-10" />;
+  let src: string | null = null;
+  if (typeof logos === 'string' && logos.startsWith('data:')) src = logos;
+  else if (Array.isArray(logos) && logos.length > 0) {
+    const first = logos[0];
+    src = typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
+  } else if (logos && typeof logos === 'object' && !Array.isArray(logos)) {
+    const obj = logos as Record<string, unknown>;
+    src = (obj.url ?? obj.data ?? obj.image) as string | null;
+  }
+  if (!src) return (
+    <div className="flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-medium"
+      style={{ background: 'rgba(143,182,199,0.12)', color: '#8FB6C7' }}>IMG</div>
+  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt="Logo" className="h-10 w-10 rounded-lg object-contain" style={{ background: '#FBF6EC' }} />;
+}
+
 interface BrandsPageProps {
   params: Promise<{ 'tenant-slug': string }>;
   searchParams: Promise<{
@@ -170,6 +191,9 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
               <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
                 <th className="w-10 px-4 py-3" />
                 <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+                  Logo
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
                   Nombre
                 </th>
                 <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
@@ -206,6 +230,9 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
                       expirationDate={brand.expiration_date}
                       legalStatus={brand.legal_status}
                     />
+                  </td>
+                  <td className="px-4 py-3">
+                    <BrandLogoThumb logos={brand.logos} brandType={brand.brand_type} />
                   </td>
                   <td className="px-4 py-3">
                     <Link

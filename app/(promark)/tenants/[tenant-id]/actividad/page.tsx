@@ -123,10 +123,11 @@ export default async function ActivityPage({ params, searchParams }: Props) {
   ].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 
   return (
-    <div className="px-2">
+    <div className="space-y-6">
       <Link
         href={`/tenants/${tenantId}/panel`}
-        className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700"
+        className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:opacity-80"
+        style={{ color: '#8FB6C7' }}
       >
         <ChevronLeft className="size-4" />
         Volver al panel
@@ -140,7 +141,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
 
       <ActivityFilters basePath={`/tenants/${tenantId}/actividad`} />
 
-      <div className="mt-4">
+      <div className="mt-6">
         <ActivityList events={events} />
       </div>
     </div>

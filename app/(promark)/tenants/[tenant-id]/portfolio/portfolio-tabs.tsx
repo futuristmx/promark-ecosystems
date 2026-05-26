@@ -37,7 +37,7 @@ interface PortfolioTabsProps {
 interface BrandItem {
   id: string; name: string; company: { id: string; name: string };
   legal_status: string; registration_number: string | null;
-  expiration_date: string | null; brand_type: string;
+  expiration_date: string | null; brand_type: string; logos: unknown;
 }
 interface HolderItem { id: string; name: string; holder_type: string; rfc: string | null; status: string; }
 interface ContractItem {
@@ -50,6 +50,44 @@ interface LicenseItem {
 }
 
 
+const VISUAL_BRAND_TYPES = ['FIGURATIVE', 'MIXED', 'THREE_D', 'TRADE_DRESS', 'HOLOGRAM'];
+
+function BrandLogoThumb({ logos, brandType }: { logos: unknown; brandType: string }) {
+  if (!VISUAL_BRAND_TYPES.includes(brandType)) return <div className="h-10 w-10" />;
+
+  let src: string | null = null;
+  if (typeof logos === 'string' && logos.startsWith('data:')) {
+    src = logos;
+  } else if (Array.isArray(logos) && logos.length > 0) {
+    const first = logos[0];
+    src = typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
+  } else if (logos && typeof logos === 'object' && !Array.isArray(logos)) {
+    const obj = logos as Record<string, unknown>;
+    src = (obj.url ?? obj.data ?? obj.image) as string | null;
+  }
+
+  if (!src) {
+    return (
+      <div
+        className="flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-medium"
+        style={{ background: 'rgba(143,182,199,0.12)', color: '#8FB6C7' }}
+      >
+        IMG
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt="Logo"
+      className="h-10 w-10 rounded-lg object-contain"
+      style={{ background: '#FBF6EC' }}
+    />
+  );
+}
+
 export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
   const router = useRouter();
   const canCreate = userRole !== 'ASSISTANT';
@@ -58,6 +96,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [brandsLoading, setBrandsLoading] = useState(true);
   const [brandSearch, setBrandSearch] = useState('');
+  const [brandsView, setBrandsView] = useState<'table' | 'cards'>('table');
 
   const fetchBrands = useCallback(async () => {
     setBrandsLoading(true);
@@ -163,6 +202,18 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             <Input placeholder="Buscar marcas..." value={brandSearch}
               onChange={(e) => setBrandSearch(e.target.value)} className="pl-9" />
           </div>
+          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: '#F1EDE3' }}>
+            <button type="button" onClick={() => setBrandsView('table')}
+              className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+              style={brandsView === 'table' ? { background: '#0F2E3D', color: '#fff' } : { color: '#355B6F' }}>
+              Tabla
+            </button>
+            <button type="button" onClick={() => setBrandsView('cards')}
+              className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+              style={brandsView === 'cards' ? { background: '#0F2E3D', color: '#fff' } : { color: '#355B6F' }}>
+              Cards
+            </button>
+          </div>
           {canCreate && (
             <Link href={`/tenants/${tenantId}/brands/new`}
               className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
@@ -179,22 +230,51 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             <EmptyState icon={<Tag className="size-6" />}
               title={brands.length === 0 ? 'Sin marcas registradas' : 'Sin resultados'}
               description={brands.length === 0 ? 'Registra la primera marca.' : 'Ajusta la búsqueda.'} />
+          ) : brandsView === 'cards' ? (
+            <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 p-4">
+              {filteredBrands.map((b) => (
+                <div
+                  key={b.id}
+                  onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
+                  className="cursor-pointer rounded-2xl border p-4 transition-all"
+                  style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,46,61,0.08)'; e.currentTarget.style.borderColor = '#D39A2B'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E2DED6'; }}
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
+                    <VigencyDot expirationDate={b.expiration_date} legalStatus={b.legal_status} />
+                  </div>
+                  <p className="text-sm font-semibold truncate" style={{ color: '#0F2E3D' }}>{b.name}</p>
+                  <p className="text-xs truncate" style={{ color: '#8FB6C7' }}>{b.company.name}</p>
+                  <div className="mt-2">
+                    <StatusBadge tone={BRAND_STATUS_TONE[b.legal_status] ?? 'muted'}
+                      label={BRAND_STATUS_LABELS[b.legal_status] ?? b.legal_status} />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-16">Logo</TableHead>
                   <TableHead className="px-4">Nombre</TableHead>
                   <TableHead>Empresa</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead>N° registro</TableHead>
                   <TableHead>Vencimiento</TableHead>
-                  <TableHead className="w-10">Vig.</TableHead>
+                  <TableHead>Vigencia</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredBrands.map((b) => (
                   <TableRow key={b.id} className="cursor-pointer"
                     onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}>
+                    <TableCell className="w-16 px-2">
+                      <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
+                    </TableCell>
                     <TableCell className="px-4 font-medium text-slate-900">{b.name}</TableCell>
                     <TableCell className="text-slate-500">{b.company.name}</TableCell>
                     <TableCell>
@@ -212,6 +292,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </div>
       </TabsContent>

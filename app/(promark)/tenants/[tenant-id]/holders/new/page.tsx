@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { useTenantName } from '@/hooks/use-tenant-name';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +35,7 @@ interface NewHolderPageProps {
 export default function NewHolderPage({ params }: NewHolderPageProps) {
   const { 'tenant-id': tenantId } = use(params);
   const router = useRouter();
+  const tenantName = useTenantName(tenantId);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -84,7 +86,7 @@ export default function NewHolderPage({ params }: NewHolderPageProps) {
       <Breadcrumb
         items={[
           { label: 'Clientes', href: '/tenants' },
-          { label: '...', href: `/tenants/${tenantId}/structure` },
+          { label: tenantName || tenantId, href: `/tenants/${tenantId}/structure` },
           { label: 'Titulares', href: `/tenants/${tenantId}/holders` },
           { label: 'Nuevo Titular' },
         ]}
