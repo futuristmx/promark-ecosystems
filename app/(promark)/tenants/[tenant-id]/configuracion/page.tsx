@@ -4,8 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
 import { PageTitle } from '@/components/ds';
-import { BrandingEditor } from './branding-editor';
-import { ClientPasswordReset } from './client-password-reset';
+import { TenantConfigTabs } from './config-tabs';
 
 interface Props {
   params: Promise<{ 'tenant-id': string }>;
@@ -46,25 +45,43 @@ export default async function TenantConfigPage({ params }: Props) {
     where: { tenant_id: tenantId },
   });
 
+  // Fetch client users for credentials tab
+  const clientUsers = await prisma.userClient.findMany({
+    where: { tenant_id: tenantId },
+    select: {
+      id: true,
+      full_name: true,
+      email: true,
+      card_id: true,
+      role: true,
+      status: true,
+      pin_generated_at: true,
+    },
+    orderBy: { role: 'asc' },
+  });
+
   const cfg = (tenant.config ?? {}) as TenantConfig;
 
   return (
-    <div>
-      <Link
-        href={`/tenants/${tenantId}/panel`}
-        className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700"
-      >
-        <ChevronLeft className="size-4" />
-        Volver al panel
-      </Link>
+    <div className="space-y-8">
+      <div>
+        <Link
+          href={`/tenants/${tenantId}/panel`}
+          className="mb-3 inline-flex items-center gap-1 text-sm transition-colors"
+          style={{ color: '#355B6F' }}
+        >
+          <ChevronLeft className="size-4" />
+          Volver al panel
+        </Link>
 
-      <PageTitle
-        eyebrow="Cliente"
-        title="Configuración"
-        subtitle={`Personalización del portal de ${tenant.name}. Cada cambio se guarda como nueva versión (actual: v${versionCount + 1}).`}
-      />
+        <PageTitle
+          eyebrow="Cliente"
+          title="Configuración"
+          subtitle={`Personalización del portal de ${tenant.name}. Cada cambio se guarda como nueva versión (actual: v${versionCount + 1}).`}
+        />
+      </div>
 
-      <BrandingEditor
+      <TenantConfigTabs
         tenantId={tenantId}
         tenantName={tenant.name}
         tenantSlug={tenant.slug}
@@ -78,11 +95,16 @@ export default async function TenantConfigPage({ params }: Props) {
           notify_email: cfg.notifications?.notify_email ?? '',
           expiry_alert_days: cfg.notifications?.expiry_alert_days ?? 90,
         }}
+        clientUsers={clientUsers.map((u) => ({
+          id: u.id,
+          full_name: u.full_name,
+          email: u.email,
+          card_id: u.card_id,
+          role: u.role,
+          status: u.status,
+          pin_generated_at: u.pin_generated_at?.toISOString() ?? null,
+        }))}
       />
-
-      <div className="mt-6">
-        <ClientPasswordReset tenantId={tenantId} tenantName={tenant.name} />
-      </div>
     </div>
   );
 }

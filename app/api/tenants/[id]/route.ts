@@ -22,6 +22,7 @@ interface PatchBody {
     features?: Record<string, boolean>;
   };
   name?: string;
+  slug?: string;
 }
 
 /**
@@ -57,6 +58,30 @@ export async function PATCH(
   });
   if (!tenant) {
     return NextResponse.json({ error: 'Tenant no encontrado' }, { status: 404 });
+  }
+
+  // Validate slug if changing
+  if (body.slug) {
+    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+    if (!slugRegex.test(body.slug)) {
+      return NextResponse.json(
+        { error: 'El slug solo puede contener letras minúsculas, números y guiones.' },
+        { status: 400 }
+      );
+    }
+    if (body.slug.length < 3 || body.slug.length > 60) {
+      return NextResponse.json(
+        { error: 'El slug debe tener entre 3 y 60 caracteres.' },
+        { status: 400 }
+      );
+    }
+    const existing = await prisma.tenant.findUnique({ where: { slug: body.slug } });
+    if (existing && existing.id !== tenantId) {
+      return NextResponse.json(
+        { error: 'Este slug ya está en uso por otro cliente.' },
+        { status: 409 }
+      );
+    }
   }
 
   const currentConfig = (tenant.config ?? {}) as Record<string, unknown>;
@@ -102,6 +127,7 @@ export async function PATCH(
       where: { id: tenantId },
       data: {
         ...(body.name ? { name: body.name } : {}),
+        ...(body.slug ? { slug: body.slug } : {}),
         config: nextConfig as Prisma.InputJsonValue,
       },
       select: { id: true, name: true, slug: true, config: true },
