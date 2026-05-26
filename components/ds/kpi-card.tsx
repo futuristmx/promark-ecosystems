@@ -60,14 +60,11 @@ export function KpiCard({
   className,
 }: KpiCardProps) {
   const accent = TONE_ACCENT[tone] ?? TONE_ACCENT.default;
-  const Wrapper = href ? Link : 'div';
-  const wrapperProps = href ? { href } : {};
 
-  return (
-    <Wrapper
-      {...(wrapperProps as Record<string, string>)}
+  const inner = (
+    <div
       className={cn(
-        'group relative flex overflow-hidden rounded-xl transition-shadow',
+        'group relative flex w-full overflow-hidden rounded-xl transition-shadow',
         href && 'cursor-pointer hover:shadow-md',
         className
       )}
@@ -117,8 +114,10 @@ export function KpiCard({
           </p>
         )}
       </div>
-    </Wrapper>
+    </div>
   );
+
+  return href ? <Link href={href}>{inner}</Link> : inner;
 }
 
 interface KpiGridProps {
