@@ -39,12 +39,11 @@ export async function GET(
       include: { company: { select: { name: true } } },
       orderBy: { name: 'asc' },
     });
-    csv = 'id,nombre,empresa,tipo,estado_legal,numero_registro,fecha_vencimiento,clase_impi\n';
+    csv = 'id,nombre,empresa,tipo,estado_legal,numero_registro,fecha_vencimiento\n';
     for (const b of brands) {
       csv += [
         b.id, esc(b.name), esc(b.company.name), b.brand_type, b.legal_status,
         b.registration_number ?? '', b.expiration_date?.toISOString().slice(0, 10) ?? '',
-        b.impi_class?.toString() ?? '',
       ].join(',') + '\n';
     }
   } else if (type === 'holdings') {
