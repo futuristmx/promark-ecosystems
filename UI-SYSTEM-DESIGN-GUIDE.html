@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promark® — UI System Design Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul-noche: #0B1F2A;
+    --azul-marino: #0F2E3D;
+    --indigo: #1C3F55;
+    --pizarra: #355B6F;
+    --niebla: #8FB6C7;
+    --hielo: #DDEAF2;
+    --marfil: #FBF6EC;
+    --hueso: #F1EDE3;
+    --arena: #E2DED6;
+    --piedra: #C8C4B9;
+    --carbon: #1A1E23;
+    --ambar: #D39A2B;
+    --critico: #B42318;
+    --critico-bg: #F9E8E5;
+    --exito: #2F6B4F;
+    --exito-bg: #E7F1EA;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--marfil);
+    color: var(--carbon);
+    font-feature-settings: "ss01", "cv11";
+    line-height: 1.6;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Layout */
+  .page { max-width: 1200px; margin: 0 auto; padding: 48px 32px; }
+  .hero { text-align: center; margin-bottom: 64px; padding: 48px 0; border-bottom: 1px solid var(--arena); }
+  .hero h1 { font-size: 2.5rem; font-weight: 800; color: var(--azul-marino); letter-spacing: -0.025em; }
+  .hero .sub { font-size: 14px; color: var(--pizarra); margin-top: 8px; }
+  .hero .badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; background: var(--hueso); border: 1px solid var(--arena); border-radius: 999px; padding: 6px 16px; font-size: 11px; font-weight: 600; color: var(--pizarra); text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--exito); }
+
+  /* Sections */
+  .section { margin-bottom: 56px; }
+  .section-num { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--niebla); margin-bottom: 4px; }
+  .section h2 { font-size: 1.5rem; font-weight: 700; color: var(--azul-marino); letter-spacing: -0.02em; margin-bottom: 8px; }
+  .section .desc { font-size: 14px; color: var(--pizarra); margin-bottom: 24px; }
+  .section h3 { font-size: 14px; font-weight: 700; color: var(--carbon); margin: 32px 0 12px; }
+
+  /* Cards */
+  .card { background: var(--hueso); border: 1px solid var(--arena); border-radius: 10px; padding: 24px; margin-bottom: 16px; transition: all 220ms ease-out; }
+  .card:hover { background: var(--arena); border-color: var(--piedra); }
+  .card-premium { background: var(--hueso); border: 1px solid var(--arena); border-radius: 10px; padding: 28px; margin-bottom: 16px; background-image: radial-gradient(ellipse at top left, rgba(15,46,61,0.12) 0%, transparent 60%), radial-gradient(ellipse at bottom right, rgba(211,154,43,0.06) 0%, transparent 60%); }
+
+  /* Color swatches */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .swatch { border-radius: 12px; overflow: hidden; border: 1px solid var(--arena); background: white; }
+  .swatch-color { height: 72px; display: flex; align-items: flex-end; padding: 8px 12px; }
+  .swatch-color span { font-size: 11px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .swatch-info { padding: 10px 12px; }
+  .swatch-name { font-size: 12px; font-weight: 700; color: var(--carbon); }
+  .swatch-token { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--piedra); margin-top: 2px; }
+  .swatch-use { font-size: 10px; color: var(--pizarra); margin-top: 4px; }
+
+  /* Gradient strips */
+  .gradient-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .gradient-chip { height: 48px; flex: 1; min-width: 180px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; border: 1px solid var(--arena); }
+
+  /* Typography specimens */
+  .type-specimen { margin-bottom: 16px; padding: 16px 20px; background: white; border-radius: 10px; border: 1px solid var(--arena); }
+  .type-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--niebla); margin-bottom: 4px; }
+
+  /* Status badges */
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid; padding: 2px 10px; font-size: 11px; font-weight: 500; }
+  .status-badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* KPI preview */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi-card { background: var(--hueso); border: 1px solid var(--arena); border-radius: 12px; overflow: hidden; display: flex; }
+  .kpi-bar { width: 4px; flex-shrink: 0; }
+  .kpi-body { padding: 20px; flex: 1; }
+  .kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--pizarra); }
+  .kpi-value { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.025em; margin-top: 4px; }
+  .kpi-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(200,196,185,0.25); display: flex; align-items: center; justify-content: center; color: var(--niebla); float: right; margin-top: -4px; font-size: 14px; }
+
+  /* Table preview */
+  .ds-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .ds-table thead { background: rgba(255,255,255,0.5); }
+  .ds-table th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--pizarra); border-bottom: 1px solid rgba(226,222,214,0.5); }
+  .ds-table td { padding: 12px 16px; color: var(--carbon); border-bottom: 1px solid rgba(226,222,214,0.5); }
+  .ds-table tbody tr:hover { background: rgba(255,255,255,0.6); }
+  .ds-table .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--pizarra); }
+
+  /* Sidebar previews */
+  .sidebar-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 768px) { .sidebar-preview { grid-template-columns: 1fr; } }
+  .sidebar-mock { width: 100%; border-radius: 12px; overflow: hidden; font-size: 13px; }
+  .sidebar-dark { background: linear-gradient(135deg, #0B1F2A, #0F2E3D); color: rgba(251,246,236,0.72); }
+  .sidebar-light { background: #F1EDE3; color: #355B6F; border: 1px solid #E2DED6; }
+  .sidebar-mock .logo-area { padding: 16px 20px; border-bottom: 1px solid rgba(251,246,236,0.10); display: flex; align-items: center; gap: 10px; }
+  .sidebar-light .logo-area { border-bottom-color: #E2DED6; }
+  .sidebar-mock .logo-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(211,154,43,0.3); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #D39A2B; }
+  .sidebar-mock .logo-text { font-weight: 700; font-size: 14px; }
+  .sidebar-dark .logo-text { color: #FBF6EC; }
+  .sidebar-light .logo-text { color: #0F2E3D; }
+  .sidebar-mock .logo-sub { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.58; }
+  .sidebar-mock .nav-section { padding: 12px; }
+  .sidebar-mock .nav-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 12px; margin-bottom: 6px; }
+  .sidebar-dark .nav-label { color: rgba(251,246,236,0.45); }
+  .sidebar-light .nav-label { color: #8FB6C7; }
+  .sidebar-mock .nav-item { padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; font-weight: 500; cursor: default; }
+  .sidebar-dark .nav-item.active { background: rgba(251,246,236,0.10); color: #FBF6EC; border-left: 3px solid #D39A2B; padding-left: 9px; }
+  .sidebar-dark .nav-item.active .icon { color: #D39A2B; }
+  .sidebar-light .nav-item.active { background: rgba(211,154,43,0.08); color: #D39A2B; box-shadow: inset 3px 0 0 #D39A2B; border-radius: 12px; }
+  .sidebar-mock .nav-item .icon { opacity: 0.5; font-size: 14px; }
+  .sidebar-dark .nav-item.active .icon { opacity: 1; }
+  .sidebar-mock .user-area { padding: 12px; border-top: 1px solid rgba(251,246,236,0.10); }
+  .sidebar-light .user-area { border-top-color: #E2DED6; }
+  .sidebar-mock .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(251,246,236,0.10); background: rgba(251,246,236,0.04); }
+  .sidebar-light .user-card { border-color: #E2DED6; background: rgba(226,222,214,0.3); }
+  .sidebar-mock .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .sidebar-dark .avatar { background: rgba(211,154,43,0.2); color: #D39A2B; }
+  .sidebar-light .avatar { background: linear-gradient(135deg, #0F2E3D, #1C3F55); color: #FBF6EC; }
+  .sidebar-mock .user-name { font-size: 13px; font-weight: 600; }
+  .sidebar-dark .user-name { color: #FBF6EC; }
+  .sidebar-light .user-name { color: #0F2E3D; }
+  .sidebar-mock .user-role { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.5; }
+
+  /* Spacing reference */
+  .spacing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .spacing-chip { background: white; border: 1px solid var(--arena); border-radius: 8px; padding: 12px; text-align: center; }
+  .spacing-chip .val { font-size: 20px; font-weight: 700; color: var(--azul-marino); }
+  .spacing-chip .label { font-size: 10px; color: var(--pizarra); margin-top: 2px; }
+  .spacing-chip .px { font-size: 9px; color: var(--piedra); font-family: 'JetBrains Mono', monospace; }
+
+  /* Radius preview */
+  .radius-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .radius-box { width: 64px; height: 64px; background: var(--pizarra); display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+  /* Shadow preview */
+  .shadow-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .shadow-box { width: 120px; height: 80px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--pizarra); }
+
+  /* Animation preview */
+  .anim-row { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .ping-demo { position: relative; width: 12px; height: 12px; }
+  .ping-demo .ring { position: absolute; inset: 0; border-radius: 50%; background: var(--exito); animation: ping 1.5s cubic-bezier(0,0,0.2,1) infinite; opacity: 0.4; }
+  .ping-demo .core { position: relative; width: 12px; height: 12px; border-radius: 50%; background: var(--exito); }
+  @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+  .pulse-demo { width: 100%; max-width: 300px; height: 12px; border-radius: 6px; background: rgba(255,255,255,0.6); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  /* Vigency dots */
+  .vigency-row { display: flex; gap: 20px; align-items: center; }
+  .vigency-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
+  .vigency-dot .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Interactive states table */
+  .states-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+  .states-table th, .states-table td { padding: 8px 12px; border-bottom: 1px solid var(--arena); text-align: left; }
+  .states-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--pizarra); font-weight: 600; background: rgba(255,255,255,0.5); }
+  .states-table .preview { display: inline-block; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; transition: all 220ms ease-out; cursor: pointer; }
+
+  /* Chart color sequence */
+  .chart-seq { display: flex; gap: 0; border-radius: 10px; overflow: hidden; height: 48px; margin-bottom: 12px; }
+  .chart-seq div { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+  /* TOC */
+  .toc { background: white; border: 1px solid var(--arena); border-radius: 12px; padding: 24px 28px; margin-bottom: 48px; }
+  .toc h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--pizarra); margin-bottom: 12px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px; }
+  .toc a { font-size: 13px; color: var(--azul-marino); text-decoration: none; padding: 4px 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .toc a:hover { color: var(--ambar); }
+  .toc a .num { font-size: 10px; font-weight: 700; color: var(--niebla); min-width: 20px; }
+
+  /* Info table */
+  .info-table { width: 100%; font-size: 13px; border-collapse: collapse; margin-bottom: 16px; }
+  .info-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--pizarra); background: rgba(255,255,255,0.5); border-bottom: 1px solid var(--arena); }
+  .info-table td { padding: 8px 12px; border-bottom: 1px solid rgba(226,222,214,0.5); vertical-align: top; }
+  .info-table code { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(226,222,214,0.5); padding: 1px 6px; border-radius: 4px; }
+
+  /* Misc */
+  .flex-center { display: flex; align-items: center; gap: 8px; }
+  .tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-8 { margin-bottom: 8px; }
+  hr { border: none; border-top: 1px solid var(--arena); margin: 48px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Promark<span style="color: var(--piedra)">®</span> UI System Design Guide</h1>
+  <p class="sub">Referencia visual completa del design system · Todos los valores extraídos del código fuente</p>
+  <div class="badge"><span class="dot"></span> v1.0 · Mayo 2026</div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h3>Índice</h3>
+  <div class="toc-grid">
+    <a href="#chromatic"><span class="num">01</span> Sistema Cromático</a>
+    <a href="#gradients"><span class="num">02</span> Gradientes</a>
+    <a href="#typography"><span class="num">03</span> Tipografía</a>
+    <a href="#spacing"><span class="num">04</span> Espaciado & Layout</a>
+    <a href="#radius"><span class="num">05</span> Border Radius</a>
+    <a href="#shadows"><span class="num">06</span> Sombras</a>
+    <a href="#components"><span class="num">07</span> Componentes DS</a>
+    <a href="#status"><span class="num">08</span> Sistema de Status</a>
+    <a href="#vigency"><span class="num">09</span> Sistema de Vigencia</a>
+    <a href="#navigation"><span class="num">10</span> Navegación</a>
+    <a href="#interactive"><span class="num">11</span> Estados Interactivos</a>
+    <a href="#animations"><span class="num">12</span> Animaciones</a>
+    <a href="#charts"><span class="num">13</span> Charts (Recharts)</a>
+    <a href="#branding"><span class="num">14</span> Tenant Branding</a>
+    <a href="#logos"><span class="num">15</span> Brand Logos & Avatars</a>
+    <a href="#pages"><span class="num">16</span> Patrones de Página</a>
+    <a href="#labels"><span class="num">17</span> Labels i18n (ES-MX)</a>
+  </div>
+</div>
+
+<!-- 1. CHROMATIC -->
+<div class="section" id="chromatic">
+  <p class="section-num">Sección 01</p>
+  <h2>Sistema Cromático</h2>
+  <p class="desc">17 tokens de color definidos en globals.css como variables CSS con @theme inline.</p>
+
+  <h3>Primarios — Azules profundos</h3>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#0B1F2A"><span style="color:#FBF6EC">#0B1F2A</span></div><div class="swatch-info"><div class="swatch-name">Azul Noche</div><div class="swatch-token">--azul-noche</div><div class="swatch-use">Dark bg, tooltips, gradientes</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#0F2E3D"><span style="color:#FBF6EC">#0F2E3D</span></div><div class="swatch-info"><div class="swatch-name">Azul Marino Profundo</div><div class="swatch-token">--azul-marino-profundo</div><div class="swatch-use">Sidebar bg, chart-1, KPI value</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#1C3F55"><span style="color:#FBF6EC">#1C3F55</span></div><div class="swatch-info"><div class="swatch-name">Indigo Estratégico</div><div class="swatch-token">--indigo-estrategico</div><div class="swatch-use">Status active, chart-2</div></div></div>
+  </div>
+
+  <h3>Secundarios — Azules suaves</h3>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#355B6F"><span style="color:#FBF6EC">#355B6F</span></div><div class="swatch-info"><div class="swatch-name">Azul Pizarra</div><div class="swatch-token">--azul-pizarra</div><div class="swatch-use">Text muted, eyebrow, labels</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8FB6C7"><span style="color:#0F2E3D">#8FB6C7</span></div><div class="swatch-info"><div class="swatch-name">Azul Niebla</div><div class="swatch-token">--azul-niebla</div><div class="swatch-use">Icon tint, muted text dark</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#DDEAF2"><span style="color:#1C3F55">#DDEAF2</span></div><div class="swatch-info"><div class="swatch-name">Azul Hielo</div><div class="swatch-token">--azul-hielo</div><div class="swatch-use">Info bg, tooltip, insight bg</div></div></div>
+  </div>
+
+  <h3>Neutros cálidos — Fondos y superficies</h3>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#FBF6EC; border-bottom: 1px solid #E2DED6"><span style="color:#355B6F">#FBF6EC</span></div><div class="swatch-info"><div class="swatch-name">Marfil Cálido</div><div class="swatch-token">--marfil-calido</div><div class="swatch-use">App background principal</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#F1EDE3"><span style="color:#355B6F">#F1EDE3</span></div><div class="swatch-info"><div class="swatch-name">Hueso</div><div class="swatch-token">--hueso</div><div class="swatch-use">Card bg, KPI bg, table bg</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#E2DED6"><span style="color:#355B6F">#E2DED6</span></div><div class="swatch-info"><div class="swatch-name">Gris Arena</div><div class="swatch-token">--gris-arena</div><div class="swatch-use">Borders, dividers</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#C8C4B9"><span style="color:#0F2E3D">#C8C4B9</span></div><div class="swatch-info"><div class="swatch-name">Gris Piedra Cálido</div><div class="swatch-token">--gris-piedra-calido</div><div class="swatch-use">Soft text, muted dots</div></div></div>
+  </div>
+
+  <h3>Acentos & Estados</h3>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#1A1E23"><span style="color:#FBF6EC">#1A1E23</span></div><div class="swatch-info"><div class="swatch-name">Carbón</div><div class="swatch-token">--carbon</div><div class="swatch-use">Títulos, body text</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#D39A2B"><span style="color:#FBF6EC">#D39A2B</span></div><div class="swatch-info"><div class="swatch-name">Ámbar Sutil</div><div class="swatch-token">--ambar-sutil</div><div class="swatch-use">CTA primario, active, ring</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#B42318"><span style="color:#FBF6EC">#B42318</span></div><div class="swatch-info"><div class="swatch-name">Estado Crítico</div><div class="swatch-token">--estado-critico</div><div class="swatch-use">Error, danger, destructive</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#2F6B4F"><span style="color:#FBF6EC">#2F6B4F</span></div><div class="swatch-info"><div class="swatch-name">Estado Éxito</div><div class="swatch-token">--estado-exito</div><div class="swatch-use">Success, sistema activo</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#F9E8E5"><span style="color:#B42318">#F9E8E5</span></div><div class="swatch-info"><div class="swatch-name">Crítico BG</div><div class="swatch-token">--estado-critico-bg</div><div class="swatch-use">Error badge background</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#E7F1EA"><span style="color:#2F6B4F">#E7F1EA</span></div><div class="swatch-info"><div class="swatch-name">Éxito BG</div><div class="swatch-token">--estado-exito-bg</div><div class="swatch-use">Success badge background</div></div></div>
+  </div>
+
+  <h3>Jerarquía visual (regla 60-75-15-25)</h3>
+  <div style="display:flex; height:32px; border-radius:8px; overflow:hidden; margin-top:8px">
+    <div style="flex:65; background:#FBF6EC; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#355B6F">60-75% Neutros</div>
+    <div style="flex:20; background:#0F2E3D; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#FBF6EC">15-25% Azules</div>
+    <div style="flex:7; background:#C8C4B9; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#0F2E3D">5-10%</div>
+    <div style="flex:5; background:#D39A2B; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#FBF6EC">3-8%</div>
+    <div style="flex:3; background:#B42318; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:600; color:#FBF6EC">&lt;2%</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 2. GRADIENTS -->
+<div class="section" id="gradients">
+  <p class="section-num">Sección 02</p>
+  <h2>Gradientes</h2>
+  <p class="desc">7 gradientes oficiales definidos como variables CSS.</p>
+  <div class="gradient-row">
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#0B1F2A,#0F2E3D); color:#FBF6EC">Noche → Marino (sidebar)</div>
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#0F2E3D,#1C3F55); color:#FBF6EC">Marino → Indigo (avatar)</div>
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#D39A2B,#F2C16A); color:#0F2E3D">Ámbar → Oro (CTA)</div>
+  </div>
+  <div class="gradient-row">
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#1C3F55,#355B6F); color:#FBF6EC">Indigo → Pizarra</div>
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#8FB6C7,#DDEAF2); color:#0F2E3D">Niebla → Hielo</div>
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#FBF6EC,#E2DED6); color:#355B6F">Marfil → Arena</div>
+    <div class="gradient-chip" style="background:linear-gradient(135deg,#C7851F,#F5DEA2); color:#0F2E3D">Ocre → Amarillo</div>
+  </div>
+
+  <h3>Chart Palette (secuencia ordenada)</h3>
+  <div class="chart-seq">
+    <div style="background:#0F2E3D; color:#FBF6EC">chart-1</div>
+    <div style="background:#1C3F55; color:#FBF6EC">chart-2</div>
+    <div style="background:#355B6F; color:#FBF6EC">chart-3</div>
+    <div style="background:#8FB6C7; color:#0F2E3D">chart-4</div>
+    <div style="background:#D39A2B; color:#0F2E3D">chart-5</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 3. TYPOGRAPHY -->
+<div class="section" id="typography">
+  <p class="section-num">Sección 03</p>
+  <h2>Tipografía</h2>
+  <p class="desc">DM Sans como fuente principal. Geist Mono para código. Feature settings: ss01, cv11.</p>
+
+  <div class="type-specimen">
+    <div class="type-label">KPI Value · 40px / 800 / tracking-tight</div>
+    <div style="font-size:2.5rem; font-weight:800; letter-spacing:-0.025em; color:#0F2E3D">2,847</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Page Title (h1) · 30px / 700 / tracking-tight</div>
+    <div style="font-size:1.875rem; font-weight:700; letter-spacing:-0.025em; color:#1A1E23">Bienvenido, Miguel Cadena</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Section Header · 16px / 600</div>
+    <div style="font-size:1rem; font-weight:600; color:#1A1E23">Distribución por estado legal</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Eyebrow · 11px / 600 / uppercase / tracking 0.08em</div>
+    <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#355B6F">Panel ejecutivo</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Body / Cell · 14px / 400</div>
+    <div style="font-size:14px; color:#1A1E23">Alimentos Premium S.A. de C.V.</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">KPI Label · 10px / 600 / uppercase / tracking 0.1em</div>
+    <div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:#355B6F">Total de marcas</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Badge / Status · 11px / 500</div>
+    <div style="font-size:11px; font-weight:500; color:#2F6B4F">● Registrada</div>
+  </div>
+  <div class="type-specimen">
+    <div class="type-label">Mono · 12px / JetBrains Mono</div>
+    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#355B6F">MX-A0001 · alimentos-pacifico</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 4. SPACING -->
+<div class="section" id="spacing">
+  <p class="section-num">Sección 04</p>
+  <h2>Espaciado & Layout</h2>
+
+  <h3>Gaps frecuentes</h3>
+  <div class="spacing-grid">
+    <div class="spacing-chip"><div class="val">4px</div><div class="label">gap-1</div><div class="px">Nav items</div></div>
+    <div class="spacing-chip"><div class="val">8px</div><div class="label">gap-2</div><div class="px">Badges</div></div>
+    <div class="spacing-chip"><div class="val">10px</div><div class="label">gap-2.5</div><div class="px">Nav interno</div></div>
+    <div class="spacing-chip"><div class="val">12px</div><div class="label">gap-3</div><div class="px">Insight cards</div></div>
+    <div class="spacing-chip"><div class="val">16px</div><div class="label">gap-4</div><div class="px">KpiGrid, nodes</div></div>
+    <div class="spacing-chip"><div class="val">48px</div><div class="label">space-y-12</div><div class="px">Page sections</div></div>
+  </div>
+
+  <h3>Padding de cards</h3>
+  <div class="spacing-grid" style="margin-top:12px">
+    <div class="spacing-chip"><div class="val">16px</div><div class="label">p-4 / sm</div><div class="px">DsCard padding="sm"</div></div>
+    <div class="spacing-chip"><div class="val">24px</div><div class="label">p-6 / md</div><div class="px">DsCard standard</div></div>
+    <div class="spacing-chip"><div class="val">28px</div><div class="label">p-7</div><div class="px">Premium, Atmospheric</div></div>
+    <div class="spacing-chip"><div class="val">32px</div><div class="label">p-8 / lg</div><div class="px">DsCard padding="lg"</div></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 5. RADIUS -->
+<div class="section" id="radius">
+  <p class="section-num">Sección 05</p>
+  <h2>Border Radius</h2>
+  <div class="radius-row">
+    <div class="radius-box" style="border-radius:6px">6px<br>sm</div>
+    <div class="radius-box" style="border-radius:8px">8px<br>md/nav</div>
+    <div class="radius-box" style="border-radius:10px">10px<br>card</div>
+    <div class="radius-box" style="border-radius:12px">12px<br>xl/kpi</div>
+    <div class="radius-box" style="border-radius:16px">16px<br>2xl/avatar</div>
+    <div class="radius-box" style="border-radius:9999px; width:48px; height:48px">full<br>badge</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 6. SHADOWS -->
+<div class="section" id="shadows">
+  <p class="section-num">Sección 06</p>
+  <h2>Sombras</h2>
+  <div class="shadow-row">
+    <div class="shadow-box" style="box-shadow:0 1px 2px rgba(26,30,35,0.03), 0 1px 3px rgba(26,30,35,0.04)">ds-sm</div>
+    <div class="shadow-box" style="box-shadow:0 4px 6px rgba(26,30,35,0.03), 0 2px 4px rgba(26,30,35,0.02)">ds-md</div>
+    <div class="shadow-box" style="box-shadow:0 8px 24px rgba(26,30,35,0.04)">ds-lg (card)</div>
+    <div class="shadow-box" style="box-shadow:0 20px 25px rgba(26,30,35,0.06), 0 8px 10px rgba(26,30,35,0.03)">ds-xl</div>
+    <div class="shadow-box" style="box-shadow:0 1px 2px rgba(211,154,43,0.28); background:linear-gradient(135deg,#D39A2B,#F2C16A); color:white">btn CTA</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 7. COMPONENTS -->
+<div class="section" id="components">
+  <p class="section-num">Sección 07</p>
+  <h2>Componentes DS</h2>
+  <p class="desc">11 componentes en components/ds/. Todos exportados desde el barrel index.ts.</p>
+
+  <h3>KpiCard + KpiGrid (4 tones)</h3>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-bar" style="background:linear-gradient(to bottom, #0F2E3D, rgba(15,46,61,0.15))"></div>
+      <div class="kpi-body"><div class="kpi-icon">👥</div><div class="kpi-label">Clientes activos</div><div class="kpi-value" style="color:#0F2E3D">2</div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-bar" style="background:linear-gradient(to bottom, #D39A2B, rgba(211,154,43,0.15))"></div>
+      <div class="kpi-body"><div class="kpi-icon">⚠️</div><div class="kpi-label">Tone: warning</div><div class="kpi-value" style="color:#D39A2B">5</div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-bar" style="background:linear-gradient(to bottom, #B42318, rgba(180,35,24,0.15))"></div>
+      <div class="kpi-body"><div class="kpi-icon">🔔</div><div class="kpi-label">Tone: danger</div><div class="kpi-value" style="color:#B42318">12</div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-bar" style="background:linear-gradient(to bottom, #2F6B4F, rgba(47,107,79,0.15))"></div>
+      <div class="kpi-body"><div class="kpi-icon">✅</div><div class="kpi-label">Tone: success</div><div class="kpi-value" style="color:#2F6B4F">98%</div></div>
+    </div>
+  </div>
+
+  <h3>DsCard — 3 variantes</h3>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px">
+    <div class="card"><div style="font-size:11px; font-weight:600; color:var(--pizarra); text-transform:uppercase; letter-spacing:0.08em">Standard</div><div style="font-size:13px; color:var(--carbon); margin-top:8px">bg #F1EDE3, border #E2DED6, padding 24px</div></div>
+    <div class="card-premium"><div style="font-size:11px; font-weight:600; color:var(--pizarra); text-transform:uppercase; letter-spacing:0.08em">Premium</div><div style="font-size:13px; color:var(--carbon); margin-top:8px">+ radial navy top-left, amber bottom-right</div></div>
+    <div style="background:#F1EDE3; border:1px solid #E2DED6; border-radius:10px; padding:28px; background-image:radial-gradient(ellipse at bottom left, rgba(28,63,85,0.08) 0%, transparent 50%), radial-gradient(ellipse at center, rgba(211,154,43,0.06) 0%, transparent 50%), radial-gradient(ellipse at right, rgba(53,91,111,0.08) 0%, transparent 50%)"><div style="font-size:11px; font-weight:600; color:var(--pizarra); text-transform:uppercase; letter-spacing:0.08em">Atmospheric</div><div style="font-size:13px; color:var(--carbon); margin-top:8px">+ 3 radial gradients (indigo, amber, pizarra)</div></div>
+  </div>
+
+  <h3>StatusBadge — 7 tones</h3>
+  <div class="badge-row" style="margin-top:12px">
+    <span class="status-badge" style="background:rgba(28,63,85,0.08); border-color:rgba(28,63,85,0.22); color:#1C3F55"><span class="dot" style="background:#1C3F55"></span> active</span>
+    <span class="status-badge" style="background:rgba(15,46,61,0.08); border-color:rgba(15,46,61,0.22); color:#0F2E3D"><span class="dot" style="background:#0F2E3D"></span> progress</span>
+    <span class="status-badge" style="background:rgba(47,107,79,0.08); border-color:rgba(47,107,79,0.22); color:#2F6B4F"><span class="dot" style="background:#2F6B4F"></span> success</span>
+    <span class="status-badge" style="background:rgba(211,154,43,0.08); border-color:rgba(211,154,43,0.22); color:#D39A2B"><span class="dot" style="background:#D39A2B"></span> warning</span>
+    <span class="status-badge" style="background:rgba(180,35,24,0.08); border-color:rgba(180,35,24,0.22); color:#B42318"><span class="dot" style="background:#B42318"></span> error</span>
+    <span class="status-badge" style="background:rgba(221,234,242,0.50); border-color:rgba(28,63,85,0.18); color:#1C3F55"><span class="dot" style="background:#1C3F55"></span> info</span>
+    <span class="status-badge" style="background:rgba(200,196,185,0.10); border-color:rgba(200,196,185,0.22); color:#355B6F"><span class="dot" style="background:#355B6F"></span> muted</span>
+  </div>
+
+  <h3>EmptyState</h3>
+  <div style="border:1px dashed #E2DED6; border-radius:12px; padding:48px 24px; text-align:center; background:white; margin-top:12px">
+    <div style="width:48px; height:48px; border-radius:50%; background:#F1EDE3; display:inline-flex; align-items:center; justify-content:center; color:#C8C4B9; font-size:20px; margin-bottom:12px">📦</div>
+    <div style="font-size:14px; font-weight:600; color:#1A1E23">Sin marcas registradas</div>
+    <div style="font-size:12px; color:#355B6F; margin-top:4px; max-width:320px; margin-left:auto; margin-right:auto">Registra la primera marca para comenzar.</div>
+    <div style="margin-top:16px"><span style="display:inline-flex; padding:8px 20px; border-radius:10px; background:linear-gradient(135deg,#D39A2B,#F2C16A); color:white; font-size:13px; font-weight:600; box-shadow:0 1px 2px rgba(211,154,43,0.28)">+ Nueva Marca</span></div>
+  </div>
+
+  <h3>DsDataTable (preview)</h3>
+  <div style="background:var(--hueso); border:1px solid var(--arena); border-radius:12px; overflow:hidden; margin-top:12px">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Logo</th>
+          <th>Nombre</th>
+          <th>Empresa</th>
+          <th>Estado</th>
+          <th>N° registro</th>
+          <th>Vigencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div style="width:40px;height:40px;border-radius:8px;background:rgba(143,182,199,0.12);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#8FB6C7">IMG</div></td>
+          <td style="font-weight:600">CampoPuro</td>
+          <td>Alimentos Premium</td>
+          <td><span class="status-badge" style="background:rgba(47,107,79,0.08);border-color:rgba(47,107,79,0.22);color:#2F6B4F"><span class="dot" style="background:#2F6B4F"></span> Registrada</span></td>
+          <td class="mono">MX-A0002</td>
+          <td><span style="width:10px;height:10px;border-radius:50%;background:#2F6B4F;display:inline-block"></span></td>
+        </tr>
+        <tr>
+          <td><div style="width:40px;height:40px;border-radius:8px;background:rgba(143,182,199,0.12);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#8FB6C7">IMG</div></td>
+          <td style="font-weight:600">GranoCero</td>
+          <td>Sabores del Campo</td>
+          <td><span class="status-badge" style="background:rgba(211,154,43,0.08);border-color:rgba(211,154,43,0.22);color:#D39A2B"><span class="dot" style="background:#D39A2B"></span> Impugnada</span></td>
+          <td class="mono">MX-A0005</td>
+          <td><span style="width:10px;height:10px;border-radius:50%;background:#D39A2B;display:inline-block"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr>
+
+<!-- 8. STATUS -->
+<div class="section" id="status">
+  <p class="section-num">Sección 08</p>
+  <h2>Sistema de Status</h2>
+
+  <h3>Brand legal_status</h3>
+  <div class="badge-row">
+    <span class="status-badge" style="background:rgba(143,182,199,0.12);border-color:rgba(143,182,199,0.3);color:#355B6F"><span class="dot" style="background:#8FB6C7"></span> Solicitada</span>
+    <span class="status-badge" style="background:rgba(53,91,111,0.1);border-color:rgba(53,91,111,0.25);color:#355B6F"><span class="dot" style="background:#355B6F"></span> Publicada</span>
+    <span class="status-badge" style="background:rgba(15,46,61,0.08);border-color:rgba(15,46,61,0.2);color:#0F2E3D"><span class="dot" style="background:#0F2E3D"></span> Registrada</span>
+    <span class="status-badge" style="background:rgba(47,107,79,0.08);border-color:rgba(47,107,79,0.2);color:#2F6B4F"><span class="dot" style="background:#2F6B4F"></span> Renovada</span>
+    <span class="status-badge" style="background:rgba(180,35,24,0.08);border-color:rgba(180,35,24,0.2);color:#B42318"><span class="dot" style="background:#B42318"></span> Expirada</span>
+    <span class="status-badge" style="background:rgba(200,196,185,0.2);border-color:rgba(200,196,185,0.4);color:#C8C4B9"><span class="dot" style="background:#C8C4B9"></span> Cancelada</span>
+    <span class="status-badge" style="background:rgba(211,154,43,0.1);border-color:rgba(211,154,43,0.25);color:#D39A2B"><span class="dot" style="background:#D39A2B"></span> Impugnada</span>
+    <span class="status-badge" style="background:rgba(11,31,42,0.08);border-color:rgba(11,31,42,0.2);color:#0B1F2A"><span class="dot" style="background:#0B1F2A"></span> En litigio</span>
+  </div>
+
+  <h3>Contract status</h3>
+  <div class="badge-row">
+    <span class="status-badge" style="background:rgba(143,182,199,0.12);border-color:rgba(143,182,199,0.3);color:#355B6F"><span class="dot" style="background:#355B6F"></span> Borrador</span>
+    <span class="status-badge" style="background:rgba(47,107,79,0.08);border-color:rgba(47,107,79,0.22);color:#2F6B4F"><span class="dot" style="background:#2F6B4F"></span> Vigente</span>
+    <span class="status-badge" style="background:rgba(180,35,24,0.08);border-color:rgba(180,35,24,0.22);color:#B42318"><span class="dot" style="background:#B42318"></span> Vencido</span>
+    <span class="status-badge" style="background:rgba(211,154,43,0.08);border-color:rgba(211,154,43,0.22);color:#D39A2B"><span class="dot" style="background:#D39A2B"></span> En revisión</span>
+  </div>
+
+  <h3>Tenant status</h3>
+  <div class="badge-row">
+    <span class="status-badge" style="background:rgba(47,107,79,0.08);border-color:rgba(47,107,79,0.22);color:#2F6B4F"><span class="dot" style="background:#2F6B4F"></span> Activo</span>
+    <span class="status-badge" style="background:rgba(180,35,24,0.08);border-color:rgba(180,35,24,0.22);color:#B42318"><span class="dot" style="background:#B42318"></span> Suspendido</span>
+    <span class="status-badge" style="background:rgba(211,154,43,0.08);border-color:rgba(211,154,43,0.22);color:#D39A2B"><span class="dot" style="background:#D39A2B"></span> Onboarding</span>
+  </div>
+</div>
+
+<hr>
+
+<!-- 9. VIGENCY -->
+<div class="section" id="vigency">
+  <p class="section-num">Sección 09</p>
+  <h2>Sistema de Vigencia</h2>
+
+  <h3>BrandVigencyDot (solo dot, hex del DS)</h3>
+  <div class="vigency-row" style="margin-bottom:16px">
+    <div class="vigency-dot"><span class="dot" style="background:#2F6B4F"></span> Vigente (&gt;90 días)</div>
+    <div class="vigency-dot"><span class="dot" style="background:#D39A2B"></span> Por vencer (0-90 días)</div>
+    <div class="vigency-dot"><span class="dot" style="background:#B42318"></span> Vencido (&lt;0 días)</div>
+    <div class="vigency-dot"><span class="dot" style="background:#C8C4B9"></span> N/A (sin fecha o cancelada)</div>
+  </div>
+
+  <h3>VigencyBadge (dot + texto, Tailwind colors)</h3>
+  <div class="badge-row">
+    <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;background:#f0fdf4;color:#15803d"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e"></span> Vigente</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;background:#fefce8;color:#a16207"><span style="width:6px;height:6px;border-radius:50%;background:#eab308"></span> Vence en 45 días</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;background:#fff7ed;color:#c2410c"><span style="width:6px;height:6px;border-radius:50%;background:#f97316"></span> Vence en 15 días</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;background:#fef2f2;color:#b91c1c"><span style="width:6px;height:6px;border-radius:50%;background:#ef4444"></span> Vencido</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;background:#f1f5f9;color:#475569"><span style="width:6px;height:6px;border-radius:50%;background:#94a3b8"></span> Pendiente</span>
+  </div>
+</div>
+
+<hr>
+
+<!-- 10. NAVIGATION -->
+<div class="section" id="navigation">
+  <p class="section-num">Sección 10</p>
+  <h2>Navegación</h2>
+  <p class="desc">Dos sidebars: Promark (dark) para superadmin y Client (light) para portal de clientes.</p>
+
+  <div class="sidebar-preview">
+    <!-- DARK SIDEBAR -->
+    <div class="sidebar-mock sidebar-dark">
+      <div class="logo-area">
+        <div class="logo-icon">P</div>
+        <div><div class="logo-text">Promark<span style="opacity:0.5">®</span></div><div class="logo-sub">Inteligencia marcaria</div></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Workspace</div>
+        <div class="nav-item active"><span class="icon">📊</span> Panel</div>
+        <div class="nav-item"><span class="icon">🏢</span> Clientes</div>
+        <div class="nav-label" style="margin-top:16px">Alimentos del Pacífico</div>
+        <div class="nav-item"><span class="icon">👁</span> Vista general</div>
+        <div class="nav-item"><span class="icon">🔗</span> Estructura</div>
+        <div class="nav-item"><span class="icon">💼</span> Portafolio</div>
+        <div class="nav-item"><span class="icon">🔔</span> Alertas <span style="background:#B42318;color:#FBF6EC;font-size:10px;padding:1px 6px;border-radius:999px;margin-left:auto">3</span></div>
+        <div class="nav-item"><span class="icon">💰</span> Financiero</div>
+      </div>
+      <div class="user-area">
+        <div class="user-card">
+          <div class="avatar">MC</div>
+          <div><div class="user-name">Miguel Cadena</div><div class="user-role">Superadmin</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- LIGHT SIDEBAR -->
+    <div class="sidebar-mock sidebar-light">
+      <div class="logo-area">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#D39A2B,#D39A2Bcc);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white">A</div>
+        <div><div class="logo-text">Alimentos del Pacífico</div><div class="logo-sub" style="color:#8FB6C7">Portal de clientes</div></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Navegación</div>
+        <div class="nav-item active"><span class="icon">📊</span> Panel</div>
+        <div class="nav-item"><span class="icon">🏷</span> Marcas</div>
+        <div class="nav-item"><span class="icon">🔔</span> Alertas</div>
+        <div class="nav-item"><span class="icon">📄</span> Documentos</div>
+        <div class="nav-item"><span class="icon">📜</span> Contratos</div>
+      </div>
+      <div class="user-area">
+        <div class="user-card">
+          <div class="avatar">JR</div>
+          <div><div class="user-name">Juan Ramírez</div><div class="user-role">Admin cliente</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:24px">Comparativa de estados</h3>
+  <table class="info-table">
+    <thead><tr><th>Propiedad</th><th>Promark (dark)</th><th>Client (light)</th></tr></thead>
+    <tbody>
+      <tr><td>Background</td><td><code>gradient #0B1F2A → #0F2E3D</code></td><td><code>#F1EDE3</code></td></tr>
+      <tr><td>Active accent</td><td><code>#D39A2B</code> (fijo)</td><td><code>var(--tenant-primary)</code></td></tr>
+      <tr><td>Active indicator</td><td><code>border-left: 3px solid</code></td><td><code>box-shadow: inset 3px 0 0</code></td></tr>
+      <tr><td>Nav radius</td><td><code>rounded-lg (8px)</code></td><td><code>rounded-xl (12px)</code></td></tr>
+      <tr><td>Text inactive</td><td><code>rgba(251,246,236,0.72)</code></td><td><code>#355B6F</code></td></tr>
+      <tr><td>Hover bg</td><td><code>rgba(251,246,236,0.08)</code></td><td><code>rgba(226,222,214,0.5)</code></td></tr>
+      <tr><td>Tooltips</td><td>No</td><td>Sí (bg <code>#0F2E3D</code>, arrow CSS)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- 11. INTERACTIVE -->
+<div class="section" id="interactive">
+  <p class="section-num">Sección 11</p>
+  <h2>Estados Interactivos</h2>
+
+  <h3>Hover patterns</h3>
+  <table class="info-table">
+    <thead><tr><th>Elemento</th><th>Normal</th><th>Hover</th><th>Transición</th></tr></thead>
+    <tbody>
+      <tr><td>DsCard</td><td>bg <code>#F1EDE3</code></td><td>bg <code>#E2DED6</code>, border <code>#C8C4B9</code></td><td><code>220ms ease-out</code></td></tr>
+      <tr><td>Botón CTA</td><td>shadow normal</td><td><code>brightness(0.96)</code>, shadow +6px, <code>translateY(-1px)</code></td><td><code>220ms ease-out</code></td></tr>
+      <tr><td>Table row</td><td>transparent</td><td><code>rgba(255,255,255,0.6)</code></td><td>class based</td></tr>
+      <tr><td>Nav item (dark)</td><td><code>rgba(FBF6EC,0.72)</code></td><td><code>rgba(FBF6EC,0.08)</code> bg + full white</td><td><code>200ms</code></td></tr>
+      <tr><td>Quick action</td><td><code>#C8C4B9</code></td><td><code>#1A1E23</code> + bg <code>#E2DED6</code></td><td>class based</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Focus ring</h3>
+  <p style="font-size:13px; color:var(--pizarra)">Global: <code>outline-ring/50</code> usando <code>--ring: #D39A2B</code> (ámbar)</p>
+</div>
+
+<hr>
+
+<!-- 12. ANIMATIONS -->
+<div class="section" id="animations">
+  <p class="section-num">Sección 12</p>
+  <h2>Animaciones</h2>
+
+  <h3>Ping dot ("Sistema activo")</h3>
+  <div class="anim-row" style="margin-bottom:16px">
+    <div class="ping-demo"><div class="ring"></div><div class="core"></div></div>
+    <span style="font-size:12px; font-weight:600; color:#2F6B4F">Sistema activo</span>
+    <span style="font-size:11px; color:var(--piedra)">animate-ping · #2F6B4F · opacity 0.4</span>
+  </div>
+
+  <h3>Loading skeleton</h3>
+  <div style="display:flex; flex-direction:column; gap:8px">
+    <div class="pulse-demo"></div>
+    <div class="pulse-demo" style="max-width:250px"></div>
+    <div class="pulse-demo" style="max-width:200px"></div>
+  </div>
+  <p style="font-size:11px; color:var(--piedra); margin-top:8px">animate-pulse · bg rgba(255,255,255,0.6) · h-12 rounded-lg</p>
+
+  <h3 style="margin-top:24px">Transiciones globales</h3>
+  <table class="info-table">
+    <thead><tr><th>Componente</th><th>Duración</th><th>Easing</th></tr></thead>
+    <tbody>
+      <tr><td>Cards, botones</td><td><code>220ms</code></td><td><code>ease-out</code></td></tr>
+      <tr><td>Nav items</td><td><code>200ms</code></td><td>default</td></tr>
+      <tr><td>CSV bar entity switch</td><td><code>150ms</code></td><td>fade+translate</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- 13. CHARTS -->
+<div class="section" id="charts">
+  <p class="section-num">Sección 13</p>
+  <h2>Charts (Recharts)</h2>
+  <p class="desc">4 chart components. Todos con isAnimationActive={false} para tooltips instantáneos.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Chart</th><th>Tipo</th><th>Colores</th><th>Detalles</th></tr></thead>
+    <tbody>
+      <tr><td><strong>StatusDonut</strong></td><td>PieChart donut</td><td>Por legal_status (ver §8)</td><td>innerRadius 68, outerRadius 100, paddingAngle 2, cornerRadius 4</td></tr>
+      <tr><td><strong>TopTenantsBar</strong></td><td>BarChart horizontal</td><td>Gradient <code>#0F2E3D → #1C3F55</code></td><td>barSize 28, radius [0,6,6,0], YAxis width 120</td></tr>
+      <tr><td><strong>VigencyTimeline</strong></td><td>BarChart vertical</td><td>Gradient <code>#1C3F55</code> vertical</td><td>barSize 18, radius [6,6,0,0], meses ES</td></tr>
+      <tr><td><strong>ImpiClassBar</strong></td><td>BarChart horizontal</td><td>Gradient <code>#0F2E3D → #355B6F</code></td><td>barSize 24, radius [0,6,6,0], YAxis width 80</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Tooltip compartido</h3>
+  <div style="display:inline-block; background:#0B1F2A; border-radius:10px; padding:8px 14px; color:#FBF6EC; font-size:12px; box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+    <div style="font-weight:600">Registrada</div>
+    <div style="color:#DDEAF2; font-size:11px; margin-top:2px">847 marcas · 65%</div>
+  </div>
+  <p style="font-size:11px; color:var(--piedra); margin-top:8px">bg #0B1F2A · radius 10px · shadow 8px 32px · color #FBF6EC · item color #DDEAF2</p>
+</div>
+
+<hr>
+
+<!-- 14. BRANDING -->
+<div class="section" id="branding">
+  <p class="section-num">Sección 14</p>
+  <h2>Tenant Branding</h2>
+  <p class="desc">Cada tenant define un primary_color en su config JSON. Se propaga como prop al ClientSidebar.</p>
+
+  <h3>Cascada de color</h3>
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px">
+    <div style="padding:12px 20px; border-radius:10px; background:rgba(211,154,43,0.08); border-left:3px solid #D39A2B; font-size:13px; font-weight:500; color:#D39A2B">Active nav (ámbar)</div>
+    <div style="padding:12px 20px; border-radius:10px; background:rgba(180,35,24,0.08); border-left:3px solid #B42318; font-size:13px; font-weight:500; color:#B42318">Active nav (rojo custom)</div>
+    <div style="padding:12px 20px; border-radius:10px; background:rgba(47,107,79,0.08); border-left:3px solid #2F6B4F; font-size:13px; font-weight:500; color:#2F6B4F">Active nav (verde custom)</div>
+  </div>
+  <p style="font-size:12px; color:var(--pizarra); margin-top:12px">El color se aplica como: <code>{primaryColor}15</code> para bg (8% opacidad), directo para text y <code>box-shadow: inset 3px 0 0</code>.</p>
+</div>
+
+<hr>
+
+<!-- 15. LOGOS -->
+<div class="section" id="logos">
+  <p class="section-num">Sección 15</p>
+  <h2>Brand Logos & Avatars</h2>
+
+  <h3>Tipos visuales de marca (muestran logo)</h3>
+  <div class="badge-row">
+    <span class="tag" style="background:rgba(28,63,85,0.08); color:#1C3F55">FIGURATIVE</span>
+    <span class="tag" style="background:rgba(28,63,85,0.08); color:#1C3F55">MIXED</span>
+    <span class="tag" style="background:rgba(28,63,85,0.08); color:#1C3F55">THREE_D</span>
+    <span class="tag" style="background:rgba(28,63,85,0.08); color:#1C3F55">TRADE_DRESS</span>
+    <span class="tag" style="background:rgba(28,63,85,0.08); color:#1C3F55">HOLOGRAM</span>
+  </div>
+  <h3>Tipos sin logo (solo texto)</h3>
+  <div class="badge-row">
+    <span class="tag" style="background:rgba(200,196,185,0.2); color:#355B6F">WORDMARK</span>
+    <span class="tag" style="background:rgba(200,196,185,0.2); color:#355B6F">SOUND</span>
+  </div>
+
+  <h3>Avatar fallbacks</h3>
+  <div style="display:flex; gap:16px; align-items:center; margin-top:12px">
+    <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#0F2E3D,#1C3F55);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#FBF6EC;border:3px solid #E2DED6">MC</div>
+    <span style="font-size:12px;color:var(--pizarra)">Dashboard avatar · 64px · rounded-2xl · gradient marino→indigo</span>
+  </div>
+  <div style="display:flex; gap:16px; align-items:center; margin-top:12px">
+    <div style="width:32px;height:32px;border-radius:50%;background:rgba(211,154,43,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#D39A2B">MC</div>
+    <span style="font-size:12px;color:var(--pizarra)">Sidebar avatar (Promark) · 32px · rounded-full · ámbar</span>
+  </div>
+  <div style="display:flex; gap:16px; align-items:center; margin-top:12px">
+    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0F2E3D,#1C3F55);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#FBF6EC">JR</div>
+    <span style="font-size:12px;color:var(--pizarra)">Sidebar avatar (Client) · 32px · rounded-full · gradient</span>
+  </div>
+  <div style="display:flex; gap:16px; align-items:center; margin-top:12px">
+    <div style="width:40px;height:40px;border-radius:8px;background:rgba(143,182,199,0.12);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#8FB6C7">IMG</div>
+    <span style="font-size:12px;color:var(--pizarra)">BrandLogoThumb placeholder · 40px · rounded-lg · niebla</span>
+  </div>
+</div>
+
+<hr>
+
+<!-- 16. PAGES -->
+<div class="section" id="pages">
+  <p class="section-num">Sección 16</p>
+  <h2>Patrones de Página</h2>
+
+  <h3>PageTitle con eyebrow</h3>
+  <div style="background:white; border:1px solid var(--arena); border-radius:12px; padding:24px; margin-top:8px">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#355B6F">Panel ejecutivo</div>
+    <div style="font-size:1.875rem;font-weight:700;letter-spacing:-0.025em;color:#1A1E23;margin-top:4px">Bienvenido, Miguel Cadena</div>
+    <div style="font-size:14px;color:#355B6F;margin-top:4px">Vista general de todos los clientes</div>
+  </div>
+
+  <h3>Layout completo de dashboard</h3>
+  <div style="font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--pizarra); background:white; border:1px solid var(--arena); border-radius:12px; padding:16px 20px; margin-top:8px; line-height:2">
+    div.space-y-12<br>
+    ├── Header (avatar + PageTitle + badge "Sistema activo")<br>
+    ├── KpiGrid (4 × KpiCard)<br>
+    ├── DsCard → StatusDonut<br>
+    ├── DsCard → TopTenantsBar<br>
+    └── RecentActivity (SectionHeader + DsTimeline)
+  </div>
+
+  <h3>Badge "Sistema activo"</h3>
+  <div style="display:inline-flex;align-items:center;gap:10px;border-radius:12px;border:1px solid #E2DED6;padding:10px 16px;background:#F1EDE3;margin-top:8px">
+    <span style="position:relative;display:flex;width:12px;height:12px">
+      <span style="position:absolute;inset:0;border-radius:50%;background:#2F6B4F;animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;opacity:0.4"></span>
+      <span style="position:relative;display:inline-flex;width:12px;height:12px;border-radius:50%;background:#2F6B4F"></span>
+    </span>
+    <span style="font-size:12px;font-weight:600;color:#2F6B4F">Sistema activo</span>
+  </div>
+</div>
+
+<hr>
+
+<!-- 17. LABELS -->
+<div class="section" id="labels">
+  <p class="section-num">Sección 17</p>
+  <h2>Labels i18n (ES-MX)</h2>
+  <p class="desc">Todos los labels de status definidos en lib/i18n/status-labels.ts.</p>
+
+  <table class="info-table">
+    <thead><tr><th>Entidad</th><th>Enum → Label</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Brand</strong></td><td>APPLIED→Solicitada, REGISTERED→Registrada, RENEWED→Renovada, EXPIRED→Expirada, CANCELLED→Cancelada, OPPOSED→Impugnada</td></tr>
+      <tr><td><strong>Brand type</strong></td><td>WORDMARK→Nominativa, FIGURATIVE→Figurativa, MIXED→Mixta, THREE_D→Tridimensional, SOUND→Sonora</td></tr>
+      <tr><td><strong>Contract status</strong></td><td>DRAFT→Borrador, ACTIVE→Vigente, EXPIRED→Vencido, TERMINATED→Terminado, RENEWED→Renovado, UNDER_REVIEW→En revisión</td></tr>
+      <tr><td><strong>Contract type</strong></td><td>LICENSE_INTERNAL→Licencia interna, COEXISTENCE→Coexistencia, ASSIGNMENT→Cesión, FRANCHISE→Franquicia, NDA→Confidencialidad</td></tr>
+      <tr><td><strong>License</strong></td><td>EXCLUSIVE→Exclusiva, NON_EXCLUSIVE→No exclusiva, SUBLICENSE→Sublicencia</td></tr>
+      <tr><td><strong>Tenant</strong></td><td>ACTIVE→Activo, SUSPENDED→Suspendido, ONBOARDING→Onboarding</td></tr>
+      <tr><td><strong>Holder</strong></td><td>ACTIVE→Activo, INACTIVE→Inactivo</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<div style="text-align:center; padding:32px 0; color:var(--piedra); font-size:12px">
+  Promark® UI System Design Guide · Generada del código fuente · Mayo 2026
+</div>
+
+</div>
+</body>
+</html>

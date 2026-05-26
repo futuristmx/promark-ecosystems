@@ -10,7 +10,7 @@ export default async function NewTenantPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-4xl">
       <PageTitle
         eyebrow="Workspace"
         title="Nuevo cliente"
