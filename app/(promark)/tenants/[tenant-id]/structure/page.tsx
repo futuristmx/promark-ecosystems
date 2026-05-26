@@ -7,7 +7,8 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Suspense } from 'react';
-import { PageTitle, EmptyState, CsvToolbar } from '@/components/ds';
+import { PageTitle, EmptyState } from '@/components/ds';
+import { StructureCsvBar } from './structure-csv-bar';
 import {
   HOLDING_STATUS_LABELS,
   COMPANY_STATUS_LABELS,
@@ -81,26 +82,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
       />
 
       {canEdit && (
-        <div className="mt-4 space-y-2">
-          <CsvToolbar
-            endpoint={`/api/tenants/${tenantId}/csv?type=holdings`}
-            templateColumns={['nombre', 'razon_social', 'rfc', 'pais', 'notas']}
-            templateExample={['Mi Holding', 'Mi Holding S.A. de C.V.', 'MHO123456ABC', 'México', '']}
-            entityLabel="holdings"
-          />
-          <CsvToolbar
-            endpoint={`/api/tenants/${tenantId}/csv?type=companies`}
-            templateColumns={['nombre', 'razon_social', 'holding', 'tipo', 'rfc', 'pais', 'estado_entidad']}
-            templateExample={['Mi Empresa', 'Mi Empresa S.A. de C.V.', 'Mi Holding', 'SUBSIDIARY', 'MEM123456ABC', 'México', 'CDMX']}
-            entityLabel="empresas"
-          />
-          <CsvToolbar
-            endpoint={`/api/tenants/${tenantId}/csv?type=brands`}
-            templateColumns={['nombre', 'empresa', 'tipo', 'estado_legal', 'numero_registro', 'fecha_vencimiento']}
-            templateExample={['Mi Marca', 'Mi Empresa', 'WORDMARK', 'APPLIED', '', '']}
-            entityLabel="marcas"
-          />
-        </div>
+        <StructureCsvBar tenantId={tenantId} className="mt-4" />
       )}
 
       {holdings.length === 0 ? (

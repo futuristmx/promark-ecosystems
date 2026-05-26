@@ -131,25 +131,6 @@ export function CsvToolbar({
           Plantilla
         </button>
 
-        {/* Export */}
-        <button
-          type="button"
-          onClick={exportCsv}
-          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
-          style={{ color: '#0F2E3D' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(226,222,214,0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-          }}
-        >
-          <Download className="size-3.5" />
-          Exportar
-        </button>
-
-        <div className="h-4 w-px" style={{ background: '#E2DED6' }} />
-
         {/* Import */}
         <input
           ref={fileRef}
@@ -177,6 +158,25 @@ export function CsvToolbar({
             <Upload className="size-3.5" />
           )}
           {importing ? 'Importando…' : 'Importar'}
+        </button>
+
+        <div className="h-4 w-px" style={{ background: '#E2DED6' }} />
+
+        {/* Export */}
+        <button
+          type="button"
+          onClick={exportCsv}
+          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+          style={{ color: '#0F2E3D' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(226,222,214,0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
+        >
+          <Download className="size-3.5" />
+          Exportar
         </button>
 
         {/* Result badge */}
