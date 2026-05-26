@@ -139,9 +139,9 @@ export async function POST(
         const data = {
           name: row[nameIdx].trim(),
           legal_name: row[legalIdx].trim(),
-          rfc: row[headers.indexOf('rfc')]?.trim() || null,
-          country: row[headers.indexOf('pais')]?.trim() || null,
-          notes: row[headers.indexOf('notas')]?.trim() || null,
+          rfc: row[headers.indexOf('rfc')]?.trim() || undefined,
+          country: row[headers.indexOf('pais')]?.trim() || undefined,
+          notes: row[headers.indexOf('notas')]?.trim() || undefined,
         };
         if (id) {
           await prisma.holding.update({ where: { id }, data });
@@ -179,10 +179,10 @@ export async function POST(
         const data: Record<string, unknown> = {
           name: row[nameIdx].trim(),
           legal_name: row[legalIdx].trim(),
-          rfc: row[headers.indexOf('rfc')]?.trim() || null,
+          rfc: row[headers.indexOf('rfc')]?.trim() || undefined,
           company_type: row[headers.indexOf('tipo')]?.trim() || 'SUBSIDIARY',
-          country: row[headers.indexOf('pais')]?.trim() || null,
-          state: row[headers.indexOf('estado_entidad')]?.trim() || null,
+          country: row[headers.indexOf('pais')]?.trim() || undefined,
+          state: row[headers.indexOf('estado_entidad')]?.trim() || undefined,
         };
         if (id) {
           await prisma.company.update({ where: { id }, data });
