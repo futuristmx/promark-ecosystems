@@ -79,6 +79,9 @@ export function ClientSidebar({
     return pathname === href || pathname.startsWith(href + '/');
   }
 
+  // Hide sidebar on login page
+  if (pathname.endsWith('/login')) return null;
+
   return (
     <aside
       className="flex w-64 flex-col border-r"
