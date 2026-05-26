@@ -125,22 +125,21 @@ export function PromarkSidebar({ userName, userRole }: PromarkSidebarProps) {
         borderRight: '1px solid rgba(251, 246, 236, 0.12)',
       }}
     >
-      {/* Logo */}
+      {/* Logo — fondo más claro para contraste */}
       <div
-        className="flex items-center gap-2.5 px-5 py-4"
-        style={{ borderBottom: '1px solid rgba(251, 246, 236, 0.10)' }}
+        className="flex items-center gap-3 px-5 py-4"
+        style={{
+          borderBottom: '1px solid rgba(251, 246, 236, 0.10)',
+          background: 'rgba(251, 246, 236, 0.06)',
+        }}
       >
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div
-            aria-hidden
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold shadow-sm"
-            style={{
-              background: 'linear-gradient(135deg, #D39A2B 0%, #F2C16A 100%)',
-              color: '#0B1F2A',
-            }}
-          >
-            P
-          </div>
+        <Link href="/dashboard" className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/promark-icon.svg"
+            alt="Promark"
+            className="h-9 w-9 shrink-0"
+          />
           <div className="flex flex-col leading-none">
             <span className="text-base font-bold tracking-tight" style={{ color: '#FBF6EC' }}>
               Promark<span style={{ color: 'rgba(251, 246, 236, 0.5)' }}>®</span>
