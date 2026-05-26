@@ -71,6 +71,35 @@ export async function GET(
         c.company_type, c.rfc ?? '', c.country ?? '', c.state ?? '', c.status,
       ].join(',') + '\n';
     }
+  } else if (type === 'holders') {
+    const holders = await prisma.holder.findMany({
+      where: { tenant_id: tenantId },
+      orderBy: { name: 'asc' },
+    });
+    csv = 'id,nombre,tipo,rfc,curp,nacionalidad,estado,notas\n';
+    for (const h of holders) {
+      csv += [h.id, esc(h.name), h.holder_type, h.rfc ?? '', h.curp ?? '', h.nationality ?? '', h.status, esc(h.notes ?? '')].join(',') + '\n';
+    }
+  } else if (type === 'contracts') {
+    const contracts = await prisma.contract.findMany({
+      where: { tenant_id: tenantId, deleted_at: null },
+      include: { contract_brands: { include: { brand: { select: { name: true } } } } },
+      orderBy: { title: 'asc' },
+    });
+    csv = 'id,titulo,tipo,estado,fecha_inicio,fecha_vencimiento,ley_aplicable,notas\n';
+    for (const c of contracts) {
+      csv += [c.id, esc(c.title), c.contract_type, c.status, c.effective_date?.toISOString().slice(0, 10) ?? '', c.expiration_date?.toISOString().slice(0, 10) ?? '', esc(c.governing_law ?? ''), esc(c.notes ?? '')].join(',') + '\n';
+    }
+  } else if (type === 'licenses') {
+    const licenses = await prisma.license.findMany({
+      where: { tenant_id: tenantId, deleted_at: null },
+      include: { brand: { select: { name: true } } },
+      orderBy: { licensee_name: 'asc' },
+    });
+    csv = 'id,marca,tipo,licenciatario,rfc_licenciatario,territorio,fecha_inicio,fecha_vencimiento,estado,notas\n';
+    for (const l of licenses) {
+      csv += [l.id, esc(l.brand.name), l.license_type, esc(l.licensee_name), l.licensee_rfc ?? '', esc(l.territory.join(';')), l.effective_date?.toISOString().slice(0, 10) ?? '', l.expiration_date?.toISOString().slice(0, 10) ?? '', l.status, esc(l.notes ?? '')].join(',') + '\n';
+    }
   } else {
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   }
@@ -245,6 +274,115 @@ export async function POST(
       } catch (e) {
         errors.push(`Fila ${i + 2}: ${(e as Error).message}`);
       }
+    }
+  } else if (type === 'holders') {
+    const nameIdx = headers.indexOf('nombre');
+    const idIdx = headers.indexOf('id');
+    if (nameIdx < 0) {
+      return NextResponse.json({ error: 'Columna requerida: nombre' }, { status: 400 });
+    }
+    const VALID_HTYPE = new Set(['INDIVIDUAL', 'CORPORATION']);
+    const VALID_HSTATUS = new Set(['ACTIVE', 'INACTIVE']);
+
+    for (let i = 0; i < dataRows.length; i++) {
+      const row = dataRows[i];
+      try {
+        const id = idIdx >= 0 ? row[idIdx]?.trim() : '';
+        const name = row[nameIdx]?.trim();
+        if (!name) { errors.push(`Fila ${i + 2}: nombre requerido.`); continue; }
+        const htRaw = (row[headers.indexOf('tipo')]?.trim() || 'INDIVIDUAL').toUpperCase();
+        const holder_type = VALID_HTYPE.has(htRaw) ? htRaw : 'INDIVIDUAL';
+        const statusRaw = (row[headers.indexOf('estado')]?.trim() || 'ACTIVE').toUpperCase();
+        const status = VALID_HSTATUS.has(statusRaw) ? statusRaw : 'ACTIVE';
+        const data = {
+          name,
+          holder_type: holder_type as import('@prisma/client').HolderType,
+          rfc: row[headers.indexOf('rfc')]?.trim() || undefined,
+          curp: row[headers.indexOf('curp')]?.trim() || undefined,
+          nationality: row[headers.indexOf('nacionalidad')]?.trim() || undefined,
+          notes: row[headers.indexOf('notas')]?.trim() || undefined,
+          status: status as import('@prisma/client').HolderStatus,
+        };
+        if (id) { await prisma.holder.update({ where: { id }, data }); updated++; }
+        else { await prisma.holder.create({ data: { tenant_id: tenantId, ...data } }); created++; }
+      } catch (e) { errors.push(`Fila ${i + 2}: ${(e as Error).message}`); }
+    }
+  } else if (type === 'contracts') {
+    const titleIdx = headers.indexOf('titulo');
+    const idIdx = headers.indexOf('id');
+    if (titleIdx < 0) {
+      return NextResponse.json({ error: 'Columna requerida: titulo' }, { status: 400 });
+    }
+    const VALID_CTYPE = new Set(['LICENSE_INTERNAL','LICENSE_EXTERNAL','COEXISTENCE','ASSIGNMENT','FRANCHISE','DISTRIBUTION']);
+    const VALID_CSTATUS = new Set(['DRAFT','ACTIVE','EXPIRED','TERMINATED','RENEWED','UNDER_REVIEW']);
+
+    for (let i = 0; i < dataRows.length; i++) {
+      const row = dataRows[i];
+      try {
+        const id = idIdx >= 0 ? row[idIdx]?.trim() : '';
+        const title = row[titleIdx]?.trim();
+        if (!title) { errors.push(`Fila ${i + 2}: titulo requerido.`); continue; }
+        const ctRaw = (row[headers.indexOf('tipo')]?.trim() || 'LICENSE_INTERNAL').toUpperCase();
+        const contract_type = VALID_CTYPE.has(ctRaw) ? ctRaw : 'LICENSE_INTERNAL';
+        const csRaw = (row[headers.indexOf('estado')]?.trim() || 'DRAFT').toUpperCase();
+        const status = VALID_CSTATUS.has(csRaw) ? csRaw : 'DRAFT';
+        const effStr = row[headers.indexOf('fecha_inicio')]?.trim();
+        const expStr = row[headers.indexOf('fecha_vencimiento')]?.trim();
+        const data = {
+          title,
+          contract_type: contract_type as import('@prisma/client').ContractType,
+          status: status as import('@prisma/client').ContractStatus,
+          effective_date: effStr ? new Date(effStr) : undefined,
+          expiration_date: expStr ? new Date(expStr) : undefined,
+          governing_law: row[headers.indexOf('ley_aplicable')]?.trim() || undefined,
+          notes: row[headers.indexOf('notas')]?.trim() || undefined,
+        };
+        if (id) { await prisma.contract.update({ where: { id }, data }); updated++; }
+        else { await prisma.contract.create({ data: { tenant_id: tenantId, ...data } }); created++; }
+      } catch (e) { errors.push(`Fila ${i + 2}: ${(e as Error).message}`); }
+    }
+  } else if (type === 'licenses') {
+    const licenseeIdx = headers.indexOf('licenciatario');
+    const brandIdx = headers.indexOf('marca');
+    const idIdx = headers.indexOf('id');
+    if (licenseeIdx < 0 || brandIdx < 0) {
+      return NextResponse.json({ error: 'Columnas requeridas: marca, licenciatario' }, { status: 400 });
+    }
+    const brands = await prisma.brand.findMany({ where: { tenant_id: tenantId }, select: { id: true, name: true } });
+    const brandMap = new Map(brands.map((b) => [b.name.toLowerCase(), b.id]));
+    const VALID_LTYPE = new Set(['EXCLUSIVE', 'NON_EXCLUSIVE', 'SUBLICENSE']);
+    const VALID_LSTATUS = new Set(['DRAFT','ACTIVE','EXPIRED','TERMINATED','SUSPENDED']);
+
+    for (let i = 0; i < dataRows.length; i++) {
+      const row = dataRows[i];
+      try {
+        const id = idIdx >= 0 ? row[idIdx]?.trim() : '';
+        const licensee_name = row[licenseeIdx]?.trim();
+        const brandName = row[brandIdx]?.trim() ?? '';
+        const brandId = brandMap.get(brandName.toLowerCase());
+        if (!licensee_name) { errors.push(`Fila ${i + 2}: licenciatario requerido.`); continue; }
+        if (!id && !brandId) { errors.push(`Fila ${i + 2}: Marca "${brandName}" no encontrada.`); continue; }
+        const ltRaw = (row[headers.indexOf('tipo')]?.trim() || 'NON_EXCLUSIVE').toUpperCase();
+        const license_type = VALID_LTYPE.has(ltRaw) ? ltRaw : 'NON_EXCLUSIVE';
+        const lsRaw = (row[headers.indexOf('estado')]?.trim() || 'DRAFT').toUpperCase();
+        const status = VALID_LSTATUS.has(lsRaw) ? lsRaw : 'DRAFT';
+        const effStr = row[headers.indexOf('fecha_inicio')]?.trim();
+        const expStr = row[headers.indexOf('fecha_vencimiento')]?.trim();
+        const terrStr = row[headers.indexOf('territorio')]?.trim();
+        const territory = terrStr ? terrStr.split(';').map((t) => t.trim()).filter(Boolean) : [];
+        const data = {
+          licensee_name,
+          license_type: license_type as import('@prisma/client').LicenseType,
+          status: status as import('@prisma/client').LicenseStatus,
+          licensee_rfc: row[headers.indexOf('rfc_licenciatario')]?.trim() || undefined,
+          territory,
+          effective_date: effStr ? new Date(effStr) : undefined,
+          expiration_date: expStr ? new Date(expStr) : undefined,
+          notes: row[headers.indexOf('notas')]?.trim() || undefined,
+        };
+        if (id) { await prisma.license.update({ where: { id }, data }); updated++; }
+        else { await prisma.license.create({ data: { tenant_id: tenantId, brand_id: brandId!, ...data } }); created++; }
+      } catch (e) { errors.push(`Fila ${i + 2}: ${(e as Error).message}`); }
     }
   } else {
     return NextResponse.json({ error: 'Tipo no soportado.' }, { status: 400 });

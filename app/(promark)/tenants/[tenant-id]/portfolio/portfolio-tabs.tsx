@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, Tag, Users, Scroll, KeyRound, Download, Upload } from 'lucide-react';
+import { Plus, Search, Tag, Users, Scroll, KeyRound } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,7 @@ import type { StatusTone } from '@/components/ds';
 import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
 } from '@/components/ui/table';
+import { PortfolioCsvBar } from './portfolio-csv-bar';
 
 const BRAND_STATUS_TONE: Record<string, StatusTone> = {
   REGISTERED: 'success', RENEWED: 'success', APPLIED: 'info', PUBLISHED: 'info',
@@ -48,62 +49,6 @@ interface LicenseItem {
   expiration_date: string | null; territory: string[]; brand: { id: string; name: string };
 }
 
-function downloadCSV(tenantId: string, type: string) {
-  window.open(`/api/tenants/${tenantId}/csv?type=${type}`, '_blank');
-}
-
-function CsvImportButton({ tenantId, type, onDone }: { tenantId: string; type: string; onDone: () => void }) {
-  const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<{ created: number; updated: number; errors: string[] } | null>(null);
-
-  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImporting(true);
-    setResult(null);
-    try {
-      const text = await file.text();
-      const res = await fetch(`/api/tenants/${tenantId}/csv?type=${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/csv' },
-        body: text,
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setResult(data);
-        onDone();
-      } else {
-        setResult({ created: 0, updated: 0, errors: [data.error] });
-      }
-    } catch {
-      setResult({ created: 0, updated: 0, errors: ['Error de red.'] });
-    } finally {
-      setImporting(false);
-      e.target.value = '';
-    }
-  }
-
-  return (
-    <div className="relative">
-      <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50">
-        <Upload className="h-3.5 w-3.5" />
-        {importing ? 'Importando…' : 'Importar CSV'}
-        <input type="file" accept=".csv" className="hidden" onChange={handleFile} disabled={importing} />
-      </label>
-      {result && (
-        <div className="absolute right-0 top-full z-10 mt-1 w-64 rounded-lg border border-slate-200 bg-white p-3 text-xs shadow-lg">
-          <p className="font-medium text-slate-700">{result.created} creados, {result.updated} actualizados</p>
-          {result.errors.length > 0 && (
-            <ul className="mt-1 space-y-0.5 text-red-600">
-              {result.errors.slice(0, 5).map((e, i) => <li key={i}>{e}</li>)}
-            </ul>
-          )}
-          <button onClick={() => setResult(null)} className="mt-2 text-slate-400 hover:text-slate-600">Cerrar</button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
   const router = useRouter();
@@ -181,7 +126,15 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
     !licenseSearch || l.licensee_name.toLowerCase().includes(licenseSearch.toLowerCase())
   );
 
+  const refetchAll = useCallback(() => {
+    fetchBrands(); fetchHolders(); fetchContracts(); fetchLicenses();
+  }, [fetchBrands, fetchHolders, fetchContracts, fetchLicenses]);
+
   return (
+    <div className="space-y-4">
+      {canCreate && (
+        <PortfolioCsvBar tenantId={tenantId} onImportSuccess={refetchAll} />
+      )}
     <Tabs defaultValue="brands" className="w-full">
       <TabsList>
         <TabsTrigger value="brands">
@@ -210,18 +163,12 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             <Input placeholder="Buscar marcas..." value={brandSearch}
               onChange={(e) => setBrandSearch(e.target.value)} className="pl-9" />
           </div>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => downloadCSV(tenantId, 'brands')} title="Exportar CSV"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">
-              <Download className="h-3.5 w-3.5" /> CSV
-            </button>
-            {canCreate && (
-              <Link href={`/tenants/${tenantId}/brands/new`}
-                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
-                <Plus className="size-4" /> Nueva Marca
-              </Link>
-            )}
-          </div>
+          {canCreate && (
+            <Link href={`/tenants/${tenantId}/brands/new`}
+              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
+              <Plus className="size-4" /> Nueva Marca
+            </Link>
+          )}
         </div>
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           {brandsLoading ? (
@@ -423,5 +370,6 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
         </div>
       </TabsContent>
     </Tabs>
+    </div>
   );
 }
