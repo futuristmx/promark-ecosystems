@@ -188,13 +188,16 @@ export default async function DashboardPage() {
         />
       </KpiGrid>
 
-      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="mt-10">
         <DsCard variant="standard">
           <StatusDonut
             data={statusDistribution}
             title="Distribución por estado legal"
           />
         </DsCard>
+      </div>
+
+      <div className="mt-4">
         <DsCard variant="standard">
           <TopTenantsBar data={topTenants} />
         </DsCard>

@@ -109,17 +109,16 @@ export function TenantPanelView({
           />
         </KpiGrid>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <DsCard variant="standard">
-            <StatusDonut data={donutData} title="Distribución por estado legal" />
-          </DsCard>
-          <DsCard variant="standard">
-            <VigencyTimeline
-              data={aggregates.expirationsByMonth}
-              title="Vencimientos próximos (24 meses)"
-            />
-          </DsCard>
-        </div>
+        <DsCard variant="standard">
+          <StatusDonut data={donutData} title="Distribución por estado legal" />
+        </DsCard>
+
+        <DsCard variant="standard">
+          <VigencyTimeline
+            data={aggregates.expirationsByMonth}
+            title="Vencimientos próximos (24 meses)"
+          />
+        </DsCard>
 
         <DsCard variant="standard">
           <ImpiClassBar data={aggregates.impiClasses} />

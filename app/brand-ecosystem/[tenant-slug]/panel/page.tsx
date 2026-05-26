@@ -139,13 +139,12 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
         />
       </KpiGrid>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <StatusDonut data={donutData} title="Distribución por estado legal" />
-        <VigencyTimeline
-          data={aggregates.expirationsByMonth}
-          title="Vencimientos próximos (24 meses)"
-        />
-      </div>
+      <StatusDonut data={donutData} title="Distribución por estado legal" />
+
+      <VigencyTimeline
+        data={aggregates.expirationsByMonth}
+        title="Vencimientos próximos (24 meses)"
+      />
 
       <RecentActivity items={aggregates.recentActivity} />
     </div>
