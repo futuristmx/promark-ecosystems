@@ -180,7 +180,7 @@ export async function POST(
         const legal_name = row[legalIdx].trim();
         const extra = {
           rfc: row[headers.indexOf('rfc')]?.trim() || undefined,
-          company_type: row[headers.indexOf('tipo')]?.trim() || 'SUBSIDIARY',
+          company_type: (row[headers.indexOf('tipo')]?.trim() || 'SUBSIDIARY') as import('@prisma/client').CompanyType,
           country: row[headers.indexOf('pais')]?.trim() || undefined,
           state: row[headers.indexOf('estado_entidad')]?.trim() || undefined,
         };
