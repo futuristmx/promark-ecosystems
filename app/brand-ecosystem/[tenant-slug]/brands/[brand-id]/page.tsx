@@ -3,13 +3,6 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
 import { BrandVigencyDot, getVigencyInfo } from '@/components/brand-vigency-dot';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   ArrowLeft,
   Calendar,
@@ -61,6 +54,17 @@ const STATUS_LABELS: Record<string, string> = {
   IN_LITIGATION: 'En litigio',
 };
 
+const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
+  APPLIED: { bg: 'rgba(143,182,199,0.12)', color: '#355B6F', border: 'rgba(143,182,199,0.3)' },
+  PUBLISHED: { bg: 'rgba(53,91,111,0.1)', color: '#355B6F', border: 'rgba(53,91,111,0.25)' },
+  REGISTERED: { bg: 'rgba(15,46,61,0.08)', color: '#0F2E3D', border: 'rgba(15,46,61,0.2)' },
+  RENEWED: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F', border: 'rgba(47,107,79,0.2)' },
+  EXPIRED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318', border: 'rgba(180,35,24,0.2)' },
+  CANCELLED: { bg: 'rgba(200,196,185,0.2)', color: '#C8C4B9', border: 'rgba(200,196,185,0.4)' },
+  OPPOSED: { bg: 'rgba(211,154,43,0.1)', color: '#D39A2B', border: 'rgba(211,154,43,0.25)' },
+  IN_LITIGATION: { bg: 'rgba(11,31,42,0.08)', color: '#0B1F2A', border: 'rgba(11,31,42,0.2)' },
+};
+
 const BRAND_TYPE_LABELS: Record<string, string> = {
   WORDMARK: 'Nominativa',
   FIGURATIVE: 'Figurativa',
@@ -98,7 +102,6 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
   const { 'tenant-slug': tenantSlug, 'brand-id': brandId } = await params;
   const session = await requireClientSession(tenantSlug);
 
-  // Fetch brand with relations
   const brandResult = await prisma.brand.findUnique({
     where: { id: brandId },
     include: {
@@ -127,15 +130,6 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
 
   const brand = brandResult;
 
-  // For CLIENT_LEGAL_REP: verify they are a holder on this brand
-  // TODO: Once user-to-holder linking is built, check that the user's linked
-  // holder_id appears in brand.holders. For now, allow access.
-  // if (session.role === 'CLIENT_LEGAL_REP') {
-  //   const isHolder = brand.holders.some(h => h.holder_id === linkedHolderId);
-  //   if (!isHolder) notFound();
-  // }
-
-  // Fetch tenant config for feature flags
   const tenant = await prisma.tenant.findUnique({
     where: { id: session.tenant_id },
     select: { config: true },
@@ -143,62 +137,56 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
   const config = (tenant?.config ?? {}) as TenantConfig;
   const features = config.features ?? {};
 
-  // CLIENT_VIEWER never sees history or documents regardless of config
   const isViewer = session.role === 'CLIENT_VIEWER';
   const showHistory = !isViewer && (features.show_brand_history ?? false);
   const showDocuments = !isViewer && (features.show_documents ?? false);
   const showContracts = !isViewer && (features.show_contracts ?? false);
-
   const allowDownload = features.allow_document_download ?? false;
 
   const vigencyInfo = getVigencyInfo(brand.expiration_date, brand.legal_status);
   const basePath = `/brand-ecosystem/${tenantSlug}/brands`;
+  const statusS = STATUS_STYLE[brand.legal_status] ?? STATUS_STYLE.APPLIED;
 
   return (
-    <div className="px-6 py-6">
+    <div className="px-8 py-8">
       {/* Back link */}
       <Link
         href={basePath}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+        style={{ color: '#8FB6C7' }}
       >
         <ArrowLeft className="size-4" />
         Volver a marcas
       </Link>
 
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-8 flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">{brand.name}</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#0F2E3D' }}>{brand.name}</h1>
             <BrandVigencyDot
               expirationDate={brand.expiration_date}
               legalStatus={brand.legal_status}
             />
           </div>
-          <p className="mt-1 text-sm text-slate-500">{brand.company.name}</p>
+          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>{brand.company.name}</p>
         </div>
         <div className="text-right">
-          <Badge
-            variant={
-              brand.legal_status === 'REGISTERED' || brand.legal_status === 'RENEWED'
-                ? 'default'
-                : brand.legal_status === 'EXPIRED' || brand.legal_status === 'CANCELLED'
-                  ? 'destructive'
-                  : 'secondary'
-            }
+          <span
+            className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ background: statusS.bg, color: statusS.color, border: `1px solid ${statusS.border}` }}
           >
             {STATUS_LABELS[brand.legal_status] ?? brand.legal_status}
-          </Badge>
-          {/* G5: solo mostrar vigencyInfo si añade información (no duplica el badge) */}
+          </span>
           {vigencyInfo.label &&
             vigencyInfo.label !== STATUS_LABELS[brand.legal_status] && (
-              <p className="mt-1 text-xs text-slate-400">{vigencyInfo.label}</p>
+              <p className="mt-1 text-xs" style={{ color: '#C8C4B9' }}>{vigencyInfo.label}</p>
             )}
         </div>
       </div>
 
       {/* Info cards grid */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <InfoCard
           icon={<Type className="size-4" />}
           label="Tipo de marca"
@@ -229,9 +217,6 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
           label="Fecha de expiración"
           value={formatDate(brand.expiration_date)}
         />
-        {/* G4: Empresa ya está en el subtítulo del header (línea ~178);
-            omitir el InfoCard duplicado. Si el legal_name difiere del
-            display name, mostrarlo entonces para que tenga valor extra. */}
         {brand.company.legal_name &&
           brand.company.legal_name !== brand.company.name && (
             <InfoCard
@@ -251,118 +236,107 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
 
       {/* Description */}
       {brand.description && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Descripción</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-600">{brand.description}</p>
-          </CardContent>
-        </Card>
+        <Section title="Descripción" className="mb-8">
+          <p className="text-sm" style={{ color: '#355B6F' }}>{brand.description}</p>
+        </Section>
       )}
 
       {/* Nice classes */}
       {brand.classes.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Clases de Niza</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {brand.classes.map((cls) => (
-                <div
-                  key={cls.id}
-                  className="flex items-start gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+        <Section title="Clases de Niza" className="mb-8">
+          <div className="space-y-2">
+            {brand.classes.map((cls) => (
+              <div
+                key={cls.id}
+                className="flex items-start gap-3 rounded-xl border px-4 py-3"
+                style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+              >
+                <span
+                  className="inline-flex h-6 min-w-6 items-center justify-center rounded-lg text-xs font-bold"
+                  style={{ background: 'rgba(15,46,61,0.08)', color: '#0F2E3D' }}
                 >
-                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded bg-slate-200 text-xs font-bold text-slate-700">
-                    {cls.class_number}
-                  </span>
-                  <span className="text-sm text-slate-600">
-                    {cls.class_description ??
-                      getNiceClassLabel(cls.class_number)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                  {cls.class_number}
+                </span>
+                <span className="text-sm" style={{ color: '#355B6F' }}>
+                  {cls.class_description ??
+                    getNiceClassLabel(cls.class_number)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Section>
       )}
 
       {/* Holders */}
       {brand.holders.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Titulares</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {brand.holders.map((bh) => (
-                <div
-                  key={bh.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">
-                      {bh.holder.name}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {bh.holder.holder_type === 'INDIVIDUAL'
-                        ? 'Persona fisica'
-                        : 'Persona moral'}
-                    </p>
-                  </div>
-                  <Badge variant="outline">{formatHolderRole(bh.role)}</Badge>
+        <Section title="Titulares" className="mb-8">
+          <div className="space-y-2">
+            {brand.holders.map((bh) => (
+              <div
+                key={bh.id}
+                className="flex items-center justify-between rounded-xl border px-4 py-3"
+                style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+              >
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
+                    {bh.holder.name}
+                  </p>
+                  <p className="text-xs" style={{ color: '#8FB6C7' }}>
+                    {bh.holder.holder_type === 'INDIVIDUAL'
+                      ? 'Persona física'
+                      : 'Persona moral'}
+                  </p>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <span
+                  className="rounded-full border px-2.5 py-0.5 text-[11px] font-medium"
+                  style={{ borderColor: '#E2DED6', color: '#355B6F' }}
+                >
+                  {formatHolderRole(bh.role)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Section>
       )}
 
       {/* History timeline */}
       {showHistory && brand.history.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="size-4" />
-              Historial
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="relative space-y-4 pl-6">
-              {/* Timeline line */}
-              <div className="absolute left-[9px] top-1 bottom-1 w-px bg-slate-200" />
-              {brand.history.map((event) => (
-                <div key={event.id} className="relative">
-                  <div
-                    className="absolute -left-6 top-1 size-2.5 rounded-full border-2 border-white"
-                    style={{ backgroundColor: 'var(--tenant-primary)' }}
-                  />
-                  <div className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-900">
-                        {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        {formatDate(event.event_date)}
-                      </span>
-                    </div>
-                    {event.description && (
-                      <p className="mt-1 text-xs text-slate-500">
-                        {event.description}
-                      </p>
-                    )}
+        <Section title="Historial" icon={<Clock className="size-4" />} className="mb-8">
+          <div className="relative space-y-4 pl-6">
+            <div className="absolute left-[9px] top-1 bottom-1 w-px" style={{ background: '#E2DED6' }} />
+            {brand.history.map((event) => (
+              <div key={event.id} className="relative">
+                <div
+                  className="absolute -left-6 top-1 size-2.5 rounded-full border-2"
+                  style={{ backgroundColor: 'var(--tenant-primary, #D39A2B)', borderColor: '#F1EDE3' }}
+                />
+                <div
+                  className="rounded-xl border px-4 py-3"
+                  style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
+                      {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
+                    </span>
+                    <span className="text-xs" style={{ color: '#C8C4B9' }}>
+                      {formatDate(event.event_date)}
+                    </span>
                   </div>
+                  {event.description && (
+                    <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
+                      {event.description}
+                    </p>
+                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+        </Section>
       )}
 
       {/* Documents */}
       {showDocuments && (
-        <div className="mb-6">
+        <div className="mb-8">
           <DocumentsPanel
             tenantId={session.tenant_id}
             entityType="BRAND"
@@ -376,48 +350,43 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
 
       {/* Contracts */}
       {showContracts && brand.contract_brands.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ScrollText className="size-4" />
-              Contratos vinculados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {brand.contract_brands.map((cb) => (
+        <Section title="Contratos vinculados" icon={<ScrollText className="size-4" />} className="mb-8">
+          <div className="space-y-2">
+            {brand.contract_brands.map((cb) => {
+              const contractStatusS: Record<string, { bg: string; color: string }> = {
+                ACTIVE: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F' },
+                EXPIRED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318' },
+                TERMINATED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318' },
+              };
+              const cs = contractStatusS[cb.contract.status] ?? { bg: 'rgba(143,182,199,0.12)', color: '#355B6F' };
+              return (
                 <div
                   key={cb.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
+                  className="flex items-center justify-between rounded-xl border px-4 py-3"
+                  style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
                 >
                   <div>
-                    <p className="text-sm font-medium text-slate-900">
+                    <p className="text-sm font-semibold" style={{ color: '#0F2E3D' }}>
                       {cb.contract.title}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs" style={{ color: '#8FB6C7' }}>
                       {formatContractType(cb.contract.contract_type)} &middot;{' '}
                       {cb.contract.expiration_date
                         ? `Vence ${formatDate(cb.contract.expiration_date)}`
                         : 'Sin fecha de vencimiento'}
                     </p>
                   </div>
-                  <Badge
-                    variant={
-                      cb.contract.status === 'ACTIVE'
-                        ? 'default'
-                        : cb.contract.status === 'EXPIRED' ||
-                            cb.contract.status === 'TERMINATED'
-                          ? 'destructive'
-                          : 'secondary'
-                    }
+                  <span
+                    className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                    style={{ background: cs.bg, color: cs.color }}
                   >
                     {formatContractStatus(cb.contract.status)}
-                  </Badge>
+                  </span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              );
+            })}
+          </div>
+        </Section>
       )}
     </div>
   );
@@ -433,12 +402,40 @@ interface InfoCardProps {
 
 function InfoCard({ icon, label, value }: InfoCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-      <div className="flex items-center gap-2 text-slate-400">
+    <div
+      className="rounded-xl border px-4 py-3"
+      style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+    >
+      <div className="flex items-center gap-2" style={{ color: '#8FB6C7' }}>
         {icon}
-        <span className="text-xs">{label}</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider">{label}</span>
       </div>
-      <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
+      <p className="mt-1.5 text-sm font-semibold" style={{ color: '#0F2E3D' }}>{value}</p>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  icon,
+  className,
+  children,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-6 ${className ?? ''}`}
+      style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+    >
+      <h3 className="mb-4 flex items-center gap-2 text-sm font-bold" style={{ color: '#0F2E3D' }}>
+        {icon}
+        {title}
+      </h3>
+      {children}
     </div>
   );
 }

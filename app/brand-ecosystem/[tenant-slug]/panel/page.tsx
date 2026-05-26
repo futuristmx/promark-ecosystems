@@ -6,8 +6,7 @@ import {
   brandIdsForLegalRep,
   computeTenantAggregates,
 } from '@/lib/dashboard/tenant-aggregates';
-import { KpiCard } from '@/components/dashboard/kpi-card';
-import { KpiGrid } from '@/components/dashboard/kpi-grid';
+import { KpiCard, KpiGrid, DsCard } from '@/components/ds';
 import { StatusDonut } from '@/components/dashboard/charts/status-donut';
 import { VigencyTimeline } from '@/components/dashboard/charts/vigency-timeline';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
@@ -58,28 +57,31 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
       : [0, 0];
 
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-slate-900">
-          Panel — {tenant.name}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Resumen de tus marcas asignadas
-        </p>
-        <div className="mt-6">
-          <KpiGrid className="md:grid-cols-2 lg:grid-cols-2">
-            <KpiCard
-              label="Mis marcas"
-              value={brandsCount}
-              icon={<Tag className="h-4 w-4" />}
-            />
-            <KpiCard
-              label="Mis alertas"
-              value={alertsCount}
-              icon={<Bell className="h-4 w-4" />}
-              tone={alertsCount > 0 ? 'danger' : 'default'}
-            />
-          </KpiGrid>
+      <div className="space-y-10 p-8">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+            Panel de consulta
+          </p>
+          <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>
+            {tenant.name}
+          </h1>
+          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
+            Resumen de tus marcas asignadas
+          </p>
         </div>
+        <KpiGrid className="md:grid-cols-2 lg:grid-cols-2">
+          <KpiCard
+            label="Mis marcas"
+            value={brandsCount}
+            icon={<Tag className="size-4" />}
+          />
+          <KpiCard
+            label="Mis alertas"
+            value={alertsCount}
+            icon={<Bell className="size-4" />}
+            tone={alertsCount > 0 ? 'danger' : 'default'}
+          />
+        </KpiGrid>
       </div>
     );
   }
@@ -102,12 +104,15 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
   }));
 
   return (
-    <div className="space-y-12 p-6">
+    <div className="space-y-10 p-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">
-          Panel — {tenant.name}
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+          Panel ejecutivo
+        </p>
+        <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>
+          {tenant.name}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
           {session.role === 'CLIENT_LEGAL_REP'
             ? 'Indicadores de las marcas a tu cargo'
             : 'Indicadores del ecosistema de marcas'}
@@ -118,33 +123,41 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
         <KpiCard
           label="Total marcas"
           value={aggregates.totals.brands}
-          icon={<Tag className="h-4 w-4" />}
+          icon={<Tag className="size-4" />}
+          href={`${hrefPrefix}/brands`}
         />
         <KpiCard
-          label="Marcas por vencer"
+          label="Por vencer (90d)"
           value={aggregates.totals.expiringSoon}
-          icon={<Clock className="h-4 w-4" />}
+          icon={<Clock className="size-4" />}
           tone="warning"
+          href={`${hrefPrefix}/brands`}
         />
         <KpiCard
-          label="Marcas vencidas"
+          label="Vencidas"
           value={aggregates.totals.expired}
-          icon={<AlertTriangle className="h-4 w-4" />}
+          icon={<AlertTriangle className="size-4" />}
           tone="danger"
+          href={`${hrefPrefix}/brands`}
         />
         <KpiCard
           label="Contratos vigentes"
           value={aggregates.totals.activeContracts}
-          icon={<Scroll className="h-4 w-4" />}
+          icon={<Scroll className="size-4" />}
+          href={`${hrefPrefix}/contratos`}
         />
       </KpiGrid>
 
-      <StatusDonut data={donutData} title="Distribución por estado legal" />
+      <DsCard variant="standard">
+        <StatusDonut data={donutData} title="Distribución por estado legal" />
+      </DsCard>
 
-      <VigencyTimeline
-        data={aggregates.expirationsByMonth}
-        title="Vencimientos próximos (24 meses)"
-      />
+      <DsCard variant="standard">
+        <VigencyTimeline
+          data={aggregates.expirationsByMonth}
+          title="Vencimientos próximos (24 meses)"
+        />
+      </DsCard>
 
       <RecentActivity items={aggregates.recentActivity} />
     </div>

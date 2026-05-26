@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { FileText, Download } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { ALERT_ENTITY_TYPE_LABELS } from '@/lib/i18n/status-labels';
 
 interface DocItem {
@@ -60,54 +59,74 @@ export function ClientDocumentsView({
   }, [tenantSlug]);
 
   return (
-    <div className="px-6 py-8">
-      <h1 className="mb-1 text-2xl font-bold text-slate-900">Documentos</h1>
-      <p className="mb-6 text-sm text-slate-500">
-        {documents.length} documento{documents.length !== 1 && 's'} disponible
-        {documents.length !== 1 && 's'}
-      </p>
+    <div className="px-8 py-8">
+      <div className="mb-8">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+          Repositorio
+        </p>
+        <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Documentos</h1>
+        <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
+          {documents.length} documento{documents.length !== 1 && 's'} disponible
+          {documents.length !== 1 && 's'}
+        </p>
+      </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div
+        className="overflow-hidden rounded-2xl border"
+        style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+      >
         {loading ? (
-          <div className="py-12 text-center text-sm text-slate-400">
+          <div className="py-12 text-center text-sm" style={{ color: '#C8C4B9' }}>
             Cargando…
           </div>
         ) : documents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <FileText className="mb-3 size-10 text-slate-300" aria-hidden />
-            <p className="text-sm text-slate-500">
+            <FileText className="mb-3 size-10" style={{ color: '#C8C4B9' }} aria-hidden />
+            <p className="text-sm" style={{ color: '#355B6F' }}>
               Sin documentos disponibles.
             </p>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs" style={{ color: '#C8C4B9' }}>
               Cuando tu equipo legal cargue contratos, certificados o
               comunicaciones, aparecerán aquí.
             </p>
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Archivo</th>
-                <th className="px-4 py-3">Categoría</th>
-                <th className="px-4 py-3">Vinculado a</th>
-                <th className="px-4 py-3">Subido</th>
-                <th className="px-4 py-3">Vence</th>
-                <th className="px-4 py-3">Tamaño</th>
-                {allowDownload && <th className="px-4 py-3"></th>}
+            <thead>
+              <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Archivo</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Categoría</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Vinculado a</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Subido</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Vence</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Tamaño</th>
+                {allowDownload && <th className="px-4 py-3" />}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
-              {documents.map((doc) => (
-                <tr key={doc.id} className="hover:bg-slate-50">
+            <tbody>
+              {documents.map((doc, i) => (
+                <tr
+                  key={doc.id}
+                  className="transition-colors"
+                  style={{
+                    borderBottom: i < documents.length - 1 ? '1px solid #E2DED6' : undefined,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(226,222,214,0.35)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <FileText className="size-4 shrink-0 text-slate-400" />
+                      <FileText className="size-4 shrink-0" style={{ color: '#8FB6C7' }} />
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">
+                        <p className="truncate font-medium" style={{ color: '#0F2E3D' }}>
                           {doc.file_name}
                         </p>
                         {doc.description && (
-                          <p className="truncate text-xs text-slate-500">
+                          <p className="truncate text-xs" style={{ color: '#8FB6C7' }}>
                             {doc.description}
                           </p>
                         )}
@@ -115,21 +134,24 @@ export function ClientDocumentsView({
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant="secondary">
+                    <span
+                      className="rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+                      style={{ background: 'rgba(143,182,199,0.12)', color: '#355B6F' }}
+                    >
                       {CATEGORY_LABELS[doc.document_category] ?? doc.document_category}
-                    </Badge>
+                    </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3" style={{ color: '#355B6F' }}>
                     {ALERT_ENTITY_TYPE_LABELS[doc.entity_type] ?? doc.entity_type}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3" style={{ color: '#355B6F' }}>
                     {new Date(doc.uploaded_at).toLocaleDateString('es-MX', {
                       day: '2-digit',
                       month: 'short',
                       year: 'numeric',
                     })}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3" style={{ color: '#355B6F' }}>
                     {doc.expires_at
                       ? new Date(doc.expires_at).toLocaleDateString('es-MX', {
                           day: '2-digit',
@@ -138,14 +160,23 @@ export function ClientDocumentsView({
                         })
                       : '—'}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3" style={{ color: '#C8C4B9' }}>
                     {formatBytes(doc.file_size)}
                   </td>
                   {allowDownload && (
                     <td className="px-4 py-3 text-right">
                       <a
                         href={`/api/client/${tenantSlug}/documents/${doc.id}/download`}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 hover:underline"
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition-colors"
+                        style={{ color: '#355B6F' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(226,222,214,0.5)';
+                          e.currentTarget.style.color = '#0F2E3D';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.color = '#355B6F';
+                        }}
                       >
                         <Download className="size-3.5" />
                         Descargar

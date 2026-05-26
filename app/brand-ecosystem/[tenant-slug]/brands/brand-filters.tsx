@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 
 interface BrandFiltersProps {
   companies: Array<{ id: string; name: string }>;
@@ -24,11 +23,22 @@ const STATUS_OPTIONS = [
 
 const VIGENCY_OPTIONS = [
   { value: '', label: 'Toda vigencia' },
-  { value: 'green', label: 'Vigente (>90 dias)' },
-  { value: 'yellow', label: 'Por vencer (31-90 dias)' },
-  { value: 'orange', label: 'Urgente (1-30 dias)' },
+  { value: 'green', label: 'Vigente (>90 días)' },
+  { value: 'yellow', label: 'Por vencer (31-90 días)' },
+  { value: 'orange', label: 'Urgente (1-30 días)' },
   { value: 'red', label: 'Expirada' },
 ];
+
+const selectStyle: React.CSSProperties = {
+  height: '2.25rem',
+  borderRadius: '0.75rem',
+  border: '1px solid #E2DED6',
+  background: '#FBF6EC',
+  padding: '0 0.625rem',
+  fontSize: '0.8125rem',
+  color: '#355B6F',
+  outline: 'none',
+};
 
 export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
   const router = useRouter();
@@ -56,13 +66,25 @@ export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
     <div className="flex flex-wrap items-center gap-3">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-        <Input
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2" style={{ color: '#C8C4B9' }} />
+        <input
           placeholder="Buscar marca..."
-          className="h-8 w-56 pl-8 text-sm"
+          className="h-9 w-56 rounded-xl border pl-9 pr-3 text-sm transition-all focus:outline-none"
+          style={{
+            background: '#FBF6EC',
+            borderColor: '#E2DED6',
+            color: '#0F2E3D',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = '#D39A2B';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(211,154,43,0.12)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = '#E2DED6';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
           defaultValue={currentSearch}
           onChange={(e) => {
-            // Debounce is handled by the server re-fetch
             const target = e.target as HTMLInputElement;
             updateParams('search', target.value);
           }}
@@ -72,7 +94,7 @@ export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
       {/* Company filter */}
       {companies.length > 1 && (
         <select
-          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm text-slate-700 outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
+          style={selectStyle}
           value={currentCompany}
           onChange={(e) => updateParams('company', e.target.value)}
         >
@@ -87,7 +109,7 @@ export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
 
       {/* Status filter */}
       <select
-        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm text-slate-700 outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
+        style={selectStyle}
         value={currentStatus}
         onChange={(e) => updateParams('status', e.target.value)}
       >
@@ -100,7 +122,7 @@ export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
 
       {/* Vigency filter */}
       <select
-        className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm text-slate-700 outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
+        style={selectStyle}
         value={currentVigency}
         onChange={(e) => updateParams('vigency', e.target.value)}
       >

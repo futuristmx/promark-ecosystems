@@ -15,8 +15,8 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
   // CLIENT_VIEWER does not get alerts
   if (session.role === 'CLIENT_VIEWER') {
     return (
-      <div className="px-6 py-12 text-center">
-        <p className="text-sm text-slate-500">
+      <div className="px-8 py-12 text-center">
+        <p className="text-sm" style={{ color: '#C8C4B9' }}>
           Su rol no tiene acceso al centro de alertas.
         </p>
       </div>
@@ -57,16 +57,17 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
   });
 
   return (
-    <div className="px-6 py-6">
-      <div className="mb-6 flex items-start justify-between gap-4">
+    <div className="px-8 py-8">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Alertas</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+            Centro de alertas
+          </p>
+          <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Alertas</h1>
+          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
             Vigencias por vencer y eventos detectados en tu catálogo.
           </p>
         </div>
-        {/* session.role ya está narrowed a 'CLIENT_ADMIN' | 'CLIENT_LEGAL_REP'
-            por el guard de VIEWER arriba; siempre mostrar el botón. */}
         <ExportMenu
           endpoint={`/api/client/${tenantSlug}/alerts/export`}
           hint="Exporta las alertas pendientes con plazo de vencimiento."

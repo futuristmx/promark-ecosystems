@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
 import { CONTRACT_TYPE_LABELS, CONTRACT_STATUS_LABELS } from '@/lib/i18n/status-labels';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import { ExportMenu } from '@/components/export-menu';
 
 interface ContractItem {
@@ -16,6 +14,15 @@ interface ContractItem {
   expiration_date: string | null;
   contract_brands: { brand: { id: string; name: string } }[];
 }
+
+const CONTRACT_STATUS_STYLE: Record<string, { bg: string; color: string }> = {
+  ACTIVE: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F' },
+  EXPIRED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318' },
+  TERMINATED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318' },
+  DRAFT: { bg: 'rgba(143,182,199,0.12)', color: '#355B6F' },
+  RENEWED: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F' },
+  UNDER_REVIEW: { bg: 'rgba(211,154,43,0.1)', color: '#D39A2B' },
+};
 
 export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
   const [contracts, setContracts] = useState<ContractItem[]>([]);
@@ -32,11 +39,14 @@ export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
   }, [tenantSlug]);
 
   return (
-    <div>
-      <div className="mb-6 flex items-start justify-between gap-4">
+    <div className="px-8 py-8">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Contratos</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+            Gestión contractual
+          </p>
+          <h1 className="mt-1 text-2xl font-bold" style={{ color: '#0F2E3D' }}>Contratos</h1>
+          <p className="mt-1 text-sm" style={{ color: '#355B6F' }}>
             {contracts.length} contrato{contracts.length !== 1 && 's'} vigente
             {contracts.length !== 1 && 's'}
           </p>
@@ -47,46 +57,97 @@ export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div
+        className="overflow-hidden rounded-2xl border"
+        style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+      >
         {loading ? (
-          <div className="py-12 text-center text-sm text-slate-400">Cargando…</div>
+          <div className="py-12 text-center text-sm" style={{ color: '#C8C4B9' }}>Cargando…</div>
         ) : contracts.length === 0 ? (
-          <div className="py-12 text-center text-sm text-slate-500">Sin contratos disponibles.</div>
+          <div className="py-12 text-center text-sm" style={{ color: '#C8C4B9' }}>Sin contratos disponibles.</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Marcas vinculadas</TableHead>
-                <TableHead>Vencimiento</TableHead>
-                <TableHead>Estado</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contracts.map((c) => (
-                <TableRow key={c.id}>
-                  <TableCell>
-                    <Link href={`/brand-ecosystem/${tenantSlug}/contratos/${c.id}`}
-                      className="font-medium text-blue-700 hover:underline">{c.title}</Link>
-                  </TableCell>
-                  <TableCell><Badge variant="secondary">{CONTRACT_TYPE_LABELS[c.contract_type]}</Badge></TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {c.contract_brands.map((cb) => <Badge key={cb.brand.id} variant="outline">{cb.brand.name}</Badge>)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center gap-2">
-                      <VigencyDot expirationDate={c.expiration_date} legalStatus={c.status} />
-                      {c.expiration_date ? new Date(c.expiration_date).toLocaleDateString('es-MX') : '-'}
-                    </span>
-                  </TableCell>
-                  <TableCell><Badge>{CONTRACT_STATUS_LABELS[c.status]}</Badge></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: '#F1EDE3', borderBottom: '1px solid #E2DED6' }}>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Título</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Tipo</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Marcas vinculadas</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Vencimiento</th>
+                <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contracts.map((c, i) => {
+                const statusS = CONTRACT_STATUS_STYLE[c.status] ?? CONTRACT_STATUS_STYLE.DRAFT;
+                return (
+                  <tr
+                    key={c.id}
+                    className="transition-colors"
+                    style={{
+                      borderBottom: i < contracts.length - 1 ? '1px solid #E2DED6' : undefined,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(226,222,214,0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/brand-ecosystem/${tenantSlug}/contratos/${c.id}`}
+                        className="font-semibold transition-colors"
+                        style={{ color: '#0F2E3D' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = 'var(--tenant-primary, #D39A2B)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#0F2E3D';
+                        }}
+                      >
+                        {c.title}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+                        style={{ background: 'rgba(143,182,199,0.12)', color: '#355B6F' }}
+                      >
+                        {CONTRACT_TYPE_LABELS[c.contract_type] ?? c.contract_type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {c.contract_brands.map((cb) => (
+                          <span
+                            key={cb.brand.id}
+                            className="rounded-full border px-2 py-0.5 text-[11px] font-medium"
+                            style={{ borderColor: '#E2DED6', color: '#355B6F' }}
+                          >
+                            {cb.brand.name}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-2" style={{ color: '#355B6F' }}>
+                        <VigencyDot expirationDate={c.expiration_date} legalStatus={c.status} />
+                        {c.expiration_date ? new Date(c.expiration_date).toLocaleDateString('es-MX') : '-'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                        style={{ background: statusS.bg, color: statusS.color }}
+                      >
+                        {CONTRACT_STATUS_LABELS[c.status] ?? c.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

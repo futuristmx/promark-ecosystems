@@ -20,5 +20,9 @@ export default async function ClientContractsPage({ params }: Props) {
   if (!cfg?.features?.show_contracts) notFound();
   if (session.role === 'CLIENT_VIEWER') notFound();
 
-  return <ClientContractsView tenantSlug={tenantSlug} />;
+  return (
+    <div>
+      <ClientContractsView tenantSlug={tenantSlug} />
+    </div>
+  );
 }

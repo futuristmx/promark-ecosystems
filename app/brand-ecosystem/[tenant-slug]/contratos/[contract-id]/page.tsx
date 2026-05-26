@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { VigencyDot } from '@/components/vigency-badge';
+import { ArrowLeft } from 'lucide-react';
 import {
   CONTRACT_TYPE_LABELS, CONTRACT_STATUS_LABELS,
 } from '@/lib/i18n/status-labels';
@@ -11,6 +11,15 @@ import {
 interface Props {
   params: Promise<{ 'tenant-slug': string; 'contract-id': string }>;
 }
+
+const CONTRACT_STATUS_STYLE: Record<string, { bg: string; color: string }> = {
+  ACTIVE: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F' },
+  EXPIRED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318' },
+  TERMINATED: { bg: 'rgba(180,35,24,0.08)', color: '#B42318' },
+  DRAFT: { bg: 'rgba(143,182,199,0.12)', color: '#355B6F' },
+  RENEWED: { bg: 'rgba(47,107,79,0.08)', color: '#2F6B4F' },
+  UNDER_REVIEW: { bg: 'rgba(211,154,43,0.1)', color: '#D39A2B' },
+};
 
 export default async function ClientContractDetailPage({ params }: Props) {
   const { 'tenant-slug': tenantSlug, 'contract-id': contractId } = await params;
@@ -45,19 +54,45 @@ export default async function ClientContractDetailPage({ params }: Props) {
   }
 
   const parties = contract.parties as { otorgante?: string; receptor?: string } | null;
+  const statusS = CONTRACT_STATUS_STYLE[contract.status] ?? CONTRACT_STATUS_STYLE.DRAFT;
 
   return (
-    <div>
-      <div className="mb-6 flex items-center gap-3">
-        <h1 className="text-2xl font-bold">{contract.title}</h1>
-        <Badge variant="secondary">{CONTRACT_TYPE_LABELS[contract.contract_type]}</Badge>
-        <Badge>{CONTRACT_STATUS_LABELS[contract.status]}</Badge>
+    <div className="px-8 py-8">
+      {/* Back */}
+      <Link
+        href={`/brand-ecosystem/${tenantSlug}/contratos`}
+        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+        style={{ color: '#8FB6C7' }}
+      >
+        <ArrowLeft className="size-4" />
+        Volver a contratos
+      </Link>
+
+      <div className="mb-8 flex items-center gap-3">
+        <h1 className="text-2xl font-bold" style={{ color: '#0F2E3D' }}>{contract.title}</h1>
+        <span
+          className="rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+          style={{ background: 'rgba(143,182,199,0.12)', color: '#355B6F' }}
+        >
+          {CONTRACT_TYPE_LABELS[contract.contract_type]}
+        </span>
+        <span
+          className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+          style={{ background: statusS.bg, color: statusS.color }}
+        >
+          {CONTRACT_STATUS_LABELS[contract.status]}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle>Información general</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
+        <div
+          className="rounded-2xl border p-6"
+          style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+        >
+          <h3 className="mb-4 text-sm font-bold" style={{ color: '#0F2E3D' }}>
+            Información general
+          </h3>
+          <div className="space-y-4">
             <F label="Otorgante">{parties?.otorgante ?? '-'}</F>
             <F label="Receptor">{parties?.receptor ?? '-'}</F>
             <F label="Entrada en vigor">{fmt(contract.effective_date)}</F>
@@ -68,23 +103,32 @@ export default async function ClientContractDetailPage({ params }: Props) {
               </span>
             </F>
             {contract.description && <F label="Descripción">{contract.description}</F>}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader><CardTitle>Marcas vinculadas</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {contract.contract_brands.length === 0 ? (
-                <p className="text-sm text-slate-500">Sin marcas vinculadas.</p>
-              ) : (
-                contract.contract_brands.map((cb) => (
-                  <Badge key={cb.id} variant="outline">{cb.brand.name}</Badge>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div
+          className="rounded-2xl border p-6"
+          style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+        >
+          <h3 className="mb-4 text-sm font-bold" style={{ color: '#0F2E3D' }}>
+            Marcas vinculadas
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {contract.contract_brands.length === 0 ? (
+              <p className="text-sm" style={{ color: '#C8C4B9' }}>Sin marcas vinculadas.</p>
+            ) : (
+              contract.contract_brands.map((cb) => (
+                <span
+                  key={cb.id}
+                  className="rounded-full border px-3 py-1 text-xs font-medium"
+                  style={{ borderColor: '#E2DED6', color: '#355B6F', background: '#FBF6EC' }}
+                >
+                  {cb.brand.name}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -93,8 +137,8 @@ export default async function ClientContractDetailPage({ params }: Props) {
 function F({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <div className="text-sm text-slate-800">{children}</div>
+      <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>{label}</p>
+      <div className="mt-0.5 text-sm font-medium" style={{ color: '#0F2E3D' }}>{children}</div>
     </div>
   );
 }
