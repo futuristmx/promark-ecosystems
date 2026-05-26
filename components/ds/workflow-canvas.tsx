@@ -39,17 +39,18 @@ export function DsWorkflowCanvas({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-slate-200/60 bg-white p-6',
+        'rounded-2xl border bg-white p-6',
         className
       )}
+      style={{ borderColor: '#E2DED6' }}
     >
       {(title || description) && (
         <div className="mb-5">
           {title && (
-            <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+            <h3 className="text-base font-semibold" style={{ color: '#1A1E23' }}>{title}</h3>
           )}
           {description && (
-            <p className="mt-1 text-xs text-slate-500">{description}</p>
+            <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>{description}</p>
           )}
         </div>
       )}
@@ -75,9 +76,10 @@ export function DsWorkflowCanvas({
             {index < validChildren.length - 1 && (
               <ChevronRight
                 className={cn(
-                  'shrink-0 text-slate-300',
+                  'shrink-0',
                   variant === 'horizontal' ? 'size-5' : 'size-5 rotate-90'
                 )}
+                style={{ color: '#C8C4B9' }}
                 aria-hidden
               />
             )}

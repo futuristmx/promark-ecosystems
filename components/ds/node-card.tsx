@@ -25,22 +25,22 @@ const TYPE_CONFIG: Record<
   { color: string; label: string; bgGlow: string }
 > = {
   input: {
-    color: '#0284C7', // cyan
+    color: '#355B6F', // azul pizarra
     label: 'Input',
     bgGlow:
-      'radial-gradient(circle at right center, rgba(2, 132, 199, 0.06), transparent 60%)',
+      'radial-gradient(circle at right center, rgba(53, 91, 111, 0.06), transparent 60%)',
   },
   process: {
-    color: '#0066FF', // electric
+    color: '#1C3F55', // indigo estratégico
     label: 'Proceso',
     bgGlow:
-      'radial-gradient(circle at right center, rgba(0, 102, 255, 0.06), transparent 60%)',
+      'radial-gradient(circle at right center, rgba(28, 63, 85, 0.06), transparent 60%)',
   },
   output: {
-    color: '#EA580C', // orange
+    color: '#D39A2B', // ámbar
     label: 'Output',
     bgGlow:
-      'radial-gradient(circle at right center, rgba(234, 88, 12, 0.06), transparent 60%)',
+      'radial-gradient(circle at right center, rgba(211, 154, 43, 0.06), transparent 60%)',
   },
 };
 
@@ -48,9 +48,9 @@ const TYPE_CONFIG: Record<
  * Node card del design system para canvas / workflow / pipelines.
  *
  * Tres tipos visuales con accent color propio:
- * - `input` cyan
- * - `process` electric blue
- * - `output` orange
+ * - `input` azul pizarra
+ * - `process` indigo estratégico
+ * - `output` ámbar
  *
  * Usar dentro de `<DsWorkflowCanvas>` para flujos visuales, o standalone
  * para representar un paso/agente/agentificación.
@@ -73,17 +73,14 @@ export function DsNodeCard({
     <div
       className={cn(
         'group min-w-[200px] rounded-xl border bg-white transition-all duration-200',
-        selected
-          ? 'shadow-md ring-2 ring-offset-2'
-          : 'border-slate-200/60 hover:border-slate-300',
         onClick && 'cursor-pointer',
         className
       )}
       style={{
         background: `${config.bgGlow}, #FFFFFF`,
+        borderColor: selected ? config.color : '#E2DED6',
         ...(selected
           ? {
-              borderColor: config.color,
               boxShadow: `0 0 0 1px ${config.color}40, 0 4px 12px ${config.color}20`,
             }
           : {}),
@@ -93,7 +90,10 @@ export function DsNodeCard({
       tabIndex={onClick ? 0 : undefined}
     >
       {/* Type label */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2">
+      <div
+        className="flex items-center justify-between border-b px-3 py-2"
+        style={{ borderColor: '#F1EDE3' }}
+      >
         <span
           className="text-[10px] font-semibold uppercase tracking-[0.1em]"
           style={{ color: config.color }}
@@ -115,11 +115,11 @@ export function DsNodeCard({
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-900">
+            <p className="truncate text-sm font-semibold" style={{ color: '#1A1E23' }}>
               {title}
             </p>
             {subtitle && (
-              <p className="mt-0.5 truncate text-xs text-slate-500">
+              <p className="mt-0.5 truncate text-xs" style={{ color: '#355B6F' }}>
                 {subtitle}
               </p>
             )}
@@ -129,7 +129,7 @@ export function DsNodeCard({
         {children && <div className="mt-3">{children}</div>}
 
         {meta && (
-          <p className="mt-3 text-[11px] text-slate-400">{meta}</p>
+          <p className="mt-3 text-[11px]" style={{ color: '#C8C4B9' }}>{meta}</p>
         )}
       </div>
     </div>

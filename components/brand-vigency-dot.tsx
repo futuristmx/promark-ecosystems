@@ -16,17 +16,17 @@ function getVigencyInfo(
 ): VigencyInfo {
   // Statuses that override date-based logic
   if (legalStatus === 'CANCELLED') {
-    return { color: '#9ca3af', label: 'Cancelada' };
+    return { color: '#C8C4B9', label: 'Cancelada' };
   }
   if (legalStatus === 'APPLIED' || legalStatus === 'PUBLISHED') {
-    return { color: '#9ca3af', label: 'Pendiente' };
+    return { color: '#C8C4B9', label: 'Pendiente' };
   }
   if (legalStatus === 'EXPIRED') {
-    return { color: '#ef4444', label: 'Expirada' };
+    return { color: '#B42318', label: 'Expirada' };
   }
 
   if (!expirationDate) {
-    return { color: '#9ca3af', label: 'Sin fecha de expiración' };
+    return { color: '#C8C4B9', label: 'Sin fecha de expiración' };
   }
 
   const now = new Date();
@@ -34,15 +34,15 @@ function getVigencyInfo(
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    return { color: '#ef4444', label: `Expirada hace ${Math.abs(diffDays)} dias` };
+    return { color: '#B42318', label: `Expirada hace ${Math.abs(diffDays)} dias` };
   }
   if (diffDays <= 30) {
-    return { color: '#f97316', label: `Expira en ${diffDays} dias` };
+    return { color: '#D39A2B', label: `Expira en ${diffDays} dias` };
   }
   if (diffDays <= 90) {
-    return { color: '#eab308', label: `Expira en ${diffDays} dias` };
+    return { color: '#D39A2B', label: `Expira en ${diffDays} dias` };
   }
-  return { color: '#22c55e', label: `Expira en ${diffDays} dias` };
+  return { color: '#2F6B4F', label: `Expira en ${diffDays} dias` };
 }
 
 export function BrandVigencyDot({

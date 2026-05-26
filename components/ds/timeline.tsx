@@ -32,13 +32,13 @@ interface DsTimelineProps {
 }
 
 const TONE_COLOR: Record<StatusTone, string> = {
-  active: '#0066FF',
-  progress: '#2C3445',
-  success: '#16A34A',
-  warning: '#EA580C',
-  error: '#DC2626',
-  info: '#0284C7',
-  muted: '#8892A0',
+  active: '#1C3F55',
+  progress: '#0F2E3D',
+  success: '#2F6B4F',
+  warning: '#D39A2B',
+  error: '#B42318',
+  info: '#1C3F55',
+  muted: '#C8C4B9',
 };
 
 /**
@@ -63,8 +63,8 @@ export function DsTimeline({
       <div className={cn('space-y-4', className)}>
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex gap-4">
-            <div className="size-2 mt-2 rounded-full bg-slate-300" />
-            <div className="flex-1 h-16 animate-pulse rounded-xl bg-[#EDEFF3]" />
+            <div className="size-2 mt-2 rounded-full" style={{ background: '#C8C4B9' }} />
+            <div className="flex-1 h-16 animate-pulse rounded-xl" style={{ background: '#F1EDE3' }} />
           </div>
         ))}
       </div>
@@ -75,9 +75,10 @@ export function DsTimeline({
     return (
       <div
         className={cn(
-          'rounded-2xl border border-dashed border-slate-300/80 bg-white py-12 text-center text-sm text-slate-500',
+          'rounded-2xl border border-dashed bg-white py-12 text-center text-sm',
           className
         )}
+        style={{ borderColor: '#E2DED6', color: '#355B6F' }}
       >
         {emptyMessage}
       </div>
@@ -90,7 +91,10 @@ export function DsTimeline({
         const isLast = index === events.length - 1;
         const dotColor = TONE_COLOR[event.tone ?? 'muted'];
         const content = (
-          <div className="flex-1 rounded-xl border border-slate-200/60 bg-white px-4 py-3 transition-colors group-hover:border-slate-300 group-hover:bg-[#EDEFF3]/40">
+          <div
+            className="flex-1 rounded-xl border bg-white px-4 py-3 transition-colors"
+            style={{ borderColor: '#E2DED6' }}
+          >
             <div className="flex flex-wrap items-center gap-2">
               {event.category && (
                 <span
@@ -104,14 +108,14 @@ export function DsTimeline({
                   {event.category}
                 </span>
               )}
-              <p className="text-sm font-semibold text-slate-900">
+              <p className="text-sm font-semibold" style={{ color: '#1A1E23' }}>
                 {event.title}
               </p>
             </div>
             {event.description && (
-              <p className="mt-1 text-xs text-slate-500">{event.description}</p>
+              <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>{event.description}</p>
             )}
-            <p className="mt-1.5 text-[11px] text-slate-400">
+            <p className="mt-1.5 text-[11px]" style={{ color: '#C8C4B9' }}>
               {formatRelativeTime(event.timestamp)}
               {event.actor && <> · {event.actor}</>}
             </p>
@@ -127,7 +131,8 @@ export function DsTimeline({
             {!isLast && (
               <span
                 aria-hidden
-                className="absolute left-[7px] top-5 h-full w-px bg-slate-200/80"
+                className="absolute left-[7px] top-5 h-full w-px"
+                style={{ background: '#E2DED6' }}
               />
             )}
             {/* Dot */}

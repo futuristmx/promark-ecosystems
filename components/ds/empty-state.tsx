@@ -27,13 +27,16 @@ export function EmptyState({
   const content = (
     <div className="flex flex-col items-center text-center">
       {icon && (
-        <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-[#EDEFF3] text-slate-400">
+        <div
+          className="mb-3 flex size-12 items-center justify-center rounded-full"
+          style={{ background: '#F1EDE3', color: '#C8C4B9' }}
+        >
           {icon}
         </div>
       )}
-      <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+      <h3 className="text-sm font-semibold" style={{ color: '#1A1E23' }}>{title}</h3>
       {description && (
-        <p className="mt-1 max-w-sm text-xs text-slate-500">{description}</p>
+        <p className="mt-1 max-w-sm text-xs" style={{ color: '#355B6F' }}>{description}</p>
       )}
       {action && <div className="mt-4">{action}</div>}
     </div>
@@ -46,9 +49,10 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300/80 bg-white py-16 px-6',
+        'flex flex-col items-center justify-center rounded-2xl border border-dashed bg-white py-16 px-6',
         className
       )}
+      style={{ borderColor: '#E2DED6' }}
     >
       {content}
     </div>

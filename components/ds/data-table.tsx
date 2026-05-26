@@ -110,12 +110,16 @@ export function DsDataTable<T>({
 
   if (loading) {
     return (
-      <div className={cn('overflow-hidden rounded-2xl border border-slate-200/60 bg-[#EDEFF3]', className)}>
+      <div
+        className={cn('overflow-hidden rounded-2xl border', className)}
+        style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+      >
         <div className="space-y-3 p-6">
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="h-12 animate-pulse rounded-lg bg-white/60"
+              className="h-12 animate-pulse rounded-lg"
+              style={{ background: 'rgba(255,255,255,0.6)' }}
             />
           ))}
         </div>
@@ -137,30 +141,36 @@ export function DsDataTable<T>({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-2xl border border-slate-200/60 bg-[#EDEFF3]',
+        'overflow-hidden rounded-2xl border',
         className
       )}
+      style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
     >
       <table className="min-w-full">
-        <thead className="border-b border-slate-200/60 bg-white/50">
+        <thead
+          className="border-b"
+          style={{ borderColor: '#E2DED6', background: 'rgba(255,255,255,0.5)' }}
+        >
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
-                style={{ width: col.width }}
+                style={{ width: col.width, color: '#355B6F' }}
                 className={cn(
-                  'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500',
+                  'px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.08em]',
                   col.align === 'right' && 'text-right',
                   col.align === 'center' && 'text-center',
                   !col.align && 'text-left',
-                  col.sortable && 'cursor-pointer select-none hover:text-slate-900'
+                  col.sortable && 'cursor-pointer select-none'
                 )}
                 onClick={() => col.sortable && toggleSort(col.key)}
+                onMouseEnter={(e) => { if (col.sortable) e.currentTarget.style.color = '#1A1E23'; }}
+                onMouseLeave={(e) => { if (col.sortable) e.currentTarget.style.color = '#355B6F'; }}
               >
                 <span className="inline-flex items-center gap-1">
                   {col.header}
                   {col.sortable && (
-                    <span className="text-slate-400">
+                    <span style={{ color: '#C8C4B9' }}>
                       {sortKey === col.key ? (
                         sortDir === 'asc' ? (
                           <ArrowUp className="size-3" />
@@ -180,7 +190,7 @@ export function DsDataTable<T>({
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200/50">
+        <tbody className="divide-y" style={{ borderColor: 'rgba(226,222,214,0.5)' }}>
           {sortedRows.map((row) => {
             const id = getRowId(row);
             return (
@@ -188,8 +198,11 @@ export function DsDataTable<T>({
                 key={id}
                 className={cn(
                   'group transition-colors',
-                  onRowClick && 'cursor-pointer hover:bg-white/60'
+                  onRowClick && 'cursor-pointer'
                 )}
+                style={onRowClick ? {} : undefined}
+                onMouseEnter={(e) => { if (onRowClick) e.currentTarget.style.background = 'rgba(255,255,255,0.6)'; }}
+                onMouseLeave={(e) => { if (onRowClick) e.currentTarget.style.background = ''; }}
                 onClick={(e) => {
                   // No disparar onRowClick si el click fue en el dropdown
                   if ((e.target as HTMLElement).closest('[data-table-action]')) return;
@@ -206,10 +219,11 @@ export function DsDataTable<T>({
                     <td
                       key={col.key}
                       className={cn(
-                        'px-4 py-3 text-sm text-slate-700',
+                        'px-4 py-3 text-sm',
                         col.align === 'right' && 'text-right',
                         col.align === 'center' && 'text-center'
                       )}
+                      style={{ color: '#1A1E23' }}
                     >
                       {value}
                     </td>
@@ -226,12 +240,21 @@ export function DsDataTable<T>({
                             key={action.label}
                             type="button"
                             title={action.label}
-                            className={cn(
-                              'inline-flex size-7 items-center justify-center rounded-md transition-colors',
-                              action.destructive
-                                ? 'text-slate-400 hover:bg-red-50 hover:text-red-600'
-                                : 'text-slate-400 hover:bg-slate-200/60 hover:text-slate-700'
-                            )}
+                            className="inline-flex size-7 items-center justify-center rounded-md transition-colors"
+                            style={{ color: '#C8C4B9' }}
+                            onMouseEnter={(e) => {
+                              if (action.destructive) {
+                                e.currentTarget.style.color = '#B42318';
+                                e.currentTarget.style.background = 'rgba(180,35,24,0.06)';
+                              } else {
+                                e.currentTarget.style.color = '#1A1E23';
+                                e.currentTarget.style.background = '#E2DED6';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = '#C8C4B9';
+                              e.currentTarget.style.background = '';
+                            }}
                             onClick={() => {
                               if (action.href) {
                                 window.location.href = action.href(row);
@@ -246,7 +269,8 @@ export function DsDataTable<T>({
                         {overflowActions.length > 0 && (
                           <DropdownMenu>
                             <DropdownMenuTrigger
-                              className="inline-flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700"
+                              className="inline-flex size-7 items-center justify-center rounded-md transition-colors"
+                              style={{ color: '#C8C4B9' }}
                               aria-label="Más acciones"
                             >
                               <MoreVertical className="size-4" />

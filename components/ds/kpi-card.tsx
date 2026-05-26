@@ -12,6 +12,19 @@ interface KpiCardProps {
   className?: string;
 }
 
+const VALUE_COLOR: Record<string, string> = {
+  default: '#1A1E23',
+  warning: '#D39A2B',
+  danger: '#B42318',
+  success: '#2F6B4F',
+};
+
+const DELTA_COLOR: Record<string, string> = {
+  positive: '#2F6B4F',
+  negative: '#B42318',
+  neutral: '#355B6F',
+};
+
 /**
  * KPI Card del design system. Para grids de métricas en dashboards.
  *
@@ -26,37 +39,41 @@ export function KpiCard({
   tone = 'default',
   className,
 }: KpiCardProps) {
-  const valueColor = {
-    default: 'text-slate-900',
-    warning: 'text-[#EA580C]',
-    danger: 'text-[#DC2626]',
-    success: 'text-[#16A34A]',
-  }[tone];
-
-  const deltaColor = {
-    positive: 'text-[#16A34A]',
-    negative: 'text-[#DC2626]',
-    neutral: 'text-slate-500',
-  }[delta?.tone ?? 'neutral'];
-
   return (
     <div
       className={cn(
-        'rounded-2xl border border-slate-200/60 bg-[#EDEFF3] p-5 transition-colors hover:bg-[#E4E8EE]',
+        'rounded-2xl border p-5 transition-colors',
         className
       )}
+      style={{
+        borderColor: '#E2DED6',
+        background: '#F1EDE3',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = '#E2DED6'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = '#F1EDE3'; }}
     >
       <div className="flex items-start justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+        <p
+          className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+          style={{ color: '#355B6F' }}
+        >
           {label}
         </p>
-        {icon && <span className="text-slate-400">{icon}</span>}
+        {icon && <span style={{ color: '#C8C4B9' }}>{icon}</span>}
       </div>
-      <p className={cn('mt-2 text-3xl font-bold tracking-tight', valueColor)}>
+      <p
+        className="mt-2 text-3xl font-bold tracking-tight"
+        style={{ color: VALUE_COLOR[tone] }}
+      >
         {value}
       </p>
       {delta && (
-        <p className={cn('mt-1 text-xs', deltaColor)}>{delta.text}</p>
+        <p
+          className="mt-1 text-xs"
+          style={{ color: DELTA_COLOR[delta.tone ?? 'neutral'] }}
+        >
+          {delta.text}
+        </p>
       )}
     </div>
   );

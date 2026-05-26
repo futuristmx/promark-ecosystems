@@ -37,12 +37,12 @@ const TYPE_STYLE: Record<
   GraphNodeType,
   { bg: string; color: string; width: number }
 > = {
-  HOLDING: { bg: '#334155', color: '#ffffff', width: 180 },
-  COMPANY: { bg: '#2563eb', color: '#ffffff', width: 160 },
-  BRAND: { bg: '#16a34a', color: '#ffffff', width: 150 },
-  HOLDER: { bg: '#a855f7', color: '#ffffff', width: 140 },
-  CONTRACT: { bg: '#f97316', color: '#ffffff', width: 140 },
-  ALERT: { bg: '#ef4444', color: '#ffffff', width: 120 },
+  HOLDING: { bg: '#0F2E3D', color: '#ffffff', width: 180 },
+  COMPANY: { bg: '#1C3F55', color: '#ffffff', width: 160 },
+  BRAND: { bg: '#2F6B4F', color: '#ffffff', width: 150 },
+  HOLDER: { bg: '#355B6F', color: '#ffffff', width: 140 },
+  CONTRACT: { bg: '#D39A2B', color: '#ffffff', width: 140 },
+  ALERT: { bg: '#B42318', color: '#ffffff', width: 120 },
 };
 
 const LAYER_Y: Record<GraphNodeType, number> = {

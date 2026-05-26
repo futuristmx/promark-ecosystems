@@ -27,7 +27,7 @@ function formatMonth(yyyymm: string): string {
 }
 
 const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: '#0A0E15',
+  backgroundColor: '#0B1F2A',
   border: 'none',
   borderRadius: 10,
   padding: '8px 14px',
@@ -59,8 +59,8 @@ export function VigencyTimeline({ data, title }: VigencyTimelineProps) {
             <BarChart data={formatted} margin={{ top: 12, right: 8, left: 0, bottom: 8 }}>
               <defs>
                 <linearGradient id="bar-grad-vigency" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0066FF" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#0066FF" stopOpacity={0.5} />
+                  <stop offset="0%" stopColor="#1C3F55" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#1C3F55" stopOpacity={0.5} />
                 </linearGradient>
               </defs>
               {/* Subtle horizontal reference lines instead of CartesianGrid */}
