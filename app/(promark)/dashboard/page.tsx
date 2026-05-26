@@ -19,14 +19,14 @@ const LEGAL_STATUS_LABELS_ES: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  APPLIED: '#3b82f6',
-  PUBLISHED: '#0ea5e9',
-  REGISTERED: '#22c55e',
-  RENEWED: '#10b981',
-  EXPIRED: '#ef4444',
-  CANCELLED: '#94a3b8',
-  OPPOSED: '#f59e0b',
-  IN_LITIGATION: '#a855f7',
+  APPLIED: '#8FB6C7',       // azul niebla
+  PUBLISHED: '#355B6F',     // azul pizarra
+  REGISTERED: '#0F2E3D',    // azul marino profundo
+  RENEWED: '#1C3F55',       // indigo estratégico
+  EXPIRED: '#B42318',       // estado crítico
+  CANCELLED: '#C8C4B9',     // gris piedra cálido
+  OPPOSED: '#D39A2B',       // ámbar sutil
+  IN_LITIGATION: '#0B1F2A', // azul noche
 };
 
 export default async function DashboardPage() {

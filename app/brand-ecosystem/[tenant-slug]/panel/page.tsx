@@ -13,14 +13,14 @@ import { VigencyTimeline } from '@/components/dashboard/charts/vigency-timeline'
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 
 const STATUS_COLORS: Record<string, string> = {
-  APPLIED: '#3b82f6',
-  PUBLISHED: '#0ea5e9',
-  REGISTERED: '#22c55e',
-  RENEWED: '#10b981',
-  EXPIRED: '#ef4444',
-  CANCELLED: '#94a3b8',
-  OPPOSED: '#f59e0b',
-  IN_LITIGATION: '#a855f7',
+  APPLIED: '#8FB6C7',
+  PUBLISHED: '#355B6F',
+  REGISTERED: '#0F2E3D',
+  RENEWED: '#1C3F55',
+  EXPIRED: '#B42318',
+  CANCELLED: '#C8C4B9',
+  OPPOSED: '#D39A2B',
+  IN_LITIGATION: '#0B1F2A',
 };
 
 interface ClientPanelPageProps {

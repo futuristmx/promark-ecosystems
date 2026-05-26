@@ -19,7 +19,7 @@ const TOOLTIP_STYLE: React.CSSProperties = {
   borderRadius: 10,
   padding: '8px 14px',
   boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-  color: '#F1F5F9',
+  color: '#FBF6EC',
   fontSize: 12,
   fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)',
 };
@@ -30,13 +30,16 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
   return (
     <div>
       {title && (
-        <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <h3
+          className="mb-1 text-xs font-semibold uppercase tracking-wider"
+          style={{ color: '#355B6F' }}
+        >
           {title}
         </h3>
       )}
       <div className="relative h-72">
         {total === 0 ? (
-          <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          <div className="flex h-full items-center justify-center text-sm" style={{ color: '#C8C4B9' }}>
             Sin datos
           </div>
         ) : (
@@ -54,11 +57,11 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
                       y2="1"
                     >
                       <stop offset="0%" stopColor={entry.color} stopOpacity={1} />
-                      <stop offset="100%" stopColor={entry.color} stopOpacity={0.7} />
+                      <stop offset="100%" stopColor={entry.color} stopOpacity={0.75} />
                     </linearGradient>
                   ))}
                   <filter id="donut-shadow">
-                    <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.12" />
+                    <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.08" />
                   </filter>
                 </defs>
                 <Pie
@@ -69,7 +72,7 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
                   cy="45%"
                   innerRadius={64}
                   outerRadius={96}
-                  paddingAngle={3}
+                  paddingAngle={2}
                   cornerRadius={4}
                   stroke="none"
                   style={{ filter: 'url(#donut-shadow)' }}
@@ -84,7 +87,7 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
                     String(name),
                   ]}
                   contentStyle={TOOLTIP_STYLE}
-                  itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
+                  itemStyle={{ color: '#DDEAF2', fontSize: 12 }}
                   cursor={false}
                 />
                 <Legend
@@ -94,16 +97,16 @@ export function StatusDonut({ data, title }: StatusDonutProps) {
                   iconSize={8}
                   wrapperStyle={{ fontSize: 11, fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)' }}
                   formatter={(value: string) => (
-                    <span className="text-slate-600">{value}</span>
+                    <span style={{ color: '#355B6F' }}>{value}</span>
                   )}
                 />
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-12">
-              <span className="text-4xl font-bold tracking-tight text-slate-900">
+              <span className="text-4xl font-bold tracking-tight" style={{ color: '#1A1E23' }}>
                 {total}
               </span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#C8C4B9' }}>
                 Total marcas
               </span>
             </div>

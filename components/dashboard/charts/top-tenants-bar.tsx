@@ -20,7 +20,7 @@ const TOOLTIP_STYLE: React.CSSProperties = {
   borderRadius: 10,
   padding: '8px 14px',
   boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-  color: '#F1F5F9',
+  color: '#FBF6EC',
   fontSize: 12,
   fontFamily: 'var(--font-dm-sans, DM Sans, sans-serif)',
 };
@@ -31,12 +31,15 @@ export function TopTenantsBar({
 }: TopTenantsBarProps) {
   return (
     <div>
-      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <h3
+        className="mb-1 text-xs font-semibold uppercase tracking-wider"
+        style={{ color: '#355B6F' }}
+      >
         {title}
       </h3>
       <div className="h-72">
         {data.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          <div className="flex h-full items-center justify-center text-sm" style={{ color: '#C8C4B9' }}>
             Sin datos
           </div>
         ) : (
@@ -48,21 +51,21 @@ export function TopTenantsBar({
             >
               <defs>
                 <linearGradient id="bar-grad-tenants" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#1C3F55" stopOpacity={0.85} />
+                  <stop offset="0%" stopColor="#0F2E3D" stopOpacity={0.9} />
                   <stop offset="100%" stopColor="#1C3F55" stopOpacity={1} />
                 </linearGradient>
               </defs>
               <XAxis
                 type="number"
                 allowDecimals={false}
-                tick={{ fontSize: 10, fill: '#94A3B8' }}
+                tick={{ fontSize: 10, fill: '#C8C4B9' }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
                 type="category"
                 dataKey="name"
-                tick={{ fontSize: 11, fill: '#475569', fontWeight: 500 }}
+                tick={{ fontSize: 11, fill: '#355B6F', fontWeight: 500 }}
                 tickLine={false}
                 axisLine={false}
                 width={120}
@@ -70,8 +73,8 @@ export function TopTenantsBar({
               <Tooltip
                 formatter={(value) => [String(value), 'Marcas']}
                 contentStyle={TOOLTIP_STYLE}
-                itemStyle={{ color: '#E2E8F0', fontSize: 12 }}
-                cursor={{ fill: '#F1F5F9', radius: 6 }}
+                itemStyle={{ color: '#DDEAF2', fontSize: 12 }}
+                cursor={{ fill: 'rgba(226, 222, 214, 0.3)', radius: 6 }}
               />
               <Bar
                 dataKey="count"
