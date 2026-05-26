@@ -45,7 +45,7 @@ export async function POST(
     });
   } else {
     targetUser = await prisma.userClient.findFirst({
-      where: { tenant_id: tenantId, role: 'ADMIN' },
+      where: { tenant_id: tenantId, role: 'CLIENT_ADMIN' },
       select: { id: true, full_name: true, email: true },
     });
   }
