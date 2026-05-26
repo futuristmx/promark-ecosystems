@@ -117,6 +117,8 @@ export async function POST(request: Request) {
           name,
           slug,
           status: status === 'SUSPENDED' ? 'SUSPENDED' : status === 'ONBOARDING' ? 'ONBOARDING' : 'ACTIVE',
+          config: {},
+          active_modules: [],
         },
       });
       created++;
