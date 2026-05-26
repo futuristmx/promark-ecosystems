@@ -169,22 +169,26 @@ export default async function DashboardPage() {
           label="Clientes activos"
           value={totalTenants}
           icon={<Users className="size-4" />}
+          href="/tenants"
         />
         <KpiCard
           label="Total de marcas"
           value={totalBrands}
           icon={<Tag className="size-4" />}
+          href="/tenants"
         />
         <KpiCard
           label="Contratos vigentes"
           value={activeContracts}
           icon={<Scroll className="size-4" />}
+          href="/tenants"
         />
         <KpiCard
           label="Alertas críticas"
           value={pendingAlerts}
           icon={<Bell className="size-4" />}
           tone={pendingAlerts > 0 ? 'danger' : 'default'}
+          href="/alertas"
         />
       </KpiGrid>
 

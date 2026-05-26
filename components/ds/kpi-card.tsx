@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface KpiCardProps {
@@ -9,6 +10,7 @@ interface KpiCardProps {
   };
   icon?: React.ReactNode;
   tone?: 'default' | 'warning' | 'danger' | 'success';
+  href?: string;
   className?: string;
 }
 
@@ -54,14 +56,19 @@ export function KpiCard({
   delta,
   icon,
   tone = 'default',
+  href,
   className,
 }: KpiCardProps) {
   const accent = TONE_ACCENT[tone] ?? TONE_ACCENT.default;
+  const Wrapper = href ? Link : 'div';
+  const wrapperProps = href ? { href } : {};
 
   return (
-    <div
+    <Wrapper
+      {...(wrapperProps as Record<string, string>)}
       className={cn(
-        'group relative flex overflow-hidden rounded-xl',
+        'group relative flex overflow-hidden rounded-xl transition-shadow',
+        href && 'cursor-pointer hover:shadow-md',
         className
       )}
       style={{ background: '#F1EDE3' }}
@@ -110,7 +117,7 @@ export function KpiCard({
           </p>
         )}
       </div>
-    </div>
+    </Wrapper>
   );
 }
 

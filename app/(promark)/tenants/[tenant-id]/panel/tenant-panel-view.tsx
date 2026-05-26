@@ -63,7 +63,6 @@ export function TenantPanelView({
   graph,
   tree,
 }: TenantPanelViewProps) {
-  void tenantId;
   const donutData = aggregates.statusDistribution.map((s) => ({
     label: s.label,
     value: s.value,
@@ -92,29 +91,34 @@ export function TenantPanelView({
               label="Total marcas"
               value={aggregates.totals.brands}
               icon={<Tag className="size-4" />}
+              href={`/tenants/${tenantId}/portfolio`}
             />
             <KpiCard
               label="Por vencer (90d)"
               value={aggregates.totals.expiringSoon}
               icon={<Clock className="size-4" />}
               tone="warning"
+              href={`/tenants/${tenantId}/portfolio`}
             />
             <KpiCard
               label="Vencidas"
               value={aggregates.totals.expired}
               icon={<AlertTriangle className="size-4" />}
               tone="danger"
+              href={`/tenants/${tenantId}/portfolio`}
             />
             <KpiCard
               label="Contratos vigentes"
               value={aggregates.totals.activeContracts}
               icon={<Scroll className="size-4" />}
+              href={`/tenants/${tenantId}/portfolio`}
             />
             <KpiCard
               label="Alertas próximas (30d)"
               value={aggregates.totals.criticalAlerts}
               icon={<Bell className="size-4" />}
               tone={aggregates.totals.criticalAlerts > 0 ? 'danger' : 'default'}
+              href={`/tenants/${tenantId}/alertas`}
             />
           </KpiGrid>
 
