@@ -223,11 +223,15 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
         </div>
         <div
           className="overflow-hidden rounded-2xl border"
-          style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+          style={{
+            borderColor: '#C8C4B9',
+            background: '#E2DED6',
+            backgroundImage: 'none',
+          }}
         >
           {brandsLoading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#E2DED6] border-t-[#D39A2B]" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#C8C4B9] border-t-[#D39A2B]" />
             </div>
           ) : filteredBrands.length === 0 ? (
             <EmptyState icon={<Tag className="size-6" />}
@@ -240,7 +244,11 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
                   key={b.id}
                   onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
                   className="cursor-pointer rounded-2xl border p-4 transition-all"
-                  style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                  style={{
+                    borderColor: '#E2DED6',
+                    background: '#FBF6EC',
+                    backgroundImage: 'none',
+                  }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.boxShadow = '0 8px 20px rgba(15,46,61,0.10)';
                     e.currentTarget.style.borderColor = '#D39A2B';
@@ -357,7 +365,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
+        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#C8C4B9', background: '#E2DED6', backgroundImage: 'none' }}>
           {contractsLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
@@ -416,7 +424,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
+        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#C8C4B9', background: '#E2DED6', backgroundImage: 'none' }}>
           {licensesLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
