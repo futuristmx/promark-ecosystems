@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { BRAND_TYPE_LABELS } from '@/lib/i18n/status-labels';
 
 const LEGAL_STATUSES = [
   'APPLIED',
@@ -30,9 +31,16 @@ const BRAND_TYPES = [
   'FIGURATIVE',
   'MIXED',
   'THREE_D',
-  'SOUND',
-  'HOLOGRAM',
+  'COMMERCIAL_NOTICE',
+  'TRADE_NAME',
   'TRADE_DRESS',
+  'SOUND',
+  'OLFACTORY',
+  'HOLOGRAM',
+  'CERTIFICATION_MARK',
+  'COLLECTIVE_MARK',
+  'APPELLATION_OF_ORIGIN',
+  'GEOGRAPHICAL_INDICATION',
 ] as const;
 
 const brandClassSchema = z.object({
@@ -201,7 +209,7 @@ export default function NewBrandPage({ params }: NewBrandPageProps) {
                 >
                   {BRAND_TYPES.map((t) => (
                     <option key={t} value={t}>
-                      {t}
+                      {BRAND_TYPE_LABELS[t] ?? t}
                     </option>
                   ))}
                 </select>

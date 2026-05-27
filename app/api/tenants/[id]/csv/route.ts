@@ -238,7 +238,7 @@ export async function POST(
     const companyMap = new Map(companies.map((c) => [c.name.toLowerCase(), c.id]));
 
     const VALID_LEGAL: Set<string> = new Set(['APPLIED','PUBLISHED','REGISTERED','RENEWED','EXPIRED','CANCELLED','OPPOSED','IN_LITIGATION']);
-    const VALID_TYPE: Set<string> = new Set(['WORDMARK','FIGURATIVE','MIXED','THREE_D','SOUND','HOLOGRAM','TRADE_DRESS']);
+    const VALID_TYPE: Set<string> = new Set(['WORDMARK','FIGURATIVE','MIXED','THREE_D','SOUND','OLFACTORY','HOLOGRAM','TRADE_DRESS','COMMERCIAL_NOTICE','TRADE_NAME','CERTIFICATION_MARK','COLLECTIVE_MARK','APPELLATION_OF_ORIGIN','GEOGRAPHICAL_INDICATION']);
 
     for (let i = 0; i < dataRows.length; i++) {
       const row = dataRows[i];

@@ -86,15 +86,44 @@ export const BRAND_STATUS_LABELS: Record<string, string> = {
   OPPOSED: 'Impugnada',
 };
 
+// Tipos de marca según el catálogo del IMPI (México).
+// Orden: del más común al más especializado.
 export const BRAND_TYPE_LABELS: Record<string, string> = {
   WORDMARK: 'Nominativa',
-  FIGURATIVE: 'Figurativa',
+  FIGURATIVE: 'Figurativa (innominada)',
   MIXED: 'Mixta',
   THREE_D: 'Tridimensional',
   SOUND: 'Sonora',
-  HOLOGRAPHIC: 'Holográfica',
   OLFACTORY: 'Olfativa',
+  HOLOGRAM: 'Holográfica',
+  TRADE_DRESS: 'Imagen comercial',
+  COMMERCIAL_NOTICE: 'Aviso comercial',
+  TRADE_NAME: 'Nombre comercial',
+  CERTIFICATION_MARK: 'Marca de certificación',
+  COLLECTIVE_MARK: 'Marca colectiva',
+  APPELLATION_OF_ORIGIN: 'Denominación de origen',
+  GEOGRAPHICAL_INDICATION: 'Indicación geográfica',
+  // Alias por compatibilidad con datos legacy
+  HOLOGRAPHIC: 'Holográfica',
 };
+
+/** Orden canónico para selects (más común primero). */
+export const BRAND_TYPE_ORDER: string[] = [
+  'WORDMARK',
+  'FIGURATIVE',
+  'MIXED',
+  'THREE_D',
+  'COMMERCIAL_NOTICE',
+  'TRADE_NAME',
+  'TRADE_DRESS',
+  'SOUND',
+  'OLFACTORY',
+  'HOLOGRAM',
+  'CERTIFICATION_MARK',
+  'COLLECTIVE_MARK',
+  'APPELLATION_OF_ORIGIN',
+  'GEOGRAPHICAL_INDICATION',
+];
 
 // Alert entity_type → user-visible label
 export const ALERT_ENTITY_TYPE_LABELS: Record<string, string> = {

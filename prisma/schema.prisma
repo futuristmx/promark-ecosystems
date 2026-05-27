@@ -71,14 +71,23 @@ enum LegalStatus {
   IN_LITIGATION
 }
 
+// Tipos de marca según el catálogo del IMPI (México).
+// Mapeo ES en lib/i18n/status-labels.ts.
 enum BrandType {
-  WORDMARK
-  FIGURATIVE
-  MIXED
-  THREE_D
-  SOUND
-  HOLOGRAM
-  TRADE_DRESS
+  WORDMARK                  // Marca nominativa
+  FIGURATIVE                // Marca innominada / figurativa
+  MIXED                     // Marca mixta
+  THREE_D                   // Marca tridimensional
+  SOUND                     // Marca sonora
+  OLFACTORY                 // Marca olfativa
+  HOLOGRAM                  // Marca holográfica
+  TRADE_DRESS               // Imagen comercial (trade dress)
+  COMMERCIAL_NOTICE         // Aviso comercial
+  TRADE_NAME                // Nombre comercial
+  CERTIFICATION_MARK        // Marca de certificación
+  COLLECTIVE_MARK           // Marca colectiva
+  APPELLATION_OF_ORIGIN     // Denominación de origen
+  GEOGRAPHICAL_INDICATION   // Indicación geográfica
 }
 
 enum BrandClassStatus {
