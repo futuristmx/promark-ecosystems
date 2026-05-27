@@ -206,12 +206,16 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
 
         {tenantId && tenantSubNav.length > 0 && (
           <>
-            {/* A2: divider visual del contexto del tenant — chip con color primario del cliente */}
+            {/* A2: divider visual del contexto del tenant.
+              * Fondo: tinte secundario derivado del color primario del tenant
+              *        (~14% opacidad sobre sidebar marino oscuro → tono claro suave).
+              * Stripe izquierda: color primario al 100% como acento.
+              */}
             <div
               className="my-4 flex items-center gap-2 rounded-lg px-2.5 py-2"
               style={{
-                background: 'rgba(251, 246, 236, 0.04)',
-                border: `1px solid ${tenantColor}33`,
+                background: `${tenantColor}24`,
+                border: `1px solid ${tenantColor}40`,
                 boxShadow: `inset 3px 0 0 ${tenantColor}`,
               }}
             >
