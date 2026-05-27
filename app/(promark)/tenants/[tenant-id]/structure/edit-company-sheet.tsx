@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ds';
 import {
   Sheet,
   SheetContent,
@@ -35,6 +36,7 @@ export function EditCompanySheet({ tenantId, companyId, open, onClose }: EditCom
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const toast = useToast();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -84,6 +86,7 @@ export function EditCompanySheet({ tenantId, companyId, open, onClose }: EditCom
       }
       onClose();
       router.refresh();
+      toast.success('Empresa actualizada');
     } catch {
       setError('Error de red.');
     } finally {
