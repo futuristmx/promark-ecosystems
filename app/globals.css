@@ -350,4 +350,24 @@
     margin-right: 0.375rem;
     background: currentColor;
   }
+
+  /* Skeleton shimmer — usado por <DsSkeleton/> */
+  .ds-skeleton-shimmer {
+    animation: ds-skeleton-shimmer 1.6s linear infinite;
+  }
+}
+
+@keyframes ds-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-skeleton-shimmer {
+    animation: none;
+  }
 }

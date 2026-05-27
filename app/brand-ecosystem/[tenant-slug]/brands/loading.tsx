@@ -2,10 +2,10 @@ import { DsCardSkeleton, DsPageTitleSkeleton, DsSkeleton } from '@/components/ds
 
 export default function Loading() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+    <div className="px-8 py-8 space-y-6">
+      <div className="flex items-start justify-between">
         <DsPageTitleSkeleton />
-        <DsSkeleton className="h-10 w-36 rounded-lg" />
+        <DsSkeleton className="h-10 w-32 rounded-lg" />
       </div>
       <DsSkeleton className="h-12 rounded-xl" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
