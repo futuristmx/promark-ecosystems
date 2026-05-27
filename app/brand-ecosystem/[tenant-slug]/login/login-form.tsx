@@ -3,13 +3,28 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export function ClientLoginForm({ tenantSlug }: { tenantSlug: string }) {
+interface ClientLoginFormProps {
+  tenantSlug: string;
+  tenantName: string;
+  primaryColor?: string | null;
+  logo?: string | null;
+}
+
+export function ClientLoginForm({
+  tenantSlug,
+  tenantName,
+  primaryColor,
+  logo,
+}: ClientLoginFormProps) {
   const router = useRouter();
 
   const [cardId, setCardId] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
+  const [attempts, setAttempts] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const accent = primaryColor || '#D39A2B';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +54,7 @@ export function ClientLoginForm({ tenantSlug }: { tenantSlug: string }) {
           USER_INACTIVE: 'Tu cuenta está inactiva. Contacta al administrador.',
         };
         setError(messages[data.error] ?? 'Error de autenticación.');
+        setAttempts((prev) => prev + 1);
         return;
       }
 
@@ -62,8 +78,8 @@ export function ClientLoginForm({ tenantSlug }: { tenantSlug: string }) {
   };
 
   function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
-    e.currentTarget.style.borderColor = '#D39A2B';
-    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(211,154,43,0.12)';
+    e.currentTarget.style.borderColor = accent;
+    e.currentTarget.style.boxShadow = `0 0 0 3px ${accent}1f`;
   }
 
   function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
@@ -98,29 +114,36 @@ export function ClientLoginForm({ tenantSlug }: { tenantSlug: string }) {
               '0 25px 50px -12px rgba(11,31,42,0.4), 0 0 80px rgba(211,154,43,0.06)',
           }}
         >
-          {/* Logo */}
-          <div className="mb-10 flex flex-col items-center">
+          {/* B1: Logo + identidad del tenant */}
+          <div className="mb-10 flex flex-col items-center text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/promark-icon.svg"
-              alt="Promark"
-              className="mb-4 h-16 w-16"
+              src={logo || '/promark-icon.svg'}
+              alt={tenantName}
+              className="mb-4 h-16 w-16 rounded-xl object-contain"
+              style={logo ? { background: '#FBF6EC', padding: 4 } : undefined}
             />
-            <h1
-              className="text-xl font-bold tracking-tight"
-              style={{ color: '#0F2E3D' }}
+            <p
+              className="text-[10px] font-semibold uppercase tracking-[0.15em]"
+              style={{ color: accent }}
             >
               Portal de Clientes
+            </p>
+            <h1
+              className="mt-1 text-xl font-bold tracking-tight"
+              style={{ color: '#0F2E3D' }}
+            >
+              {tenantName}
             </h1>
             <p
-              className="mt-1 text-xs font-medium"
+              className="mt-2 text-xs font-medium"
               style={{ color: '#355B6F' }}
             >
               Ingresa con tu tarjeta y PIN
             </p>
           </div>
 
-          {/* Error */}
+          {/* Error + indicador de intentos */}
           {error && (
             <div
               className="mb-6 rounded-xl px-4 py-3 text-sm"
@@ -130,7 +153,12 @@ export function ClientLoginForm({ tenantSlug }: { tenantSlug: string }) {
                 color: '#B42318',
               }}
             >
-              {error}
+              <div className="font-medium">{error}</div>
+              {attempts >= 2 && attempts < 5 && (
+                <div className="mt-1 text-[11px]" style={{ opacity: 0.75 }}>
+                  {attempts}/5 intentos. La cuenta se bloqueará temporalmente al 5º error.
+                </div>
+              )}
             </div>
           )}
 
@@ -189,18 +217,18 @@ export function ClientLoginForm({ tenantSlug }: { tenantSlug: string }) {
               disabled={loading}
               className="mt-2 w-full rounded-xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all disabled:cursor-not-allowed disabled:opacity-50"
               style={{
-                background: 'linear-gradient(135deg, #D39A2B 0%, #E8B84A 100%)',
+                background: `linear-gradient(135deg, ${accent} 0%, ${accent}DD 100%)`,
                 color: '#0B1F2A',
-                boxShadow: '0 4px 14px rgba(211,154,43,0.3)',
+                boxShadow: `0 4px 14px ${accent}4D`,
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(211,154,43,0.4)';
+                  e.currentTarget.style.boxShadow = `0 6px 20px ${accent}66`;
                   e.currentTarget.style.transform = 'translateY(-1px)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 14px rgba(211,154,43,0.3)';
+                e.currentTarget.style.boxShadow = `0 4px 14px ${accent}4D`;
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >

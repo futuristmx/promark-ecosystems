@@ -267,24 +267,8 @@ export function StatusDonut({
             </div>
           </div>
 
-          {/* Summary insight */}
-          <div
-            className="mt-5 flex items-center gap-3 rounded-xl px-4 py-3"
-            style={{ background: 'rgba(221,234,242,0.35)', border: '1px solid #E2DED6' }}
-          >
-            <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-              style={{ background: 'rgba(143,182,199,0.25)' }}
-            >
-              <TrendingUp className="h-4 w-4" style={{ color: '#355B6F' }} />
-            </span>
-            <span className="text-sm" style={{ color: '#1A1E23' }}>
-              {insights.summary}
-            </span>
-          </div>
-
-          {/* Insight cards */}
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {/* Insight cards (A4: removed redundant summary banner — `Insight principal` ya cubre lo mismo) */}
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {/* Insight principal */}
             <div
               className="rounded-xl px-4 py-3.5"

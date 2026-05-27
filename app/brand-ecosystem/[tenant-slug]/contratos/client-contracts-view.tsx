@@ -64,7 +64,20 @@ export function ClientContractsView({ tenantSlug }: { tenantSlug: string }) {
         {loading ? (
           <div className="py-12 text-center text-sm" style={{ color: '#C8C4B9' }}>Cargando…</div>
         ) : contracts.length === 0 ? (
-          <div className="py-12 text-center text-sm" style={{ color: '#C8C4B9' }}>Sin contratos disponibles.</div>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div
+              className="mb-3 flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ background: 'rgba(143,182,199,0.12)' }}
+            >
+              <span className="text-2xl">📄</span>
+            </div>
+            <p className="text-sm font-medium" style={{ color: '#0F2E3D' }}>
+              Sin contratos vigentes
+            </p>
+            <p className="mt-1 max-w-sm text-xs" style={{ color: '#355B6F' }}>
+              Tu equipo legal cargará licencias, cesiones y contratos relacionados con tus marcas aquí.
+            </p>
+          </div>
         ) : (
           <table className="w-full text-sm">
             <thead>

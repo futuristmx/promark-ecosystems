@@ -58,7 +58,28 @@ export default async function ClientContractDetailPage({ params }: Props) {
 
   return (
     <div className="px-8 py-8">
-      {/* Back */}
+      {/* C2: Breadcrumb + back link */}
+      <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs">
+        <Link
+          href={`/brand-ecosystem/${tenantSlug}/panel`}
+          className="font-medium transition-colors hover:underline"
+          style={{ color: '#355B6F' }}
+        >
+          Panel
+        </Link>
+        <span style={{ color: '#C8C4B9' }}>/</span>
+        <Link
+          href={`/brand-ecosystem/${tenantSlug}/contratos`}
+          className="font-medium transition-colors hover:underline"
+          style={{ color: '#355B6F' }}
+        >
+          Contratos
+        </Link>
+        <span style={{ color: '#C8C4B9' }}>/</span>
+        <span className="font-semibold" style={{ color: '#0F2E3D' }}>
+          {contract.title}
+        </span>
+      </nav>
       <Link
         href={`/brand-ecosystem/${tenantSlug}/contratos`}
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"

@@ -12,12 +12,25 @@ export async function GET(
   const { id } = await params;
   const tenant = await prisma.tenant.findUnique({
     where: { id },
-    select: { id: true, name: true, slug: true, status: true },
+    select: { id: true, name: true, slug: true, status: true, config: true },
   });
 
   if (!tenant) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  return NextResponse.json(tenant);
+  const cfg = tenant.config as {
+    branding?: { primary_color?: string; logo_url?: string };
+  } | null;
+
+  return NextResponse.json({
+    id: tenant.id,
+    name: tenant.name,
+    slug: tenant.slug,
+    status: tenant.status,
+    branding: {
+      primary_color: cfg?.branding?.primary_color ?? null,
+      logo_url: cfg?.branding?.logo_url ?? null,
+    },
+  });
 }

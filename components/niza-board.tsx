@@ -29,9 +29,33 @@ export default function NizaBoard({ registeredClasses }: NizaBoardProps) {
   }, []);
 
   const registeredSet = new Set(registeredClasses);
+  const coverage = registeredSet.size;
 
   return (
     <div className="relative">
+      {/* B5: header con contexto de cobertura */}
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
+            Clases de Niza
+          </h3>
+          <p className="mt-0.5 text-xs" style={{ color: '#355B6F' }}>
+            Cobertura de clases registradas. Pasa el cursor para ver descripción.
+          </p>
+        </div>
+        <div
+          className="shrink-0 rounded-lg border px-3 py-1.5 text-right"
+          style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
+            Cobertura
+          </p>
+          <p className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
+            {coverage} <span className="text-[11px] font-medium" style={{ color: '#355B6F' }}>de 45</span>
+          </p>
+        </div>
+      </div>
+
       <div
         className="grid gap-1.5"
         style={{ gridTemplateColumns: 'repeat(9, 1fr)' }}

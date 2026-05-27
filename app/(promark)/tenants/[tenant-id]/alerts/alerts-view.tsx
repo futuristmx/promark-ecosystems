@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AlertTriangle, CheckCircle2, X, Bell, Settings } from 'lucide-react';
+import { useToast } from '@/components/ds';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -74,6 +75,30 @@ function urgencyLabel(alert: SerializedAlert): string {
   return `Vence en ${days} días`;
 }
 
+/* A5: agrupar alertas duplicadas por entity_id + alert_type
+ * El backend genera múltiples alertas por la misma marca al disparar varias reglas.
+ * Visualmente las consolidamos en una sola fila con badge ×N.
+ */
+type GroupedAlert = SerializedAlert & { count: number; groupedIds: string[] };
+
+function groupAlerts(alerts: SerializedAlert[]): GroupedAlert[] {
+  const map = new Map<string, GroupedAlert>();
+  for (const a of alerts) {
+    const key = `${a.entity_id}-${a.alert_type}-${a.status}`;
+    const existing = map.get(key);
+    if (existing) {
+      existing.count++;
+      existing.groupedIds.push(a.id);
+      if (new Date(a.expiry_date) < new Date(existing.expiry_date)) {
+        existing.expiry_date = a.expiry_date;
+      }
+    } else {
+      map.set(key, { ...a, count: 1, groupedIds: [a.id] });
+    }
+  }
+  return Array.from(map.values());
+}
+
 export function AlertsView({
   tenantId,
   initialAlerts,
@@ -84,9 +109,12 @@ export function AlertsView({
 }: AlertsViewProps) {
   const [alerts, setAlerts] = useState(initialAlerts);
   const [rules, setRules] = useState(initialRules);
+  const toast = useToast();
   const [filter, setFilter] = useState<'PENDING' | 'DISMISSED' | 'RESOLVED' | 'ALL'>('PENDING');
 
-  const filtered = alerts.filter((a) => filter === 'ALL' || a.status === filter);
+  const filtered = groupAlerts(
+    alerts.filter((a) => filter === 'ALL' || a.status === filter)
+  );
 
   async function handleDismiss(alertId: string) {
     const res = await fetch(`/api/tenants/${tenantId}/alerts/${alertId}/dismiss`, {
@@ -106,6 +134,9 @@ export function AlertsView({
             : a
         )
       );
+      toast.success('Alerta descartada', 'La alerta dejó de mostrarse como pendiente.');
+    } else {
+      toast.error('No se pudo descartar', 'Intenta de nuevo en unos segundos.');
     }
   }
 
@@ -127,6 +158,9 @@ export function AlertsView({
             : a
         )
       );
+      toast.success('Alerta resuelta', 'Quedó registrada como atendida.');
+    } else {
+      toast.error('No se pudo resolver', 'Intenta de nuevo en unos segundos.');
     }
   }
 
@@ -139,6 +173,12 @@ export function AlertsView({
     if (res.ok) {
       const { rule } = await res.json();
       setRules((prev) => prev.map((r) => (r.id === ruleId ? rule : r)));
+      toast.success(
+        rule.is_active ? 'Regla activada' : 'Regla desactivada',
+        `"${rule.name}" ${rule.is_active ? 'volverá a disparar alertas.' : 'ya no generará alertas nuevas.'}`
+      );
+    } else {
+      toast.error('No se pudo actualizar la regla');
     }
   }
 
@@ -232,9 +272,20 @@ export function AlertsView({
                         {urgencyLabel(alert)}
                       </Badge>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-slate-900">
-                          {alert.entity_name}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-sm font-medium text-slate-900">
+                            {alert.entity_name}
+                          </p>
+                          {alert.count > 1 && (
+                            <span
+                              className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold"
+                              style={{ background: 'rgba(15,46,61,0.08)', color: '#0F2E3D' }}
+                              title={`${alert.count} alertas idénticas agrupadas`}
+                            >
+                              ×{alert.count}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-slate-500">
                           {alert.entity_type} · {alert.alert_type}
                         </p>
