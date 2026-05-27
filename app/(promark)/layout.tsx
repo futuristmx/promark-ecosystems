@@ -10,7 +10,12 @@ export default async function PromarkLayout({
 
   return (
     <div className="flex h-full min-h-screen bg-background">
-      <PromarkSidebar userName={session.full_name} userRole={session.role} userAvatar={session.avatar} />
+      <PromarkSidebar
+        userName={session.full_name}
+        userRole={session.role}
+        userAvatar={session.avatar}
+        isSuperAdmin={session.role === 'SUPERADMIN'}
+      />
       <main className="flex-1 overflow-y-auto px-10 py-8">
         {children}
       </main>
