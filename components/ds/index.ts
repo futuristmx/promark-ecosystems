@@ -22,3 +22,12 @@ export type { NodeType } from './node-card';
 export { DsWorkflowCanvas } from './workflow-canvas';
 export { CsvToolbar } from './csv-toolbar';
 export { ToastProvider, useToast } from './toast';
+export {
+  DsSkeleton,
+  DsCardSkeleton,
+  DsKpiSkeleton,
+  DsKpiGridSkeleton,
+  DsPageTitleSkeleton,
+  DsTableRowSkeleton,
+  DsTableSkeleton,
+} from './skeleton';

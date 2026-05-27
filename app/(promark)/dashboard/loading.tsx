@@ -1,16 +1,21 @@
+import { DsKpiGridSkeleton, DsPageTitleSkeleton, DsSkeleton } from '@/components/ds';
+
 export default function Loading() {
   return (
-    <div className="space-y-6">
-      <div className="h-8 w-64 animate-pulse rounded bg-slate-200" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-24 animate-pulse rounded-xl bg-slate-100" />
-        ))}
+    <div className="space-y-12">
+      <div className="flex items-center gap-5">
+        <DsSkeleton className="h-16 w-16 rounded-full" />
+        <div className="flex-1">
+          <DsPageTitleSkeleton />
+        </div>
+        <DsSkeleton className="h-10 w-32 rounded-xl" />
       </div>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="h-72 animate-pulse rounded-xl bg-slate-100" />
-        <div className="h-72 animate-pulse rounded-xl bg-slate-100" />
-      </div>
+
+      <DsKpiGridSkeleton />
+
+      <DsSkeleton className="h-80 rounded-2xl" />
+      <DsSkeleton className="h-80 rounded-2xl" />
+      <DsSkeleton className="h-64 rounded-2xl" />
     </div>
   );
 }
