@@ -69,8 +69,8 @@ function BrandLogoThumb({ logos, brandType }: { logos: unknown; brandType: strin
   if (!src) {
     return (
       <div
-        className="flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-medium"
-        style={{ background: 'rgba(143,182,199,0.12)', color: '#8FB6C7' }}
+        className="flex h-10 w-10 items-center justify-center rounded-lg text-[10px] font-bold"
+        style={{ background: 'rgba(15,46,61,0.1)', color: '#0F2E3D' }}
       >
         IMG
       </div>
@@ -240,16 +240,27 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
                   key={b.id}
                   onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
                   className="cursor-pointer rounded-2xl border p-4 transition-all"
-                  style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,46,61,0.08)'; e.currentTarget.style.borderColor = '#D39A2B'; e.currentTarget.style.background = '#FBF6EC'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E2DED6'; e.currentTarget.style.background = '#F1EDE3'; }}
+                  style={{
+                    borderColor: 'rgba(15,46,61,0.08)',
+                    background: 'linear-gradient(135deg, #B5C4CC 0%, #E6EEF2 100%)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(15,46,61,0.12)';
+                    e.currentTarget.style.borderColor = '#0F2E3D';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = 'rgba(15,46,61,0.08)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
                   <div className="mb-3 flex items-center justify-between">
                     <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
                     <VigencyDot expirationDate={b.expiration_date} legalStatus={b.legal_status} />
                   </div>
-                  <p className="text-sm font-semibold truncate" style={{ color: '#0F2E3D' }}>{b.name}</p>
-                  <p className="text-xs truncate" style={{ color: '#8FB6C7' }}>{b.company.name}</p>
+                  <p className="text-sm font-bold truncate" style={{ color: '#0F2E3D' }}>{b.name}</p>
+                  <p className="text-xs font-medium truncate" style={{ color: '#0F2E3D', opacity: 0.7 }}>{b.company.name}</p>
                   <div className="mt-2">
                     <StatusBadge tone={BRAND_STATUS_TONE[b.legal_status] ?? 'muted'}
                       label={BRAND_STATUS_LABELS[b.legal_status] ?? b.legal_status} />
