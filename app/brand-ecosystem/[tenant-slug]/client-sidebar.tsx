@@ -84,7 +84,7 @@ export function ClientSidebar({
 
   return (
     <aside
-      className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r"
+      className="sticky top-0 z-40 flex h-screen w-64 shrink-0 flex-col border-r"
       style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
     >
       {/* Logo / Brand header */}
@@ -169,7 +169,7 @@ export function ClientSidebar({
                 </Link>
                 {/* Tooltip */}
                 <div
-                  className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+                  className="pointer-events-none absolute left-full top-1/2 z-[100] ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
                   style={{ background: '#0F2E3D', color: '#FBF6EC' }}
                 >
                   {item.tooltip}
