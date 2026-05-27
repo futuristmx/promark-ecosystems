@@ -97,9 +97,15 @@ export function KpiCard({
             </span>
           )}
         </div>
-        {/* Value */}
+        {/* Value — tamaño adaptativo: strings largos (>6 chars, p.ej. moneda)
+            reciben fuente más chica para evitar wrap a 2 líneas. */}
         <p
-          className="mt-5 text-[2.5rem] font-extrabold leading-none tracking-tight"
+          className={cn(
+            'mt-4 font-extrabold leading-none tracking-tight',
+            typeof value === 'string' && value.length > 6
+              ? 'text-[1.625rem]'
+              : 'text-[2.25rem]'
+          )}
           style={{ color: accent.value }}
         >
           {value}

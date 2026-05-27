@@ -93,6 +93,8 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
     return () => controller.abort();
   }, [tenantId, pathname]);
 
+  // Orden solicitado: Vista General, Estructura, Portafolio, Financiero, Alertas,
+  // Actividad — y Configuración separada al final.
   const tenantSubNav: NavItem[] = tenantId
     ? [
         {
@@ -117,27 +119,31 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
           ],
         },
         {
-          href: `/tenants/${tenantId}/alerts`,
-          label: 'Alertas',
-          icon: <Bell className="h-4 w-4" />,
-        },
-        {
           href: `/tenants/${tenantId}/financiero`,
           label: 'Financiero',
           icon: <DollarSign className="h-4 w-4" />,
+        },
+        {
+          href: `/tenants/${tenantId}/alerts`,
+          label: 'Alertas',
+          icon: <Bell className="h-4 w-4" />,
         },
         {
           href: `/tenants/${tenantId}/actividad`,
           label: 'Actividad',
           icon: <Activity className="h-4 w-4" />,
         },
-        {
-          href: `/tenants/${tenantId}/configuracion`,
-          label: 'Configuración',
-          icon: <Settings className="h-4 w-4" />,
-        },
       ]
     : [];
+
+  // Configuración va separada al final (con divider)
+  const tenantConfigItem: NavItem | null = tenantId
+    ? {
+        href: `/tenants/${tenantId}/configuracion`,
+        label: 'Configuración',
+        icon: <Settings className="h-4 w-4" />,
+      }
+    : null;
 
   function isItemActive(item: NavItem): boolean {
     if (pathname === item.href || pathname.startsWith(item.href + '/')) return true;
@@ -259,9 +265,26 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
                 icon={item.icon}
                 label={item.label}
                 isActive={isItemActive(item)}
+                accentColor={tenantColor}
                 badge={item.href.endsWith('/alerts') && pendingAlerts > 0 ? pendingAlerts : undefined}
               />
             ))}
+            {/* Spacer + Configuración separada del resto */}
+            {tenantConfigItem && (
+              <>
+                <div
+                  className="my-3"
+                  style={{ borderTop: '1px solid rgba(251, 246, 236, 0.08)' }}
+                />
+                <NavLinkItem
+                  href={tenantConfigItem.href}
+                  icon={tenantConfigItem.icon}
+                  label={tenantConfigItem.label}
+                  isActive={isItemActive(tenantConfigItem)}
+                  accentColor={tenantColor}
+                />
+              </>
+            )}
           </>
         )}
       </nav>
@@ -331,13 +354,18 @@ function NavLinkItem({
   label,
   isActive,
   badge,
+  accentColor,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
   isActive: boolean;
   badge?: number;
+  /** Color de acento para el estado activo. Por defecto ámbar; items dentro de
+   * un tenant pasan el color primario del cliente. */
+  accentColor?: string;
 }) {
+  const accent = accentColor ?? '#D39A2B';
   return (
     <Link
       href={href}
@@ -347,11 +375,11 @@ function NavLinkItem({
       style={
         isActive
           ? {
-              // Gradient: ámbar suave a la izquierda → casi transparente a la derecha.
-              background:
-                'linear-gradient(90deg, rgba(211,154,43,0.22) 0%, rgba(211,154,43,0.06) 55%, rgba(251,246,236,0.02) 100%)',
+              // Gradient horizontal del color de acento (suave a la izquierda,
+              // transparente a la derecha).
+              background: `linear-gradient(90deg, ${accent}38 0%, ${accent}10 55%, rgba(251,246,236,0.02) 100%)`,
               color: '#FBF6EC',
-              borderLeft: '2px solid #D39A2B',
+              borderLeft: `2px solid ${accent}`,
               paddingLeft: '10px',
             }
           : {
@@ -371,7 +399,7 @@ function NavLinkItem({
         }
       }}
     >
-      <span style={isActive ? { color: '#D39A2B' } : { color: 'rgba(251, 246, 236, 0.5)' }}>
+      <span style={isActive ? { color: accent } : { color: 'rgba(251, 246, 236, 0.5)' }}>
         {icon}
       </span>
       <span className="flex-1">{label}</span>
