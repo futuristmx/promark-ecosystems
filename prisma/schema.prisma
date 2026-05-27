@@ -345,6 +345,7 @@ model Brand {
   registration_date   DateTime?
   expiration_date     DateTime?
   renewal_date        DateTime?
+  use_declaration_date DateTime?
   legal_status        LegalStatus
   brand_type          BrandType
   description         String?

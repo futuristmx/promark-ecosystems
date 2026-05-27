@@ -210,6 +210,7 @@ export async function POST(
           registration_date: brandData.registration_date ?? undefined,
           expiration_date: brandData.expiration_date ?? undefined,
           renewal_date: brandData.renewal_date ?? undefined,
+          use_declaration_date: brandData.use_declaration_date ?? undefined,
           legal_status: brandData.legal_status ?? 'APPLIED',
           brand_type: brandData.brand_type ?? 'WORDMARK',
           description: brandData.description ?? undefined,
