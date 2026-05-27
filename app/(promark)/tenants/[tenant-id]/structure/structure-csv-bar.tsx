@@ -23,8 +23,8 @@ const ENTITIES = [
     key: 'brands',
     label: 'Marcas',
     icon: Tag,
-    columns: ['nombre', 'empresa', 'tipo', 'estado_legal', 'numero_registro', 'fecha_vencimiento'],
-    example: ['Mi Marca', 'Mi Empresa', 'WORDMARK', 'APPLIED', '', ''],
+    columns: ['nombre', 'empresa', 'tipo', 'estado_legal', 'numero_registro', 'fecha_vencimiento', 'declaracion_de_uso'],
+    example: ['Mi Marca', 'Mi Empresa', 'WORDMARK', 'APPLIED', '', '', ''],
   },
 ] as const;
 

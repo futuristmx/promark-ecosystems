@@ -39,11 +39,13 @@ export async function GET(
       include: { company: { select: { name: true } } },
       orderBy: { name: 'asc' },
     });
-    csv = 'id,nombre,empresa,tipo,estado_legal,numero_registro,fecha_vencimiento\n';
+    csv = 'id,nombre,empresa,tipo,estado_legal,numero_registro,fecha_vencimiento,declaracion_de_uso\n';
     for (const b of brands) {
       csv += [
         b.id, esc(b.name), esc(b.company.name), b.brand_type, b.legal_status,
-        b.registration_number ?? '', b.expiration_date?.toISOString().slice(0, 10) ?? '',
+        b.registration_number ?? '',
+        b.expiration_date?.toISOString().slice(0, 10) ?? '',
+        b.use_declaration_date?.toISOString().slice(0, 10) ?? '',
       ].join(',') + '\n';
     }
   } else if (type === 'holdings') {
@@ -256,18 +258,21 @@ export async function POST(
         const regNum = row[headers.indexOf('numero_registro')]?.trim() || undefined;
         const expStr = row[headers.indexOf('fecha_vencimiento')]?.trim();
         const expiration_date = expStr ? new Date(expStr) : undefined;
+        const useDeclIdx = headers.indexOf('declaracion_de_uso');
+        const useDeclStr = useDeclIdx >= 0 ? row[useDeclIdx]?.trim() : '';
+        const use_declaration_date = useDeclStr ? new Date(useDeclStr) : undefined;
 
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
         if (id) {
           await prisma.brand.update({
             where: { id },
-            data: { name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date },
+            data: { name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date, use_declaration_date },
           });
           updated++;
         } else {
           await prisma.brand.create({
-            data: { tenant_id: tenantId, company_id: companyId!, name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date },
+            data: { tenant_id: tenantId, company_id: companyId!, name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date, use_declaration_date },
           });
           created++;
         }

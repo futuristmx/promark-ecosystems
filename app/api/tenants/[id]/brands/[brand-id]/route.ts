@@ -185,6 +185,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       application_number: existing.application_number,
       expiration_date: existing.expiration_date,
       renewal_date: existing.renewal_date,
+      use_declaration_date: existing.use_declaration_date,
       description: existing.description,
       disclaimers: existing.disclaimers,
     };
@@ -227,6 +228,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         application_number: brand.application_number,
         expiration_date: brand.expiration_date,
         renewal_date: brand.renewal_date,
+        use_declaration_date: brand.use_declaration_date,
         description: brand.description,
         disclaimers: brand.disclaimers,
       };

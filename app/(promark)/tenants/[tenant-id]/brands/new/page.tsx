@@ -48,6 +48,7 @@ const brandFormSchema = z.object({
   registration_date: z.string().optional(),
   expiration_date: z.string().optional(),
   renewal_date: z.string().optional(),
+  use_declaration_date: z.string().optional(),
   legal_status: z.enum(LEGAL_STATUSES),
   brand_type: z.enum(BRAND_TYPES),
   company_id: z.string().min(1, 'Campo requerido'),
@@ -287,6 +288,15 @@ export default function NewBrandPage({ params }: NewBrandPageProps) {
                   id="renewal_date"
                   type="date"
                   {...register('renewal_date')}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="use_declaration_date">Declaración de uso</Label>
+                <Input
+                  id="use_declaration_date"
+                  type="date"
+                  {...register('use_declaration_date')}
                   className="mt-1"
                 />
               </div>

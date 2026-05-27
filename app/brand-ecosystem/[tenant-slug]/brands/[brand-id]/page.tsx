@@ -277,6 +277,13 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
             value={formatDate(brand.renewal_date)}
           />
         )}
+        {brand.use_declaration_date && (
+          <InfoCard
+            icon={<Calendar className="size-4" />}
+            label="Declaración de uso"
+            value={formatDate(brand.use_declaration_date)}
+          />
+        )}
       </div>
 
       {/* Description */}

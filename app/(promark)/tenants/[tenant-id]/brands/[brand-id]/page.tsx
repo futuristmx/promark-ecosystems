@@ -218,6 +218,14 @@ export default async function BrandDetailPage({
                     {formatDate(brand.renewal_date)}
                   </p>
                 </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                    Declaración de uso
+                  </p>
+                  <p className="mt-1 text-sm text-slate-900">
+                    {formatDate(brand.use_declaration_date)}
+                  </p>
+                </div>
               </div>
 
               {brand.description && (
