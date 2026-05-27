@@ -216,7 +216,7 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
               style={{
                 background: `${tenantColor}24`,
                 border: `1px solid ${tenantColor}40`,
-                boxShadow: `inset 3px 0 0 ${tenantColor}`,
+                boxShadow: `inset 2px 0 0 ${tenantColor}`,
               }}
             >
               <span
@@ -336,10 +336,12 @@ function NavLinkItem({
       style={
         isActive
           ? {
-              background: 'rgba(251, 246, 236, 0.10)',
+              // Gradient: ámbar suave a la izquierda → casi transparente a la derecha.
+              background:
+                'linear-gradient(90deg, rgba(211,154,43,0.22) 0%, rgba(211,154,43,0.06) 55%, rgba(251,246,236,0.02) 100%)',
               color: '#FBF6EC',
-              borderLeft: '3px solid #D39A2B',
-              paddingLeft: '9px',
+              borderLeft: '2px solid #D39A2B',
+              paddingLeft: '10px',
             }
           : {
               color: 'rgba(251, 246, 236, 0.72)',
