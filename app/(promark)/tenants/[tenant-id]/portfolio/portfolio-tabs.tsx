@@ -235,38 +235,50 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
               description={brands.length === 0 ? 'Registra la primera marca.' : 'Ajusta la búsqueda.'} />
           ) : brandsView === 'cards' ? (
             <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 p-4">
-              {filteredBrands.map((b) => (
-                <div
-                  key={b.id}
-                  onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
-                  className="cursor-pointer rounded-2xl border p-4 transition-all"
-                  style={{
-                    borderColor: 'rgba(15,46,61,0.08)',
-                    background: 'linear-gradient(135deg, #B5C4CC 0%, #E6EEF2 100%)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(15,46,61,0.12)';
-                    e.currentTarget.style.borderColor = '#0F2E3D';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'rgba(15,46,61,0.08)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
-                    <VigencyDot expirationDate={b.expiration_date} legalStatus={b.legal_status} />
+              {filteredBrands.map((b) => {
+                // Activa = marca con derechos vigentes (registrada/renovada/publicada/solicitada).
+                // Inactiva = marca terminada o conflictiva.
+                const isActive = !['EXPIRED', 'CANCELLED', 'OPPOSED', 'IN_LITIGATION'].includes(b.legal_status);
+                const cardBg = isActive ? '#FBF6EC' : '#C8C4B9';
+                const cardBorder = isActive ? '#E2DED6' : '#B5B0A4';
+                const textPrimary = '#0F2E3D';
+                const textSecondary = isActive ? '#355B6F' : '#0F2E3D';
+                return (
+                  <div
+                    key={b.id}
+                    onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
+                    className="cursor-pointer rounded-2xl border p-4 transition-all"
+                    style={{
+                      borderColor: cardBorder,
+                      background: cardBg,
+                      opacity: isActive ? 1 : 0.85,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(15,46,61,0.12)';
+                      e.currentTarget.style.borderColor = '#0F2E3D';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = cardBorder;
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.opacity = isActive ? '1' : '0.85';
+                    }}
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
+                      <VigencyDot expirationDate={b.expiration_date} legalStatus={b.legal_status} />
+                    </div>
+                    <p className="text-sm font-bold truncate" style={{ color: textPrimary }}>{b.name}</p>
+                    <p className="text-xs font-medium truncate" style={{ color: textSecondary }}>{b.company.name}</p>
+                    <div className="mt-2">
+                      <StatusBadge tone={BRAND_STATUS_TONE[b.legal_status] ?? 'muted'}
+                        label={BRAND_STATUS_LABELS[b.legal_status] ?? b.legal_status} />
+                    </div>
                   </div>
-                  <p className="text-sm font-bold truncate" style={{ color: '#0F2E3D' }}>{b.name}</p>
-                  <p className="text-xs font-medium truncate" style={{ color: '#0F2E3D', opacity: 0.7 }}>{b.company.name}</p>
-                  <div className="mt-2">
-                    <StatusBadge tone={BRAND_STATUS_TONE[b.legal_status] ?? 'muted'}
-                      label={BRAND_STATUS_LABELS[b.legal_status] ?? b.legal_status} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -360,7 +372,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
+        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#C8C4B9', background: '#E2DED6' }}>
           {contractsLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
@@ -419,7 +431,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
+        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#C8C4B9', background: '#E2DED6' }}>
           {licensesLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
