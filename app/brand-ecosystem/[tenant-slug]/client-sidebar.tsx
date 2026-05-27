@@ -84,7 +84,7 @@ export function ClientSidebar({
 
   return (
     <aside
-      className="flex w-64 flex-col border-r"
+      className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r"
       style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
     >
       {/* Logo / Brand header */}
@@ -223,6 +223,28 @@ export function ClientSidebar({
             <LogOut className="size-4" />
           </button>
         </div>
+      </div>
+
+      {/* Brand mark — logo del tenant también al pie (mismo del header) */}
+      <div
+        className="flex items-center justify-center border-t px-4 py-3"
+        style={{ borderColor: '#E2DED6', background: 'rgba(226,222,214,0.35)' }}
+      >
+        {logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logoUrl}
+            alt={displayName}
+            className="h-6 max-w-[140px] object-contain opacity-60 transition-opacity hover:opacity-100"
+          />
+        ) : (
+          <span
+            className="text-[10px] font-semibold uppercase tracking-[0.15em]"
+            style={{ color: primaryColor, opacity: 0.7 }}
+          >
+            {displayName}
+          </span>
+        )}
       </div>
     </aside>
   );
