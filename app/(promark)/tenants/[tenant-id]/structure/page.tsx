@@ -85,6 +85,9 @@ export default async function StructurePage({ params }: StructurePageProps) {
         <StructureCsvBar tenantId={tenantId} className="mt-4" />
       )}
 
+      {/* Separación generosa entre la barra CSV y la lista de holdings */}
+      <div className="mt-16" />
+
       {holdings.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
           <Network className="mx-auto mb-3 h-10 w-10 text-slate-300" />
