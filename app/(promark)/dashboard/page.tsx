@@ -205,7 +205,7 @@ export default async function DashboardPage() {
           value={pendingAlerts}
           icon={<Bell className="size-4" />}
           tone={pendingAlerts > 0 ? 'danger' : 'default'}
-          href="/alertas"
+          href="/tenants"
         />
       </KpiGrid>
 

@@ -142,16 +142,46 @@ export function EditCompanySheet({ tenantId, companyId, open, onClose }: EditCom
             <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-[#0066FF] focus:outline-none focus:ring-1 focus:ring-[#0066FF]" />
           </div>
-          <div className="mt-auto flex items-center justify-end gap-2 pt-4">
-            <button type="button" onClick={onClose}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-              Cancelar
+          <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={async () => {
+                if (!companyId) return;
+                if (!confirm(`¿Eliminar la empresa "${name}"? Esta acción no se puede deshacer.\n\nSi tiene marcas o subsidiarias, primero hay que reasignarlas o eliminarlas.`)) return;
+                setSaving(true);
+                try {
+                  const res = await fetch(`/api/tenants/${tenantId}/companies/${companyId}`, { method: 'DELETE' });
+                  if (!res.ok) {
+                    const d = await res.json().catch(() => ({}));
+                    toast.error('No se pudo eliminar', d.error ?? 'Intenta de nuevo.');
+                    setSaving(false);
+                    return;
+                  }
+                  toast.success('Empresa eliminada');
+                  onClose();
+                  router.refresh();
+                } catch {
+                  toast.error('Error de red');
+                  setSaving(false);
+                }
+              }}
+              className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+              style={{ borderColor: 'rgba(180,35,24,0.3)', color: '#B42318', background: 'rgba(180,35,24,0.04)' }}
+            >
+              Eliminar
             </button>
-            <button type="submit" disabled={saving || !name.trim() || !legalName.trim()}
-              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              {saving ? 'Guardando…' : 'Guardar'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={onClose}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                Cancelar
+              </button>
+              <button type="submit" disabled={saving || !name.trim() || !legalName.trim()}
+                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50">
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                {saving ? 'Guardando…' : 'Guardar'}
+              </button>
+            </div>
           </div>
         </form>
       </SheetContent>

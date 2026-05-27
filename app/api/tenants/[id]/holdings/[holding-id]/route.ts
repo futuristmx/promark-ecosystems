@@ -119,3 +119,50 @@ export async function PUT(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// ─── DELETE /api/tenants/[id]/holdings/[holding-id] ─────────────────────────
+// Hard delete. Falla si el holding tiene companies asociadas (onDelete: Restrict).
+
+export async function DELETE(request: Request, { params }: RouteParams) {
+  try {
+    const { id: tenantId, 'holding-id': holdingId } = await params;
+
+    const session = await requireApiAuth(request);
+    if (isErrorResponse(session)) return session;
+
+    if (session.userType === 'CLIENT' && session.tenant_id !== tenantId) {
+      return NextResponse.json({ error: 'Forbidden: Tenant mismatch' }, { status: 403 });
+    }
+
+    const permError = await requirePermission({
+      userId: getSessionUserId(session),
+      userType: getSessionUserType(session),
+      role: getSessionRole(session),
+      module: 'corporate_structure',
+      action: 'DELETE',
+    });
+    if (permError) return permError;
+
+    const existing = await prisma.holding.findFirst({
+      where: { id: holdingId, tenant_id: tenantId },
+      include: { _count: { select: { companies: true } } },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: 'Holding no encontrado' }, { status: 404 });
+    }
+    if (existing._count.companies > 0) {
+      return NextResponse.json(
+        {
+          error: `No se puede eliminar: el holding tiene ${existing._count.companies} empresa(s) asociadas. Elimina o reasigna las empresas primero.`,
+        },
+        { status: 409 }
+      );
+    }
+
+    await prisma.holding.delete({ where: { id: holdingId } });
+    return NextResponse.json({ deleted: { id: holdingId, name: existing.name } });
+  } catch (error) {
+    console.error('Holding DELETE error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

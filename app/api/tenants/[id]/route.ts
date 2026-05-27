@@ -136,3 +136,38 @@ export async function PATCH(
 
   return NextResponse.json({ tenant: updated });
 }
+
+/**
+ * DELETE /api/tenants/[id]
+ *
+ * Elimina el tenant en hard delete. Cascadea a holdings, companies,
+ * brands, contracts, alerts, etc. (configurado en schema con
+ * onDelete: Cascade). Solo SUPERADMIN.
+ */
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: tenantId } = await params;
+  const session = await requirePromarkApiAuth(request);
+  if (isErrorResponse(session)) return session;
+
+  if (session.role !== 'SUPERADMIN') {
+    return NextResponse.json(
+      { error: 'Solo SUPERADMIN puede eliminar clientes' },
+      { status: 403 }
+    );
+  }
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { id: true, name: true },
+  });
+  if (!tenant) {
+    return NextResponse.json({ error: 'Tenant no encontrado' }, { status: 404 });
+  }
+
+  await prisma.tenant.delete({ where: { id: tenantId } });
+
+  return NextResponse.json({ deleted: { id: tenant.id, name: tenant.name } });
+}
