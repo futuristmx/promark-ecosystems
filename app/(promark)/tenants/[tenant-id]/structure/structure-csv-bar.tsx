@@ -54,7 +54,7 @@ export function StructureCsvBar({ tenantId, className }: StructureCsvBarProps) {
     >
       {/* Entity selector row */}
       <div className="flex items-center gap-1 border-b px-4 py-3" style={{ borderColor: '#E2DED6' }}>
-        <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#C8C4B9' }}>
+        <span className="mr-2 text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
           Entidad CSV
         </span>
         {ENTITIES.map((e) => {
@@ -76,6 +76,18 @@ export function StructureCsvBar({ tenantId, className }: StructureCsvBarProps) {
                     }
                   : { color: '#355B6F', background: 'transparent' }
               }
+              onMouseEnter={(ev) => {
+                if (!isActive) {
+                  ev.currentTarget.style.background = 'rgba(15,46,61,0.06)';
+                  ev.currentTarget.style.color = '#0F2E3D';
+                }
+              }}
+              onMouseLeave={(ev) => {
+                if (!isActive) {
+                  ev.currentTarget.style.background = 'transparent';
+                  ev.currentTarget.style.color = '#355B6F';
+                }
+              }}
             >
               <Icon className="size-3.5" />
               {e.label}
