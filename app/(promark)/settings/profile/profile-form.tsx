@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, Save, Loader2, KeyRound } from 'lucide-react';
+import { useToast } from '@/components/ds';
 
 interface ProfileFormProps {
   profile: {
@@ -32,17 +33,17 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   );
   const [avatarData, setAvatarData] = useState<string | null>(null); // new upload
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const toast = useToast();
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setMessage({ type: 'error', text: 'Solo se permiten imágenes.' });
+      toast.error('Tipo de archivo no permitido', 'Solo se permiten imágenes.');
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      setMessage({ type: 'error', text: 'La imagen debe ser menor a 2MB.' });
+      toast.error('Imagen muy grande', 'El máximo permitido es 2 MB.');
       return;
     }
     const reader = new FileReader();
@@ -55,7 +56,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   }
 
   async function handleSave() {
-    setMessage(null);
     setSaving(true);
     try {
       const body: Record<string, unknown> = {};
@@ -66,7 +66,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         body.avatar = avatarData;
       }
       if (Object.keys(body).length === 0) {
-        setMessage({ type: 'error', text: 'No hay cambios para guardar.' });
+        toast.info('Sin cambios', 'No hay nada nuevo que guardar.');
         return;
       }
       const res = await fetch('/api/promark/profile', {
@@ -76,14 +76,14 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setMessage({ type: 'error', text: data.error ?? 'Error al guardar.' });
+        toast.error('No se pudo guardar', data.error ?? 'Intenta de nuevo.');
         return;
       }
-      setMessage({ type: 'success', text: 'Perfil actualizado correctamente.' });
+      toast.success('Perfil actualizado');
       setAvatarData(null);
       router.refresh();
     } catch {
-      setMessage({ type: 'error', text: 'Error de red.' });
+      toast.error('Error de red', 'Revisa tu conexión.');
     } finally {
       setSaving(false);
     }
@@ -167,19 +167,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       {/* Change password */}
       <ChangePasswordSection />
 
-      {/* Message */}
-      {message && (
-        <div
-          className={`rounded-lg px-3 py-2 text-sm ${
-            message.type === 'success'
-              ? 'bg-emerald-50 text-emerald-700'
-              : 'bg-red-50 text-red-700'
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
-
       {/* Actions */}
       <div className="flex justify-end">
         <button
@@ -204,16 +191,15 @@ function ChangePasswordSection() {
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const toast = useToast();
 
   async function handleChangePassword() {
-    setMsg(null);
     if (newPassword.length < 6) {
-      setMsg({ type: 'error', text: 'Mínimo 6 caracteres.' });
+      toast.error('Contraseña muy corta', 'Usa al menos 6 caracteres.');
       return;
     }
     if (newPassword !== confirm) {
-      setMsg({ type: 'error', text: 'Las contraseñas no coinciden.' });
+      toast.error('Las contraseñas no coinciden');
       return;
     }
     setSaving(true);
@@ -225,14 +211,14 @@ function ChangePasswordSection() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setMsg({ type: 'error', text: data.error ?? 'Error.' });
+        toast.error('No se pudo cambiar', data.error ?? 'Intenta de nuevo.');
         return;
       }
-      setMsg({ type: 'success', text: 'Contraseña actualizada.' });
+      toast.success('Contraseña actualizada');
       setNewPassword('');
       setConfirm('');
     } catch {
-      setMsg({ type: 'error', text: 'Error de red.' });
+      toast.error('Error de red');
     } finally {
       setSaving(false);
     }
@@ -271,11 +257,6 @@ function ChangePasswordSection() {
           />
         </div>
       </div>
-      {msg && (
-        <div className={`mt-3 rounded-lg px-3 py-2 text-sm ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
-          {msg.text}
-        </div>
-      )}
       <div className="mt-4 flex justify-end">
         <button
           type="button"

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { VigencyDot } from '@/components/vigency-badge';
 import { DocumentsPanel } from '@/components/documents-panel';
-import { StatusBadge } from '@/components/ds';
+import { StatusBadge, useToast } from '@/components/ds';
 import type { StatusTone } from '@/components/ds';
 
 const CONTRACT_STATUS_TONE: Record<string, StatusTone> = {
@@ -59,6 +59,7 @@ type TabKey = typeof TABS[number];
 
 export function ContractDetailView({ tenantId, userRole, contract: initial, availableBrands }: Props) {
   const router = useRouter();
+  const toast = useToast();
   const tenantName = useTenantName(tenantId);
   const [tab, setTab] = useState<TabKey>('info');
   const [contract, setContract] = useState(initial);
@@ -90,13 +91,23 @@ export function ContractDetailView({ tenantId, userRole, contract: initial, avai
   async function terminateContract() {
     if (!confirm('¿Terminar este contrato?')) return;
     const r = await fetch(`/api/tenants/${tenantId}/contracts/${contract.id}/terminate`, { method: 'POST' });
-    if (r.ok) refreshContract();
+    if (r.ok) {
+      refreshContract();
+      toast.success('Contrato terminado');
+    } else {
+      toast.error('No se pudo terminar el contrato');
+    }
   }
 
   async function deleteContract() {
     if (!confirm('¿Eliminar este contrato?')) return;
     const r = await fetch(`/api/tenants/${tenantId}/contracts/${contract.id}`, { method: 'DELETE' });
-    if (r.ok) router.push(`/tenants/${tenantId}/contratos`);
+    if (r.ok) {
+      toast.success('Contrato eliminado');
+      router.push(`/tenants/${tenantId}/contratos`);
+    } else {
+      toast.error('No se pudo eliminar');
+    }
   }
 
   async function linkBrand() {
@@ -105,12 +116,23 @@ export function ContractDetailView({ tenantId, userRole, contract: initial, avai
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ brand_id: addBrandId }),
     });
-    if (r.ok) { setAddBrandId(''); refreshContract(); }
+    if (r.ok) {
+      setAddBrandId('');
+      refreshContract();
+      toast.success('Marca vinculada al contrato');
+    } else {
+      toast.error('No se pudo vincular la marca');
+    }
   }
 
   async function unlinkBrand(brandId: string) {
     const r = await fetch(`/api/tenants/${tenantId}/contracts/${contract.id}/brands?brand_id=${brandId}`, { method: 'DELETE' });
-    if (r.ok) refreshContract();
+    if (r.ok) {
+      refreshContract();
+      toast.success('Marca desvinculada');
+    } else {
+      toast.error('No se pudo desvincular');
+    }
   }
 
   const linkedIds = new Set(contract.contract_brands.map((cb) => cb.brand.id));

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ds';
 import {
   Sheet,
   SheetContent,
@@ -42,6 +43,7 @@ export function CompanyFormSheet({
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const toast = useToast();
 
   function reset() {
     setName('');
@@ -81,6 +83,7 @@ export function CompanyFormSheet({
       reset();
       onClose();
       router.refresh();
+      toast.success('Empresa creada', `"${name.trim()}" se agregó a la estructura.`);
     } catch {
       setError('Error de red.');
     } finally {

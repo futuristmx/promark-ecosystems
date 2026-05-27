@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ds';
 import {
   Sheet,
   SheetContent,
@@ -38,6 +39,7 @@ export function EditHoldingSheet({ tenantId, holdingId, open, onClose }: EditHol
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const toast = useToast();
 
   useEffect(() => {
     if (!holdingId || !open) return;
@@ -81,6 +83,7 @@ export function EditHoldingSheet({ tenantId, holdingId, open, onClose }: EditHol
       }
       onClose();
       router.refresh();
+      toast.success('Holding actualizada');
     } catch {
       setError('Error de red.');
     } finally {

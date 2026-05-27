@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/components/ds';
 import {
   Sheet,
   SheetContent,
@@ -26,6 +27,7 @@ export function HoldingFormSheet({ tenantId, open, onClose }: HoldingFormSheetPr
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const toast = useToast();
 
   function reset() {
     setName('');
@@ -60,6 +62,7 @@ export function HoldingFormSheet({ tenantId, open, onClose }: HoldingFormSheetPr
       reset();
       onClose();
       router.refresh();
+      toast.success('Holding creada', `"${name.trim()}" se agregó a la estructura.`);
     } catch {
       setError('Error de red.');
     } finally {

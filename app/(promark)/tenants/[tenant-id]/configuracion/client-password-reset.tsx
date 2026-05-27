@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { KeyRound, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/components/ds';
 
 interface Props {
   tenantId: string;
@@ -12,15 +13,14 @@ export function ClientPasswordReset({ tenantId, tenantName }: Props) {
   const [pin, setPin] = useState('');
   const [show, setShow] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const toast = useToast();
 
   async function handleReset() {
     if (pin.length < 4) {
-      setMessage({ type: 'error', text: 'El PIN debe tener al menos 4 caracteres.' });
+      toast.error('PIN muy corto', 'Usa al menos 4 caracteres.');
       return;
     }
     setSaving(true);
-    setMessage(null);
     try {
       const res = await fetch(`/api/tenants/${tenantId}/reset-password`, {
         method: 'POST',
@@ -29,16 +29,16 @@ export function ClientPasswordReset({ tenantId, tenantName }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setMessage({ type: 'error', text: data.error ?? 'Error al resetear PIN.' });
+        toast.error('No se pudo resetear', data.error ?? 'Intenta de nuevo.');
       } else {
-        setMessage({
-          type: 'success',
-          text: `PIN actualizado para ${data.name ?? data.email ?? tenantName}.`,
-        });
+        toast.success(
+          'PIN actualizado',
+          `Nuevo PIN listo para ${data.name ?? data.email ?? tenantName}.`
+        );
         setPin('');
       }
     } catch {
-      setMessage({ type: 'error', text: 'Error de conexión.' });
+      toast.error('Error de conexión');
     } finally {
       setSaving(false);
     }
@@ -82,18 +82,6 @@ export function ClientPasswordReset({ tenantId, tenantName }: Props) {
           {saving ? 'Guardando…' : 'Resetear'}
         </button>
       </div>
-
-      {message && (
-        <div
-          className={`mt-3 rounded-lg px-3 py-2 text-xs ${
-            message.type === 'success'
-              ? 'bg-emerald-50 text-emerald-700'
-              : 'bg-red-50 text-red-700'
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
     </div>
   );
 }
