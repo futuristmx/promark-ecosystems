@@ -115,40 +115,46 @@ export function FinancialDashboard({
       </TabsContent>
 
       <TabsContent value="config" className="pt-6">
-        <DsCard variant="standard">
-          <h3 className="mb-6 text-sm font-bold" style={{ color: '#0F2E3D' }}>
+        <div
+          className="rounded-2xl border p-6"
+          style={{
+            background: 'linear-gradient(135deg, #B5C4CC 0%, #E6EEF2 100%)',
+            borderColor: 'rgba(15,46,61,0.08)',
+          }}
+        >
+          <h3 className="mb-2 text-base font-bold" style={{ color: '#0F2E3D' }}>
             Configuración de valores monetarios
           </h3>
-          <p className="mb-6 text-xs" style={{ color: '#355B6F' }}>
+          <p className="mb-6 text-xs" style={{ color: '#0F2E3D', opacity: 0.75 }}>
             Estos valores se usan para calcular estimaciones financieras. Se guardan localmente en esta sesión.
           </p>
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0F2E3D' }}>
                 Costo por renovación (MXN)
               </label>
               <input
                 type="number"
                 value={renewalCost}
                 onChange={(e) => setRenewalCost(Number(e.target.value) || 0)}
-                className="w-full rounded-xl border px-4 py-3 text-sm"
-                style={{ background: '#FBF6EC', borderColor: '#E2DED6', color: '#0F2E3D' }}
+                className="w-full rounded-xl border px-4 py-3 text-sm focus:outline-none focus:ring-2"
+                style={{ background: '#FBF6EC', borderColor: 'rgba(15,46,61,0.12)', color: '#0F2E3D' }}
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0F2E3D' }}>
                 Costo por declaración de uso (MXN)
               </label>
               <input
                 type="number"
                 value={declarationCost}
                 onChange={(e) => setDeclarationCost(Number(e.target.value) || 0)}
-                className="w-full rounded-xl border px-4 py-3 text-sm"
-                style={{ background: '#FBF6EC', borderColor: '#E2DED6', color: '#0F2E3D' }}
+                className="w-full rounded-xl border px-4 py-3 text-sm focus:outline-none focus:ring-2"
+                style={{ background: '#FBF6EC', borderColor: 'rgba(15,46,61,0.12)', color: '#0F2E3D' }}
               />
             </div>
           </div>
-        </DsCard>
+        </div>
       </TabsContent>
     </Tabs>
   );
