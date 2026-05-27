@@ -66,9 +66,16 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
 
   const [pendingAlerts, setPendingAlerts] = useState<number>(0);
   const [tenantName, setTenantName] = useState<string>('');
+  const [tenantColor, setTenantColor] = useState<string>('#D39A2B');
 
   useEffect(() => {
-    if (!tenantId) { setTenantName(''); setPendingAlerts(0); return; }
+    if (!tenantId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTenantName('');
+      setPendingAlerts(0);
+      setTenantColor('#D39A2B');
+      return;
+    }
     const controller = new AbortController();
     fetch(`/api/tenants/${tenantId}/alerts?status=PENDING&limit=1`, {
       signal: controller.signal,
@@ -78,7 +85,10 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
       .catch(() => {});
     fetch(`/api/tenants/${tenantId}/info`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (d?.name) setTenantName(d.name); })
+      .then((d) => {
+        if (d?.name) setTenantName(d.name);
+        if (d?.branding?.primary_color) setTenantColor(d.branding.primary_color);
+      })
       .catch(() => {});
     return () => controller.abort();
   }, [tenantId, pathname]);
@@ -196,12 +206,37 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
 
         {tenantId && tenantSubNav.length > 0 && (
           <>
-            <p
-              className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-[0.08em]"
-              style={{ color: 'rgba(251, 246, 236, 0.45)' }}
+            {/* A2: divider visual del contexto del tenant — chip con color primario del cliente */}
+            <div
+              className="my-4 flex items-center gap-2 rounded-lg px-2.5 py-2"
+              style={{
+                background: 'rgba(251, 246, 236, 0.04)',
+                border: `1px solid ${tenantColor}33`,
+                boxShadow: `inset 3px 0 0 ${tenantColor}`,
+              }}
             >
-              {tenantName || 'Cliente'}
-            </p>
+              <span
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-bold"
+                style={{ background: tenantColor, color: '#0B1F2A' }}
+              >
+                {(tenantName || 'C').charAt(0).toUpperCase()}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p
+                  className="text-[9px] font-semibold uppercase tracking-[0.1em]"
+                  style={{ color: 'rgba(251, 246, 236, 0.5)' }}
+                >
+                  Cliente
+                </p>
+                <p
+                  className="truncate text-xs font-semibold"
+                  style={{ color: '#FBF6EC' }}
+                  title={tenantName}
+                >
+                  {tenantName || 'Cargando...'}
+                </p>
+              </div>
+            </div>
             {tenantSubNav.map((item) => (
               <NavLinkItem
                 key={item.href}

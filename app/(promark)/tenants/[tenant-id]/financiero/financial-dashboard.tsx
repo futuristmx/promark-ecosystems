@@ -36,8 +36,9 @@ export function FinancialDashboard({
   const totalRenewals = renewals30 + renewals60 + renewals90;
   const totalCost = totalRenewals * renewalCost;
 
+  // A8: incluir sufijo "MXN" para que la moneda sea explícita (no ambigua vs USD).
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(val);
+    `${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(val)} MXN`;
 
   return (
     <Tabs defaultValue="dashboard" className="w-full">

@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { LayoutGrid, List, BarChart3, Settings } from 'lucide-react';
+import { LayoutGrid, List, BarChart3, Settings, Tag, Bell } from 'lucide-react';
 import { DsDataTable, StatusBadge } from '@/components/ds';
 import type { StatusTone, DsColumn } from '@/components/ds';
 import { TENANT_STATUS_LABELS } from '@/lib/i18n/status-labels';
@@ -21,6 +20,8 @@ export interface TenantRow {
   status: string;
   created_at: string;
   logoUrl: string | null;
+  brandCount: number;
+  alertCount: number;
 }
 
 interface TenantsViewProps {
@@ -32,7 +33,6 @@ type ViewMode = 'cards' | 'list';
 
 export function TenantsView({ tenants, isSuperAdmin }: TenantsViewProps) {
   const [view, setView] = useState<ViewMode>('cards');
-  const router = useRouter();
 
   return (
     <div>
@@ -130,6 +130,23 @@ function CardsView({ tenants, isSuperAdmin }: TenantsViewProps) {
             </span>
           </div>
 
+          {/* A3: micro-KPIs */}
+          <div className="mt-3 flex items-center gap-3 text-xs">
+            <span className="inline-flex items-center gap-1" style={{ color: '#355B6F' }}>
+              <Tag className="size-3.5" />
+              <strong style={{ color: '#0F2E3D' }}>{t.brandCount}</strong>
+              {t.brandCount === 1 ? ' marca' : ' marcas'}
+            </span>
+            <span
+              className="inline-flex items-center gap-1"
+              style={{ color: t.alertCount > 0 ? '#B42318' : '#355B6F' }}
+            >
+              <Bell className="size-3.5" />
+              <strong>{t.alertCount}</strong>
+              {t.alertCount === 1 ? ' alerta' : ' alertas'}
+            </span>
+          </div>
+
           {/* Quick actions */}
           <div
             className="mt-3 flex gap-1 border-t pt-3"
@@ -197,6 +214,27 @@ function ListView({ tenants, isSuperAdmin }: TenantsViewProps) {
       headerTooltip: 'Identificador unico del cliente en URLs y configuraciones internas',
       cell: (t) => (
         <span className="font-mono text-xs" style={{ color: '#8FB6C7' }}>{t.slug}</span>
+      ),
+    },
+    {
+      key: 'brandCount',
+      header: 'Marcas',
+      sortable: true,
+      cell: (t) => (
+        <span style={{ color: '#0F2E3D' }} className="font-medium">{t.brandCount}</span>
+      ),
+    },
+    {
+      key: 'alertCount',
+      header: 'Alertas',
+      sortable: true,
+      cell: (t) => (
+        <span
+          className="font-medium"
+          style={{ color: t.alertCount > 0 ? '#B42318' : '#355B6F' }}
+        >
+          {t.alertCount}
+        </span>
       ),
     },
     {

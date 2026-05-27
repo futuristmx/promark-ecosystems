@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { Tag, Bell, Scroll } from 'lucide-react';
+import { Tag, Bell, Scroll, FileText } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
 import {
@@ -137,7 +137,7 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
         </div>
       </div>
 
-      <KpiGrid className="md:grid-cols-2 lg:grid-cols-2">
+      <KpiGrid className="md:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="Total marcas"
           value={aggregates.totals.brands}
@@ -149,6 +149,20 @@ export default async function ClientPanelPage({ params }: ClientPanelPageProps) 
           value={aggregates.totals.activeContracts}
           icon={<Scroll className="size-4" />}
           href={`${hrefPrefix}/contratos`}
+        />
+        <KpiCard
+          label="Alertas pendientes"
+          value={aggregates.totals.criticalAlerts}
+          icon={<Bell className="size-4" />}
+          tone={aggregates.totals.criticalAlerts > 0 ? 'danger' : 'default'}
+          href={`${hrefPrefix}/alerts`}
+        />
+        <KpiCard
+          label="Vencidas"
+          value={aggregates.totals.expired}
+          icon={<FileText className="size-4" />}
+          tone={aggregates.totals.expired > 0 ? 'warning' : 'default'}
+          href={`${hrefPrefix}/brands?vigency=red`}
         />
       </KpiGrid>
 

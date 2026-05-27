@@ -171,7 +171,28 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
 
   return (
     <div className="px-8 py-8">
-      {/* Back link */}
+      {/* C2: Breadcrumb + back link */}
+      <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs">
+        <Link
+          href={`/brand-ecosystem/${tenantSlug}/panel`}
+          className="font-medium transition-colors hover:underline"
+          style={{ color: '#355B6F' }}
+        >
+          Panel
+        </Link>
+        <span style={{ color: '#C8C4B9' }}>/</span>
+        <Link
+          href={basePath}
+          className="font-medium transition-colors hover:underline"
+          style={{ color: '#355B6F' }}
+        >
+          Marcas
+        </Link>
+        <span style={{ color: '#C8C4B9' }}>/</span>
+        <span className="font-semibold" style={{ color: '#0F2E3D' }}>
+          {brand.name}
+        </span>
+      </nav>
       <Link
         href={basePath}
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-[#355B6F] transition-colors hover:text-[#0F2E3D]"

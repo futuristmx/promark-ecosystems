@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Open_Sans, Manrope, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ds";
 
 // Font stack del design system: Manrope primaria, DM Sans + Open Sans
 // como fallbacks. Cada una con su CSS variable propia para que se pueda
@@ -46,7 +47,9 @@ export default function RootLayout({
       lang="es-MX"
       className={`${dmSans.variable} ${openSans.variable} ${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

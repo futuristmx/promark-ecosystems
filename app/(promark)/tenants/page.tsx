@@ -20,6 +20,24 @@ export default async function TenantsPage() {
     },
   });
 
+  // A3: enriquecer cards con micro-KPIs (marcas, alertas pendientes)
+  const tenantIds = tenants.map((t) => t.id);
+  const [brandCounts, alertCounts] = await Promise.all([
+    prisma.brand.groupBy({
+      by: ['tenant_id'],
+      where: { tenant_id: { in: tenantIds } },
+      _count: { _all: true },
+    }),
+    prisma.alert.groupBy({
+      by: ['tenant_id'],
+      where: { tenant_id: { in: tenantIds }, status: 'PENDING' },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const brandMap = new Map(brandCounts.map((b) => [b.tenant_id, b._count._all]));
+  const alertMap = new Map(alertCounts.map((a) => [a.tenant_id, a._count._all]));
+
   const tenantRows = tenants.map((t) => {
     const cfg = t.config as { branding?: { logo_url?: string } } | null;
     return {
@@ -29,6 +47,8 @@ export default async function TenantsPage() {
       status: t.status,
       created_at: t.created_at.toISOString(),
       logoUrl: cfg?.branding?.logo_url ?? null,
+      brandCount: brandMap.get(t.id) ?? 0,
+      alertCount: alertMap.get(t.id) ?? 0,
     };
   });
 

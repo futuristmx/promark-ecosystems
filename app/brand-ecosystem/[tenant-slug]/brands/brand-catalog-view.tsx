@@ -119,6 +119,8 @@ interface BrandCatalogViewProps {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
+const PAGE_SIZE = 24;
+
 export function BrandCatalogView({
   brands,
   companies,
@@ -127,6 +129,14 @@ export function BrandCatalogView({
   count,
 }: BrandCatalogViewProps) {
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
+  // B4: paginación cliente-side (24 cards por página)
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(brands.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginatedBrands = brands.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE
+  );
 
   return (
     <div className="px-8 py-8">
@@ -191,12 +201,56 @@ export function BrandCatalogView({
           className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16"
           style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
         >
-          <p className="text-sm" style={{ color: '#C8C4B9' }}>No se encontraron marcas.</p>
+          <p className="text-sm" style={{ color: '#355B6F' }}>
+            No se encontraron marcas con los filtros actuales.
+          </p>
+          <p className="mt-1 text-xs" style={{ color: '#C8C4B9' }}>
+            Cuando se registren marcas a tu nombre aparecerán aquí.
+          </p>
         </div>
       ) : viewMode === 'cards' ? (
-        <CardsView brands={brands} basePath={basePath} />
+        <CardsView brands={paginatedBrands} basePath={basePath} />
       ) : (
-        <ListView brands={brands} basePath={basePath} />
+        <ListView brands={paginatedBrands} basePath={basePath} />
+      )}
+
+      {/* B4: Paginación */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-between gap-3 text-sm">
+          <p style={{ color: '#355B6F' }}>
+            Mostrando{' '}
+            <strong style={{ color: '#0F2E3D' }}>
+              {(safePage - 1) * PAGE_SIZE + 1}
+              {' – '}
+              {Math.min(safePage * PAGE_SIZE, brands.length)}
+            </strong>{' '}
+            de <strong style={{ color: '#0F2E3D' }}>{brands.length}</strong>
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              disabled={safePage === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:bg-[#F1EDE3]"
+              style={{ borderColor: '#E2DED6', color: '#355B6F', background: '#FBF6EC' }}
+            >
+              Anterior
+            </button>
+            <span className="px-3 text-xs" style={{ color: '#355B6F' }}>
+              Página <strong style={{ color: '#0F2E3D' }}>{safePage}</strong> de{' '}
+              <strong style={{ color: '#0F2E3D' }}>{totalPages}</strong>
+            </span>
+            <button
+              type="button"
+              disabled={safePage === totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:bg-[#F1EDE3]"
+              style={{ borderColor: '#E2DED6', color: '#355B6F', background: '#FBF6EC' }}
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
