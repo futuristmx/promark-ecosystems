@@ -14,6 +14,7 @@ import {
   LogOut,
   Briefcase,
   DollarSign,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +22,7 @@ interface PromarkSidebarProps {
   userName: string;
   userRole: string;
   userAvatar?: unknown;
+  isSuperAdmin?: boolean;
 }
 
 function extractAvatarSrc(avatar: unknown): string | null {
@@ -57,7 +59,7 @@ const mainNav: NavItem[] = [
   },
 ];
 
-export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSidebarProps) {
+export function PromarkSidebar({ userName, userRole, userAvatar, isSuperAdmin = false }: PromarkSidebarProps) {
   const avatarSrc = extractAvatarSrc(userAvatar);
   const pathname = usePathname();
 
@@ -209,6 +211,14 @@ export function PromarkSidebar({ userName, userRole, userAvatar }: PromarkSideba
             isActive={isItemActive(item)}
           />
         ))}
+        {isSuperAdmin && (
+          <NavLinkItem
+            href="/settings/users"
+            icon={<Users className="h-4 w-4" />}
+            label="Usuarios"
+            isActive={isItemActive({ href: '/settings/users', label: 'Usuarios', icon: null })}
+          />
+        )}
 
         {tenantId && tenantSubNav.length > 0 && (
           <>
