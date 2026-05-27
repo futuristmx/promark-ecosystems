@@ -96,7 +96,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [brandsLoading, setBrandsLoading] = useState(true);
   const [brandSearch, setBrandSearch] = useState('');
-  const [brandsView, setBrandsView] = useState<'table' | 'cards'>('table');
+  const [brandsView, setBrandsView] = useState<'table' | 'cards'>('cards');
 
   const fetchBrands = useCallback(async () => {
     setBrandsLoading(true);
@@ -221,10 +221,13 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div
+          className="overflow-hidden rounded-2xl border"
+          style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+        >
           {brandsLoading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#E2DED6] border-t-[#D39A2B]" />
             </div>
           ) : filteredBrands.length === 0 ? (
             <EmptyState icon={<Tag className="size-6" />}
@@ -237,9 +240,9 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
                   key={b.id}
                   onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
                   className="cursor-pointer rounded-2xl border p-4 transition-all"
-                  style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,46,61,0.08)'; e.currentTarget.style.borderColor = '#D39A2B'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E2DED6'; }}
+                  style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(15,46,61,0.08)'; e.currentTarget.style.borderColor = '#D39A2B'; e.currentTarget.style.background = '#FBF6EC'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E2DED6'; e.currentTarget.style.background = '#F1EDE3'; }}
                 >
                   <div className="mb-3 flex items-center justify-between">
                     <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
@@ -346,7 +349,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
           {contractsLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
@@ -405,7 +408,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </Link>
           )}
         </div>
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}>
           {licensesLoading ? (
             <div className="flex items-center justify-center py-16">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-[#0066FF]" />
