@@ -334,11 +334,12 @@ export function AlertsView({
                 {rules.map((rule) => (
                   <div
                     key={rule.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
+                    className="flex items-center justify-between rounded-xl border p-3"
+                    style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
                   >
                     <div>
-                      <p className="text-sm font-medium text-slate-900">{rule.name}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-sm font-medium" style={{ color: '#0F2E3D' }}>{rule.name}</p>
+                      <p className="text-xs" style={{ color: '#355B6F' }}>
                         {rule.entity_type} ·{' '}
                         {rule.trigger_days === 0
                           ? 'al vencer'
@@ -346,17 +347,32 @@ export function AlertsView({
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={rule.is_active ? 'default' : 'outline'}>
+                      <span
+                        className="text-xs font-semibold uppercase tracking-wider"
+                        style={{ color: rule.is_active ? '#2F6B4F' : '#C8C4B9' }}
+                      >
                         {rule.is_active ? 'Activa' : 'Inactiva'}
-                      </Badge>
+                      </span>
                       {canModifyRules && (
-                        <Button
-                          size="sm"
-                          variant="outline"
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={rule.is_active}
+                          aria-label={`${rule.is_active ? 'Desactivar' : 'Activar'} regla ${rule.name}`}
                           onClick={() => toggleRule(rule.id, rule.is_active)}
+                          className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+                          style={{
+                            background: rule.is_active ? '#2F6B4F' : '#C8C4B9',
+                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.08)',
+                          }}
                         >
-                          {rule.is_active ? 'Desactivar' : 'Activar'}
-                        </Button>
+                          <span
+                            className="inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform"
+                            style={{
+                              transform: rule.is_active ? 'translateX(22px)' : 'translateX(2px)',
+                            }}
+                          />
+                        </button>
                       )}
                     </div>
                   </div>
