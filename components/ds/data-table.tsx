@@ -14,8 +14,8 @@ import { EmptyState } from './empty-state';
 export interface DsColumn<T> {
   /** Identificador estable de la columna (también la key del row data) */
   key: string;
-  /** Header visible */
-  header: string;
+  /** Header visible (string para sorting; ReactNode permite controles como checkboxes) */
+  header: string | React.ReactNode;
   /** Ancho en px o % opcional */
   width?: string | number;
   /** Si la columna es sortable */

@@ -146,3 +146,60 @@ export async function PUT(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// ─── DELETE /api/tenants/[id]/companies/[company-id] ────────────────────────
+// Hard delete. Falla si la empresa tiene marcas asociadas (onDelete: Restrict).
+
+export async function DELETE(request: Request, { params }: RouteParams) {
+  try {
+    const { id: tenantId, 'company-id': companyId } = await params;
+
+    const session = await requireApiAuth(request);
+    if (isErrorResponse(session)) return session;
+
+    if (session.userType === 'CLIENT' && session.tenant_id !== tenantId) {
+      return NextResponse.json({ error: 'Forbidden: Tenant mismatch' }, { status: 403 });
+    }
+
+    const permError = await requirePermission({
+      userId: getSessionUserId(session),
+      userType: getSessionUserType(session),
+      role: getSessionRole(session),
+      module: 'corporate_structure',
+      action: 'DELETE',
+    });
+    if (permError) return permError;
+
+    const existing = await prisma.company.findFirst({
+      where: { id: companyId, tenant_id: tenantId },
+      include: {
+        _count: { select: { brands: true, subsidiaries: true } },
+      },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: 'Empresa no encontrada' }, { status: 404 });
+    }
+    if (existing._count.brands > 0) {
+      return NextResponse.json(
+        {
+          error: `No se puede eliminar: la empresa tiene ${existing._count.brands} marca(s) asociadas. Reasigna o elimina las marcas primero.`,
+        },
+        { status: 409 }
+      );
+    }
+    if (existing._count.subsidiaries > 0) {
+      return NextResponse.json(
+        {
+          error: `No se puede eliminar: la empresa tiene ${existing._count.subsidiaries} subsidiaria(s). Reasigna las subsidiarias primero.`,
+        },
+        { status: 409 }
+      );
+    }
+
+    await prisma.company.delete({ where: { id: companyId } });
+    return NextResponse.json({ deleted: { id: companyId, name: existing.name } });
+  } catch (error) {
+    console.error('Company DELETE error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
