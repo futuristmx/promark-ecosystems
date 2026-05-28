@@ -25,6 +25,9 @@ interface TenantConfig {
     language?: string;
     timezone?: string;
   };
+  client_alerts?: {
+    enabled?: boolean;
+  };
 }
 
 export { type TenantConfig };
@@ -111,7 +114,12 @@ export default async function BrandEcosystemLayout({
           userName={userName}
           userRoleLabel={userRole ? (roleLabels[userRole] ?? userRole) : null}
           showContracts={config?.features?.show_contracts === true && userRole !== 'CLIENT_VIEWER'}
-          showAlerts={userRole !== 'CLIENT_VIEWER'}
+          showAlerts={
+            userRole !== 'CLIENT_VIEWER' &&
+            // Si el SUPERADMIN apagó client_alerts.enabled, no mostrar el item.
+            // Default: si nunca se ha configurado, asumir habilitado (true).
+            config?.client_alerts?.enabled !== false
+          }
         />
       )}
 
