@@ -388,8 +388,8 @@ export function PromarkFinancialDashboard({
 
         {/* Breakdown por categoría (eventos) — refleja filtros */}
         <div
-          className="grid gap-4 rounded-2xl border-[1.5px] p-5 md:grid-cols-4"
-          style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+          className="grid gap-4 rounded-2xl p-5 md:grid-cols-4"
+          style={{ background: '#F1EDE3' }}
         >
           <BreakdownStat
             label="Renovaciones de marca"
@@ -1063,8 +1063,8 @@ function BreakdownStat({
 function Stat({ label, value, hint }: { label: string; value: number; hint: string }) {
   return (
     <div
-      className="rounded-xl border-[1.5px] px-4 py-3"
-      style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+      className="rounded-xl px-4 py-3"
+      style={{ background: '#F1EDE3' }}
     >
       <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#355B6F' }}>
         {label}
