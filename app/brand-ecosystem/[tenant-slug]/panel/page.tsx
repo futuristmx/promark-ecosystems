@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Tag, FileText, Shield, Sparkles } from 'lucide-react';
+import { Tag, FileText, Shield } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
 import {
@@ -64,7 +64,6 @@ function PromarkProtectionCard() {
             <strong style={{ color: '#F5C97A' }}>Promark®</strong> con tecnología y profesionalismo.
           </p>
         </div>
-        <Sparkles className="hidden size-5 md:block" style={{ color: 'rgba(245,201,122,0.55)' }} />
       </div>
     </div>
   );

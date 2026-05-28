@@ -59,7 +59,7 @@ function Dropdown({ label, tooltip, icon, value, options, onChange, allLabel }: 
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-1.5 rounded-xl border-2 px-3 py-2 text-xs font-semibold transition-all"
+        className="inline-flex items-center gap-1.5 rounded-xl border-[1.5px] px-3 py-2 text-xs font-semibold transition-all"
         style={{
           borderColor: hasValue ? '#D39A2B' : '#355B6F',
           background: hasValue ? 'rgba(211,154,43,0.10)' : '#FBF6EC',
@@ -84,7 +84,7 @@ function Dropdown({ label, tooltip, icon, value, options, onChange, allLabel }: 
       )}
       {open && (
         <div
-          className="absolute left-0 top-full z-40 mt-1.5 max-h-72 w-56 overflow-auto rounded-xl border-2 shadow-xl"
+          className="absolute left-0 top-full z-40 mt-1.5 max-h-72 w-56 overflow-auto rounded-xl border-[1.5px] shadow-xl"
           style={{
             borderColor: '#355B6F',
             background: '#FBF6EC',
@@ -153,7 +153,7 @@ export function BrandFilters({ companies, basePath, availableClasses = [] }: Bra
 
   return (
     <div
-      className="rounded-2xl border-2 p-3"
+      className="rounded-2xl border-[1.5px] p-3"
       style={{
         borderColor: '#355B6F',
         background: 'linear-gradient(135deg, #FBF6EC 0%, #F1EDE3 100%)',
@@ -190,7 +190,7 @@ export function BrandFilters({ companies, basePath, availableClasses = [] }: Bra
           />
           <input
             placeholder="Buscar marca…"
-            className="h-9 w-60 rounded-xl border-2 pl-9 pr-3 text-sm font-medium transition-all focus:outline-none"
+            className="h-9 w-60 rounded-xl border-[1.5px] pl-9 pr-3 text-sm font-medium transition-all focus:outline-none"
             style={{
               background: '#FFFFFF',
               borderColor: currentSearch ? '#D39A2B' : '#355B6F',
