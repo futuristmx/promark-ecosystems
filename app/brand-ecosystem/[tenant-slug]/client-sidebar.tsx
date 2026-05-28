@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { Tag, FileText, ScrollText, Bell, LayoutDashboard, LogOut, MessageCircle, Download } from 'lucide-react';
+import { Tag, FileText, Bell, LayoutDashboard, LogOut, MessageCircle, Download } from 'lucide-react';
 
 interface ClientSidebarProps {
   tenantSlug: string;
@@ -14,7 +14,7 @@ interface ClientSidebarProps {
   primaryColor: string;
   userName: string;
   userRoleLabel: string | null;
-  showContracts?: boolean;
+  showContracts?: boolean; // deprecated — contratos viven dentro de Documentos
   showAlerts?: boolean;
 }
 
@@ -33,7 +33,6 @@ export function ClientSidebar({
   primaryColor,
   userName,
   userRoleLabel,
-  showContracts = false,
   showAlerts = true,
 }: ClientSidebarProps) {
   const pathname = usePathname();
@@ -71,8 +70,7 @@ export function ClientSidebar({
     { label: 'Panel', href: `${basePath}/panel`, icon: LayoutDashboard, tooltip: 'Vista general del ecosistema de marcas' },
     { label: 'Marcas', href: `${basePath}/brands`, icon: Tag, tooltip: 'Catálogo completo de marcas registradas' },
     ...(showAlerts ? [{ label: 'Alertas', href: `${basePath}/alerts`, icon: Bell, tooltip: 'Vigencias por vencer y eventos detectados' }] : []),
-    { label: 'Documentos', href: `${basePath}/documents`, icon: FileText, tooltip: 'Contratos, certificados y comunicaciones' },
-    ...(showContracts ? [{ label: 'Contratos', href: `${basePath}/contratos`, icon: ScrollText, tooltip: 'Contratos y licencias vinculadas a marcas' }] : []),
+    { label: 'Documentos', href: `${basePath}/documents`, icon: FileText, tooltip: 'Contratos, licencias, certificados y comunicaciones — organizados por tipo' },
     { label: 'Descargas', href: `${basePath}/descargas`, icon: Download, tooltip: 'Exporta el catálogo en PDF o Excel con filtros' },
     { label: 'Contacto', href: `${basePath}/contacto`, icon: MessageCircle, tooltip: 'WhatsApp, email o mensaje directo a Promark' },
   ];
