@@ -662,6 +662,20 @@ model RolePermission {
   @@map("role_permissions")
 }
 
+// Configuración de roles del staff Promark editada por SUPERADMIN.
+// Permite renombrar cada rol y togglear permisos finos sin tocar el
+// catálogo RolePermission ni código.
+model PromarkRoleConfig {
+  id          String   @id @default(cuid())
+  role        String   @unique   // PromarkRole as string
+  label       String?
+  permissions Json     @default("{}")
+  updated_at  DateTime @updatedAt
+  created_at  DateTime @default(now())
+
+  @@map("promark_role_configs")
+}
+
 model PermissionOverride {
   id         String           @id @default(cuid())
   user_id    String
