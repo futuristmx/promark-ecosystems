@@ -78,12 +78,15 @@ export const CONTRACT_CHANGE_TYPE_LABELS: Record<string, string> = {
 
 export const BRAND_STATUS_LABELS: Record<string, string> = {
   APPLIED: 'Solicitada',
+  PUBLISHED: 'Publicada',
   REGISTERED: 'Registrada',
   RENEWED: 'Renovada',
-  EXPIRED: 'Expirada',
-  ABANDONED: 'Abandonada',
+  EXPIRED: 'Vencida',
   CANCELLED: 'Cancelada',
-  OPPOSED: 'Impugnada',
+  OPPOSED: 'Opuesta',
+  IN_LITIGATION: 'En litigio',
+  IN_PROGRESS: 'En trámite',
+  ABANDONED: 'Abandonada',
 };
 
 // Tipos de marca según el catálogo del IMPI (México).
@@ -106,6 +109,43 @@ export const BRAND_TYPE_LABELS: Record<string, string> = {
   // Alias por compatibilidad con datos legacy
   HOLOGRAPHIC: 'Holográfica',
 };
+
+// Estatus legal — labels ES + nuevos estados IMPI (en trámite, abandonada).
+export const BRAND_STATUS_LABELS_EXTENDED: Record<string, string> = {
+  APPLIED: 'Solicitada',
+  PUBLISHED: 'Publicada',
+  REGISTERED: 'Registrada',
+  RENEWED: 'Renovada',
+  EXPIRED: 'Vencida',
+  CANCELLED: 'Cancelada',
+  OPPOSED: 'Opuesta',
+  IN_LITIGATION: 'En litigio',
+  IN_PROGRESS: 'En trámite',
+  ABANDONED: 'Abandonada',
+};
+
+// Tipo de solicitud (IMPI). Diferente del Tipo de Marca.
+export const APPLICATION_TYPE_LABELS: Record<string, string> = {
+  TRADEMARK_REGISTRATION: 'Registro de Marca',
+  COMMERCIAL_NOTICE_REGISTRATION: 'Registro de Aviso Comercial',
+  TRADE_NAME_REGISTRATION: 'Registro de Nombre Comercial',
+  APPELLATION_OF_ORIGIN_REQUEST: 'Solicitud de Denominación de Origen',
+  GEOGRAPHICAL_INDICATION_REQUEST: 'Solicitud de Indicación Geográfica',
+  RENEWAL: 'Renovación',
+  ASSIGNMENT: 'Cesión',
+  OTHER: 'Otro',
+};
+
+export const APPLICATION_TYPE_ORDER: string[] = [
+  'TRADEMARK_REGISTRATION',
+  'COMMERCIAL_NOTICE_REGISTRATION',
+  'TRADE_NAME_REGISTRATION',
+  'RENEWAL',
+  'ASSIGNMENT',
+  'APPELLATION_OF_ORIGIN_REQUEST',
+  'GEOGRAPHICAL_INDICATION_REQUEST',
+  'OTHER',
+];
 
 /** Orden canónico para selects (más común primero). */
 export const BRAND_TYPE_ORDER: string[] = [

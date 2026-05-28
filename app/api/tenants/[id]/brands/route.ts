@@ -213,8 +213,11 @@ export async function POST(
           use_declaration_date: brandData.use_declaration_date ?? undefined,
           legal_status: brandData.legal_status ?? 'APPLIED',
           brand_type: brandData.brand_type ?? 'WORDMARK',
+          application_type: brandData.application_type ?? undefined,
+          country: brandData.country ?? undefined,
           description: brandData.description ?? undefined,
           disclaimers: brandData.disclaimers ?? undefined,
+          observations: brandData.observations ?? undefined,
         },
         include: {
           company: { select: { id: true, name: true } },

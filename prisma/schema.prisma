@@ -69,6 +69,22 @@ enum LegalStatus {
   CANCELLED
   OPPOSED
   IN_LITIGATION
+  IN_PROGRESS    // En trámite — solicitud en proceso ante IMPI
+  ABANDONED      // Abandonada — solicitud declarada abandonada por IMPI
+}
+
+// Tipo de solicitud ante IMPI (independiente del Tipo de Marca).
+// El Excel real de Promark distingue "Registro de Marca" vs "Registro de
+// Aviso Comercial" vs el tipo de marca (nominativa, mixta, etc).
+enum ApplicationType {
+  TRADEMARK_REGISTRATION         // Registro de Marca
+  COMMERCIAL_NOTICE_REGISTRATION // Registro de Aviso Comercial
+  TRADE_NAME_REGISTRATION        // Registro de Nombre Comercial
+  APPELLATION_OF_ORIGIN_REQUEST  // Solicitud de Denominación de Origen
+  GEOGRAPHICAL_INDICATION_REQUEST // Solicitud de Indicación Geográfica
+  RENEWAL                        // Renovación de registro
+  ASSIGNMENT                     // Cesión de derechos
+  OTHER                          // Otros trámites
 }
 
 // Tipos de marca según el catálogo del IMPI (México).
@@ -357,8 +373,11 @@ model Brand {
   use_declaration_date DateTime?
   legal_status        LegalStatus
   brand_type          BrandType
+  application_type    ApplicationType? // Tipo de solicitud IMPI (Registro de Marca / Aviso Comercial / etc)
+  country             String           @default("México")
   description         String?
   disclaimers         String?
+  observations        String?          @db.Text  // Notas legales narrativas: historia del trámite, oficios, renovaciones, etc.
   priority_claim      Json?
   metadata            Json?
   created_at          DateTime    @default(now())

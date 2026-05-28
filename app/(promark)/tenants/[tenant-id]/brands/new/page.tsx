@@ -20,10 +20,23 @@ const LEGAL_STATUSES = [
   'PUBLISHED',
   'REGISTERED',
   'RENEWED',
+  'IN_PROGRESS',
   'EXPIRED',
+  'ABANDONED',
   'CANCELLED',
   'OPPOSED',
   'IN_LITIGATION',
+] as const;
+
+const APPLICATION_TYPES = [
+  'TRADEMARK_REGISTRATION',
+  'COMMERCIAL_NOTICE_REGISTRATION',
+  'TRADE_NAME_REGISTRATION',
+  'RENEWAL',
+  'ASSIGNMENT',
+  'APPELLATION_OF_ORIGIN_REQUEST',
+  'GEOGRAPHICAL_INDICATION_REQUEST',
+  'OTHER',
 ] as const;
 
 const BRAND_TYPES = [
@@ -59,9 +72,12 @@ const brandFormSchema = z.object({
   use_declaration_date: z.string().optional(),
   legal_status: z.enum(LEGAL_STATUSES),
   brand_type: z.enum(BRAND_TYPES),
+  application_type: z.enum(APPLICATION_TYPES).optional(),
+  country: z.string().optional(),
   company_id: z.string().min(1, 'Campo requerido'),
   description: z.string().optional(),
   disclaimers: z.string().optional(),
+  observations: z.string().optional(),
   classes: z.array(brandClassSchema),
 });
 
@@ -95,6 +111,8 @@ export default function NewBrandPage({ params }: NewBrandPageProps) {
       name: '',
       legal_status: 'APPLIED',
       brand_type: 'WORDMARK',
+      application_type: 'TRADEMARK_REGISTRATION',
+      country: 'México',
       company_id: '',
       classes: [],
     },
@@ -213,6 +231,30 @@ export default function NewBrandPage({ params }: NewBrandPageProps) {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <Label htmlFor="application_type">Tipo de solicitud</Label>
+                <select
+                  id="application_type"
+                  {...register('application_type')}
+                  className={`mt-1 ${selectClasses}`}
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="TRADEMARK_REGISTRATION">Registro de Marca</option>
+                  <option value="COMMERCIAL_NOTICE_REGISTRATION">Registro de Aviso Comercial</option>
+                  <option value="TRADE_NAME_REGISTRATION">Registro de Nombre Comercial</option>
+                  <option value="RENEWAL">Renovación</option>
+                  <option value="ASSIGNMENT">Cesión</option>
+                  <option value="APPELLATION_OF_ORIGIN_REQUEST">Solicitud de Denominación de Origen</option>
+                  <option value="GEOGRAPHICAL_INDICATION_REQUEST">Solicitud de Indicación Geográfica</option>
+                  <option value="OTHER">Otro</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="country">País de Registro</Label>
+                <Input id="country" {...register('country')} placeholder="México" className="mt-1" />
               </div>
 
               <div className="col-span-2">
@@ -335,6 +377,22 @@ export default function NewBrandPage({ params }: NewBrandPageProps) {
                   {...register('disclaimers')}
                   className="mt-1"
                   rows={2}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="observations">
+                  Observaciones legales
+                  <span className="ml-1 text-xs font-normal text-slate-500">
+                    (historia del trámite, oficios IMPI, citas, notas)
+                  </span>
+                </Label>
+                <Textarea
+                  id="observations"
+                  {...register('observations')}
+                  className="mt-1"
+                  rows={5}
+                  placeholder="Ej. MARCA REGISTRADA Y VIGENTE. Declaración de Uso: 28/04/2029. — o — ABANDONADA. 1er oficio (20251092147) del 14/07/2025: Cita de anterioridad. Impedimento: marca QNICE!! (2472712)..."
                 />
               </div>
             </div>
