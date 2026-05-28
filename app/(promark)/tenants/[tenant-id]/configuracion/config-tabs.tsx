@@ -40,10 +40,30 @@ interface Props {
 }
 
 const TABS = [
-  { id: 'branding', label: 'Branding', icon: Paintbrush },
-  { id: 'portal', label: 'Portal & URL', icon: Link2 },
-  { id: 'credentials', label: 'Credenciales', icon: KeyRound },
-  { id: 'notifications', label: 'Notificaciones', icon: Bell },
+  {
+    id: 'branding',
+    label: 'Branding',
+    icon: Paintbrush,
+    tooltip: 'Logo, color primario y nombre que aparecen en el portal del cliente',
+  },
+  {
+    id: 'portal',
+    label: 'Portal & URL',
+    icon: Link2,
+    tooltip: 'Slug y URL pública del portal del cliente',
+  },
+  {
+    id: 'credentials',
+    label: 'Credenciales',
+    icon: KeyRound,
+    tooltip: 'Usuarios del cliente, PIN de acceso, nombre y permisos de cada rol',
+  },
+  {
+    id: 'notifications',
+    label: 'Notificaciones',
+    icon: Bell,
+    tooltip: 'Email destinatario y días de anticipación para alertas de vencimiento',
+  },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -73,6 +93,8 @@ export function TenantConfigTabs({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
+              title={tab.tooltip}
+              aria-label={`${tab.label}: ${tab.tooltip}`}
               className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all"
               style={
                 isActive
@@ -99,18 +121,25 @@ export function TenantConfigTabs({
           );
         })}
 
-        {/* Portal link */}
+        {/* Portal link — botón sólido para mejor contraste */}
         <a
           href={`/brand-ecosystem/${tenantSlug}/panel`}
           target="_blank"
           rel="noreferrer"
-          className="ml-auto flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-colors"
-          style={{ color: '#D39A2B' }}
+          title="Abre el portal del cliente en una pestaña nueva"
+          className="ml-auto flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all"
+          style={{
+            background: 'linear-gradient(135deg, #D39A2B 0%, #E8B84A 100%)',
+            color: '#0B1F2A',
+            boxShadow: '0 2px 8px rgba(211,154,43,0.25)',
+          }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(211,154,43,0.08)';
+            e.currentTarget.style.boxShadow = '0 4px 14px rgba(211,154,43,0.4)';
+            e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(211,154,43,0.25)';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           <ExternalLink className="size-3.5" />

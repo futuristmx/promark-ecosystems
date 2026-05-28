@@ -58,9 +58,12 @@ const DEFAULT_PERMISSIONS: Record<RoleKey, Record<PermissionKey, boolean>> = {
 interface Props {
   tenantId: string;
   initialOverrides: RoleOverrides;
+  /** Si se pasa, sólo se muestra el card de ese rol (acorta el editor cuando
+   * el usuario seleccionado en el panel de Credenciales tiene un rol claro). */
+  focusedRole?: string | null;
 }
 
-export function RolesPermissionsEditor({ tenantId, initialOverrides }: Props) {
+export function RolesPermissionsEditor({ tenantId, initialOverrides, focusedRole }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [overrides, setOverrides] = useState<RoleOverrides>(initialOverrides);
@@ -138,8 +141,15 @@ export function RolesPermissionsEditor({ tenantId, initialOverrides }: Props) {
         </HelpTip>
       </div>
 
+      {focusedRole && (
+        <p className="mb-3 text-[11px]" style={{ color: '#355B6F' }}>
+          Mostrando solo el rol del usuario seleccionado. Para ver los demás,
+          deselecciona el usuario o cambia la selección.
+        </p>
+      )}
+
       <div className="space-y-5">
-        {ROLE_KEYS.map((role) => (
+        {ROLE_KEYS.filter((r) => !focusedRole || r === focusedRole).map((role) => (
           <div
             key={role}
             className="rounded-xl border p-4"
