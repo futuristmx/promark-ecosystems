@@ -223,34 +223,56 @@ export function AlertsView({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="alerts">
+        <TabsContent value="alerts" className="space-y-4">
+          {/* Barra de filtros — separada de la card de contenido para evitar
+             cambios de layout y mejorar legibilidad. */}
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-5 py-3"
+            style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+          >
+            <div>
+              <p
+                className="text-[10px] font-semibold uppercase tracking-[0.1em]"
+                style={{ color: '#355B6F' }}
+              >
+                Filtros
+              </p>
+              <p className="mt-0.5 text-sm font-semibold" style={{ color: '#0F2E3D' }}>
+                {filter === 'PENDING' && 'Pendientes'}
+                {filter === 'DISMISSED' && 'Descartadas'}
+                {filter === 'RESOLVED' && 'Resueltas'}
+                {filter === 'ALL' && 'Todas las alertas'}
+                <span className="ml-2 text-xs font-normal" style={{ color: '#355B6F' }}>
+                  ({filtered.length})
+                </span>
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {(['PENDING', 'DISMISSED', 'RESOLVED', 'ALL'] as const).map((s) => {
+                const labels: Record<typeof s, string> = {
+                  PENDING: 'Pendientes',
+                  DISMISSED: 'Descartadas',
+                  RESOLVED: 'Resueltas',
+                  ALL: 'Todas',
+                };
+                return (
+                  <Button
+                    key={s}
+                    size="sm"
+                    variant={filter === s ? 'default' : 'outline'}
+                    onClick={() => setFilter(s)}
+                  >
+                    {labels[s]}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Card con el listado — sin header propio para que el contenido
+             arranque siempre en la misma posición. min-h estable. */}
           <Card>
-            <CardHeader className="border-b">
-              <div className="flex items-center justify-between">
-                <CardTitle>Alertas</CardTitle>
-                <div className="flex gap-1">
-                  {(['PENDING', 'DISMISSED', 'RESOLVED', 'ALL'] as const).map((s) => {
-                    const labels: Record<typeof s, string> = {
-                      PENDING: 'Pendientes',
-                      DISMISSED: 'Descartadas',
-                      RESOLVED: 'Resueltas',
-                      ALL: 'Todas',
-                    };
-                    return (
-                      <Button
-                        key={s}
-                        size="sm"
-                        variant={filter === s ? 'default' : 'outline'}
-                        onClick={() => setFilter(s)}
-                      >
-                        {labels[s]}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="min-h-[200px]">
               {filtered.length === 0 ? (
                 <div className="py-12 text-center">
                   <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-emerald-500" />
