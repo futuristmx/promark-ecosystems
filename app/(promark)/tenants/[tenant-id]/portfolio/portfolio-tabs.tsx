@@ -3,7 +3,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Tag, Users, Scroll, KeyRound } from 'lucide-react';
+import {
+  Plus, Tag, Users, Scroll, KeyRound,
+  CheckSquare, Square, GripHorizontal, Building2, Network, User as UserIcon, X,
+} from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
@@ -22,6 +25,7 @@ import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
 } from '@/components/ui/table';
 import { PortfolioCsvBar } from './portfolio-csv-bar';
+import { ReassignSheet, type ReassignTargetType } from './reassign-sheet';
 import {
   SmartFilterBar,
   buildOptions,
@@ -141,6 +145,59 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
       { key: 'vigency', label: 'Vigencia', options: buildOptions(brands, (b) => vigencyBucket(b.expiration_date), VIGENCY_LABELS) },
     ],
     [brands],
+  );
+
+  /* ── Brands selection + reassign ── */
+  const canManagePortfolio = userRole === 'SUPERADMIN' || userRole === 'LAWYER';
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedBrandIds, setSelectedBrandIds] = useState<Set<string>>(new Set());
+  const [reassignOpen, setReassignOpen] = useState(false);
+  const [reassignInitialTab, setReassignInitialTab] = useState<ReassignTargetType>('company');
+
+  const clearSelection = useCallback(() => {
+    setSelectedBrandIds(new Set());
+  }, []);
+
+  const toggleBrandSelected = useCallback((id: string) => {
+    setSelectedBrandIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const openReassignWith = useCallback(
+    (tab: ReassignTargetType) => {
+      setReassignInitialTab(tab);
+      setReassignOpen(true);
+    },
+    [],
+  );
+
+  // When selection mode toggles off, clear selections.
+  useEffect(() => {
+    if (!selectionMode) clearSelection();
+  }, [selectionMode, clearSelection]);
+
+  const onBrandDragStart = useCallback(
+    (e: React.DragEvent<HTMLDivElement>, brandId: string) => {
+      let idsToDrag: string[];
+      if (selectedBrandIds.has(brandId)) {
+        idsToDrag = Array.from(selectedBrandIds);
+      } else {
+        idsToDrag = [brandId];
+        setSelectedBrandIds(new Set([brandId]));
+      }
+      try {
+        e.dataTransfer.setData('application/x-promark-brand-ids', JSON.stringify(idsToDrag));
+        e.dataTransfer.effectAllowed = 'move';
+      } catch {
+        // Ignore — some browsers restrict custom mime types.
+      }
+      setReassignOpen(true);
+    },
+    [selectedBrandIds],
   );
 
   /* ── Holders ── */
@@ -299,6 +356,22 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
           totalUnfiltered={brands.length}
           rightSlot={
             <div className="flex items-center gap-2">
+              {canManagePortfolio && (
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode((v) => !v)}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+                  style={
+                    selectionMode
+                      ? { background: '#D39A2B', color: '#fff' }
+                      : { background: '#F1EDE3', color: '#355B6F' }
+                  }
+                  aria-pressed={selectionMode}
+                >
+                  {selectionMode ? <CheckSquare className="size-3.5" /> : <Square className="size-3.5" />}
+                  Selección múltiple
+                </button>
+              )}
               <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: '#F1EDE3' }}>
                 <button type="button" onClick={() => setBrandsView('table')}
                   className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
@@ -320,6 +393,21 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </div>
           }
         />
+        {selectionMode && (
+          <div
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
+            style={{
+              background: 'rgba(211,154,43,0.10)',
+              border: '1px solid rgba(211,154,43,0.35)',
+              color: '#0F2E3D',
+            }}
+          >
+            <span style={{ fontSize: 14 }}>💡</span>
+            <span>
+              Arrastra marcas hacia el panel lateral para reasignarlas a Holding, Empresa o Titular.
+            </span>
+          </div>
+        )}
         <div
           className="overflow-hidden rounded-2xl border"
           style={{
@@ -338,39 +426,67 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
               description={brands.length === 0 ? 'Registra la primera marca.' : 'Ajusta la búsqueda.'} />
           ) : brandsView === 'cards' ? (
             <div className="grid grid-cols-2 gap-4 xl:grid-cols-4 p-4">
-              {filteredBrands.map((b) => (
-                <div
-                  key={b.id}
-                  onClick={() => router.push(`/tenants/${tenantId}/brands/${b.id}`)}
-                  className="cursor-pointer rounded-2xl border p-4 transition-all"
-                  style={{
-                    borderColor: '#E2DED6',
-                    background: '#FBF6EC',
-                    backgroundImage: 'none',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(15,46,61,0.10)';
-                    e.currentTarget.style.borderColor = '#D39A2B';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = '#E2DED6';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
-                    <VigencyDot expirationDate={b.expiration_date} legalStatus={b.legal_status} />
+              {filteredBrands.map((b) => {
+                const isSelected = selectedBrandIds.has(b.id);
+                const baseBorder = isSelected ? '#D39A2B' : '#E2DED6';
+                const baseBg = isSelected ? 'rgba(211,154,43,0.06)' : '#FBF6EC';
+                return (
+                  <div
+                    key={b.id}
+                    draggable={selectionMode}
+                    onDragStart={
+                      selectionMode ? (e) => onBrandDragStart(e, b.id) : undefined
+                    }
+                    onClick={(e) => {
+                      if (selectionMode) {
+                        e.preventDefault();
+                        toggleBrandSelected(b.id);
+                      } else {
+                        router.push(`/tenants/${tenantId}/brands/${b.id}`);
+                      }
+                    }}
+                    className="relative cursor-pointer rounded-2xl p-4 transition-all"
+                    style={{
+                      border: isSelected ? '1.5px solid #D39A2B' : '1px solid #E2DED6',
+                      background: baseBg,
+                      backgroundImage: 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(15,46,61,0.10)';
+                      e.currentTarget.style.borderColor = '#D39A2B';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = baseBorder;
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    {selectionMode && (
+                      <div
+                        className="absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-md"
+                        style={{
+                          background: isSelected ? '#D39A2B' : '#fff',
+                          border: `1.5px solid ${isSelected ? '#D39A2B' : '#C8C4B9'}`,
+                          color: '#fff',
+                        }}
+                      >
+                        {isSelected ? <CheckSquare className="h-3 w-3" /> : null}
+                      </div>
+                    )}
+                    <div className="mb-3 flex items-center justify-between">
+                      <BrandLogoThumb logos={b.logos} brandType={b.brand_type} />
+                      <VigencyDot expirationDate={b.expiration_date} legalStatus={b.legal_status} />
+                    </div>
+                    <p className="text-sm font-bold truncate" style={{ color: '#0F2E3D' }}>{b.name}</p>
+                    <p className="text-xs font-medium truncate" style={{ color: '#355B6F' }}>{b.company.name}</p>
+                    <div className="mt-2">
+                      <StatusBadge tone={BRAND_STATUS_TONE[b.legal_status] ?? 'muted'}
+                        label={BRAND_STATUS_LABELS[b.legal_status] ?? b.legal_status} />
+                    </div>
                   </div>
-                  <p className="text-sm font-bold truncate" style={{ color: '#0F2E3D' }}>{b.name}</p>
-                  <p className="text-xs font-medium truncate" style={{ color: '#355B6F' }}>{b.company.name}</p>
-                  <div className="mt-2">
-                    <StatusBadge tone={BRAND_STATUS_TONE[b.legal_status] ?? 'muted'}
-                      label={BRAND_STATUS_LABELS[b.legal_status] ?? b.legal_status} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -584,6 +700,89 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
         </div>
       </TabsContent>
     </Tabs>
+
+    {selectionMode && selectedBrandIds.size > 0 && (
+      <div
+        role="toolbar"
+        aria-label="Acciones de selección"
+        style={{
+          position: 'fixed',
+          bottom: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 55,
+          padding: '8px 12px 12px',
+          minWidth: 480,
+          borderRadius: 18,
+          background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
+          boxShadow: '0 16px 40px rgba(15,46,61,0.32)',
+          color: '#fff',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <div className="flex flex-col items-center">
+          <GripHorizontal className="h-3.5 w-3.5 opacity-50 mb-1.5" aria-hidden />
+          <div className="flex w-full items-center gap-3">
+            <div
+              className="rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wider"
+              style={{ background: 'rgba(211,154,43,0.18)', color: '#FBF6EC' }}
+            >
+              {selectedBrandIds.size} marca{selectedBrandIds.size === 1 ? '' : 's'} seleccionada{selectedBrandIds.size === 1 ? '' : 's'}
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => openReassignWith('company')}
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
+              >
+                <Building2 className="h-3.5 w-3.5" /> Mover a Empresa…
+              </button>
+              <button
+                type="button"
+                onClick={() => openReassignWith('holding')}
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
+              >
+                <Network className="h-3.5 w-3.5" /> Mover a Holding…
+              </button>
+              <button
+                type="button"
+                onClick={() => openReassignWith('holder')}
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                style={{ background: '#D39A2B', color: '#0F2E3D' }}
+              >
+                <UserIcon className="h-3.5 w-3.5" /> Mover a Titular…
+              </button>
+              <button
+                type="button"
+                onClick={clearSelection}
+                className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
+                style={{ background: 'transparent', color: 'rgba(255,255,255,0.7)' }}
+                aria-label="Cancelar selección"
+              >
+                <X className="h-3.5 w-3.5" /> Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {canManagePortfolio && (
+      <ReassignSheet
+        tenantId={tenantId}
+        open={reassignOpen}
+        onClose={() => setReassignOpen(false)}
+        selectedBrandIds={Array.from(selectedBrandIds)}
+        initialTab={reassignInitialTab}
+        onAssigned={() => {
+          clearSelection();
+          fetchBrands();
+          router.refresh();
+        }}
+      />
+    )}
     </div>
   );
 }
