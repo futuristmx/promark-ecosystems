@@ -79,23 +79,24 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
         </HelpTip>
       </div>
 
-      {/* Contexto: a quién llegan estas alertas hoy */}
+      {/* Contexto: a quién llegan estas alertas hoy. Tono azul hielo
+        sutil para diferenciarse de los cards marfil/hueso del resto. */}
       <div
         className="mt-6 rounded-2xl border p-5"
         style={{
-          borderColor: '#E2DED6',
-          background: 'linear-gradient(135deg, #F1EDE3 0%, #FBF6EC 100%)',
+          borderColor: 'rgba(143,182,199,0.45)',
+          background: 'linear-gradient(135deg, #DDEAF2 0%, #EFF4F8 100%)',
         }}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <p
               className="text-[10px] font-semibold uppercase tracking-wider"
-              style={{ color: '#355B6F' }}
+              style={{ color: '#1C3F55' }}
             >
               ¿Quién ve estas alertas?
             </p>
-            <p className="mt-1 text-sm" style={{ color: '#1A1E23' }}>
+            <p className="mt-1 text-sm" style={{ color: '#0F2E3D' }}>
               Las reglas de abajo <strong>siempre</strong> generan alertas en la
               base de datos del staff Promark. La distribución externa depende
               de la configuración del cliente.
@@ -104,7 +105,7 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
               {/* Email interno */}
               <div
                 className="flex items-start gap-3 rounded-xl border p-3"
-                style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                style={{ borderColor: 'rgba(143,182,199,0.35)', background: 'rgba(255,255,255,0.55)' }}
               >
                 <span
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
@@ -136,7 +137,7 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
               {/* Portal cliente */}
               <div
                 className="flex items-start gap-3 rounded-xl border p-3"
-                style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                style={{ borderColor: 'rgba(143,182,199,0.35)', background: 'rgba(255,255,255,0.55)' }}
               >
                 <span
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
@@ -167,9 +168,9 @@ export default async function AlertsPage({ params }: AlertsPageProps) {
             href={`/tenants/${tenantId}/configuracion?tab=notifications`}
             className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors"
             style={{
-              borderColor: '#E2DED6',
+              borderColor: 'rgba(143,182,199,0.5)',
               color: '#0F2E3D',
-              background: '#FBF6EC',
+              background: 'rgba(255,255,255,0.55)',
             }}
           >
             <Settings className="size-3.5" />
