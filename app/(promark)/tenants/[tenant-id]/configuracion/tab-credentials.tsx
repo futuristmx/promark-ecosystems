@@ -305,11 +305,13 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
         )}
       </div>
 
-      {/* Info panel — Editable Roles & Permisos */}
+      {/* Info panel — Editable Roles & Permisos, filtrado al rol del
+        usuario seleccionado para no mostrar las 3 secciones a la vez. */}
       <div className="lg:col-span-2">
         <RolesPermissionsEditor
           tenantId={tenantId}
           initialOverrides={roleOverrides}
+          focusedRole={selectedUser?.role ?? null}
         />
       </div>
     </div>
