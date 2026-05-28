@@ -695,6 +695,23 @@ model PromarkRoleConfig {
   @@map("promark_role_configs")
 }
 
+// Configuración de tarifas/conceptos facturables a nivel Promark.
+// Tabla key-value editable desde el módulo financiero.
+model PromarkBillingConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  description String?
+  amount      Decimal  @default(0) @db.Decimal(12, 2)
+  currency    String   @default("MXN")
+  category    String   @default("OPERATIVO") // OPERATIVO | RECURRENTE | EVENTUAL
+  order       Int      @default(0)
+  updated_at  DateTime @updatedAt
+  created_at  DateTime @default(now())
+
+  @@map("promark_billing_configs")
+}
+
 model PermissionOverride {
   id         String           @id @default(cuid())
   user_id    String
