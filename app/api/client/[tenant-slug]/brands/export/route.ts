@@ -32,9 +32,15 @@ export async function GET(
 
   const tenant = await prisma.tenant.findUnique({
     where: { slug: tenantSlug },
-    select: { id: true, name: true },
+    select: { id: true, name: true, config: true },
   });
   if (!tenant) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
+
+  const cfg = tenant.config as {
+    branding?: { logo_url?: string | null; primary_color?: string | null };
+  } | null;
+  const tenantLogoDataUrl = cfg?.branding?.logo_url ?? null;
+  const tenantPrimaryColor = cfg?.branding?.primary_color ?? undefined;
 
   // Filtros opcionales (?status=, ?type=, ?class=, ?company=)
   const where: Prisma.BrandWhereInput = { tenant_id: tenant.id };
@@ -133,16 +139,18 @@ export async function GET(
   // PDF
   const buffer = await buildPdfBuffer({
     title: 'Catálogo de Marcas',
-    subtitle: `${rows.length} marcas registradas`,
+    subtitle: 'Portafolio Marcario',
     tenantName: tenant.name,
+    tenantLogoDataUrl,
+    tenantPrimaryColor,
     columns: [
-      { header: 'Marca', key: 'name', width: 100 },
+      { header: 'Marca', key: 'name', width: 110 },
       { header: 'Empresa', key: 'company', width: 130 },
-      { header: 'Estado', key: 'status', width: 70 },
-      { header: 'Tipo', key: 'type', width: 60 },
-      { header: 'No. Registro', key: 'registration_number', width: 80 },
-      { header: 'Clases', key: 'classes', width: 60 },
-      { header: 'Expiración', key: 'expiration_date', width: 80 },
+      { header: 'Estado', key: 'status', width: 80 },
+      { header: 'Tipo', key: 'type', width: 90 },
+      { header: 'No. Registro', key: 'registration_number', width: 90 },
+      { header: 'Clases IMPI', key: 'classes', width: 70 },
+      { header: 'Expiración', key: 'expiration_date', width: 90 },
     ],
     rows,
   });
