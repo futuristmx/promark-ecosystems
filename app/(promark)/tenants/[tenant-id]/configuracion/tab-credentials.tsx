@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck, User, Copy, Check } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck, User, Copy, Check, UserPlus, Pencil, Trash2 } from 'lucide-react';
 import { HelpTip } from '@/components/ds';
 import { RolesPermissionsEditor, type RoleOverrides } from './roles-permissions-editor';
+import { UserFormModal, type ClientUserDraft } from './user-form-modal';
 
 interface ClientUser {
   id: string;
@@ -61,6 +63,7 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
     CLIENT_VIEWER: roleOverrides.CLIENT_VIEWER?.label || ROLE_LABEL_DEFAULT.CLIENT_VIEWER,
     CLIENT_LEGAL_REP: roleOverrides.CLIENT_LEGAL_REP?.label || ROLE_LABEL_DEFAULT.CLIENT_LEGAL_REP,
   };
+  const router = useRouter();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(
     clientUsers.find((u) => u.role === 'CLIENT_ADMIN')?.id ?? clientUsers[0]?.id ?? null,
   );
@@ -68,6 +71,29 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
   const [show, setShow] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [modal, setModal] = useState<{ mode: 'create' | 'edit'; initial?: ClientUserDraft } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function handleDelete(userId: string, userName: string) {
+    if (!confirm(`¿Eliminar a "${userName}" del portal? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+    setDeletingId(userId);
+    try {
+      const res = await fetch(`/api/tenants/${tenantId}/users/${userId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage({ type: 'error', text: data.error ?? 'Error al eliminar.' });
+      } else {
+        setMessage({ type: 'success', text: 'Usuario eliminado.' });
+        router.refresh();
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Error de conexión.' });
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const selectedUser = clientUsers.find((u) => u.id === selectedUserId);
 
@@ -116,8 +142,21 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
             </h3>
             <HelpTip>
               Cada usuario tiene un ID de tarjeta (login) y un PIN (contraseña).
-              Para resetear el PIN selecciona el usuario aquí abajo.
+              Selecciona uno para resetear su PIN, o usa los iconos para editar/eliminar.
             </HelpTip>
+            <button
+              type="button"
+              onClick={() => setModal({ mode: 'create' })}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
+              style={{
+                background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
+                color: '#FBF6EC',
+                boxShadow: '0 2px 6px rgba(15,46,61,0.18)',
+              }}
+            >
+              <UserPlus className="size-3.5" />
+              Nuevo usuario
+            </button>
           </div>
           <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
             Selecciona un usuario para administrar su acceso.
@@ -182,6 +221,75 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
                         style={{ background: status.bg, color: status.color }}
                       >
                         {status.text}
+                      </span>
+                    </div>
+                    <div className="ml-1 flex shrink-0 items-center gap-0.5">
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModal({
+                            mode: 'edit',
+                            initial: {
+                              id: user.id,
+                              full_name: user.full_name,
+                              email: user.email,
+                              role: user.role as ClientUserDraft['role'],
+                              status: user.status as ClientUserDraft['status'],
+                              card_id: user.card_id,
+                            },
+                          });
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setModal({
+                              mode: 'edit',
+                              initial: {
+                                id: user.id,
+                                full_name: user.full_name,
+                                email: user.email,
+                                role: user.role as ClientUserDraft['role'],
+                                status: user.status as ClientUserDraft['status'],
+                                card_id: user.card_id,
+                              },
+                            });
+                          }
+                        }}
+                        className="cursor-pointer rounded-md p-1.5 transition-colors hover:bg-black/5"
+                        style={{ color: '#355B6F' }}
+                        title="Editar usuario"
+                      >
+                        <Pencil className="size-3.5" />
+                      </span>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(user.id, user.full_name);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDelete(user.id, user.full_name);
+                          }
+                        }}
+                        className="cursor-pointer rounded-md p-1.5 transition-colors hover:bg-black/5"
+                        style={{
+                          color: deletingId === user.id ? '#C8C4B9' : '#B42318',
+                          pointerEvents: deletingId === user.id ? 'none' : 'auto',
+                        }}
+                        title="Eliminar usuario"
+                      >
+                        {deletingId === user.id ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-3.5" />
+                        )}
                       </span>
                     </div>
                   </button>
@@ -314,6 +422,23 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
           focusedRole={selectedUser?.role ?? null}
         />
       </div>
+
+      {modal && (
+        <UserFormModal
+          tenantId={tenantId}
+          mode={modal.mode}
+          initial={modal.initial}
+          roleLabels={ROLE_LABEL}
+          onClose={() => setModal(null)}
+          onSaved={() => {
+            router.refresh();
+            setMessage({
+              type: 'success',
+              text: modal.mode === 'create' ? 'Usuario creado.' : 'Usuario actualizado.',
+            });
+          }}
+        />
+      )}
     </div>
   );
 }
