@@ -95,11 +95,9 @@ interface CuboidProps {
 }
 
 function Cuboid({ x, y, width, height, depth, base, stroke, opacity = 1 }: CuboidProps) {
-  // Cara frontal: rectángulo (x, y-height) .. (x+width, y)
-  // Cara superior: paralelogramo
-  // Cara derecha: paralelogramo
+  // Outline-only style: caras translúcidas con stroke del color base.
   const dx = depth;
-  const dy = -depth * 0.55; // ángulo isométrico suave
+  const dy = -depth * 0.55;
 
   const top = [
     [x, y - height],
@@ -123,14 +121,12 @@ function Cuboid({ x, y, width, height, depth, base, stroke, opacity = 1 }: Cuboi
   const toPath = (pts: number[][]) =>
     pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(' ') + ' Z';
 
-  const topColor = shadeColor(base, 20);
-  const rightColor = shadeColor(base, -25);
-
+  // Outline: stroke=base color, fill muy sutil con base color para diferenciar caras.
   return (
     <g opacity={opacity}>
-      <path d={toPath(top)} fill={topColor} stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" />
-      <path d={toPath(right)} fill={rightColor} stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" />
-      <path d={toPath(front)} fill={base} stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" />
+      <path d={toPath(top)} fill={base} fillOpacity={0.06} stroke={stroke} strokeWidth={2} strokeLinejoin="round" />
+      <path d={toPath(right)} fill={base} fillOpacity={0.12} stroke={stroke} strokeWidth={2} strokeLinejoin="round" />
+      <path d={toPath(front)} fill={base} fillOpacity={0.04} stroke={stroke} strokeWidth={2} strokeLinejoin="round" />
     </g>
   );
 }
@@ -151,7 +147,8 @@ export function MonolithicStructure({
   brandsByStatus,
 }: MonolithicStructureProps) {
   const base = primaryColor || '#0F2E3D';
-  const stroke = useMemo(() => shadeColor(base, -40), [base]);
+  const stroke = base;
+  void useMemo;
 
   // Layout: tres niveles apilados, centrados horizontalmente.
   // Base block (más ancho) → middle (companies) → top (holding, más angosto).
@@ -202,77 +199,58 @@ export function MonolithicStructure({
       <svg
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         xmlns="http://www.w3.org/2000/svg"
-        className="block h-auto w-full max-w-[720px]"
+        className="block h-auto w-full"
         role="img"
         aria-label={`Estructura monolítica de ${holding.name}`}
       >
-        {/* Fondo sutil — radial cálido marfil */}
-        <defs>
-          <radialGradient id="mono-bg" cx="35%" cy="40%" r="75%">
-            <stop offset="0%" stopColor="#FBF6EC" stopOpacity="1" />
-            <stop offset="100%" stopColor="#F1EDE3" stopOpacity="1" />
-          </radialGradient>
-          <filter id="mono-shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor={stroke} floodOpacity="0.18" />
-          </filter>
-        </defs>
-
-        <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#mono-bg)" rx="20" />
-
-        {/* Suelo isométrico — sombra suave bajo el bloque base */}
+        {/* Suelo isométrico — sombra muy sutil */}
         <ellipse
           cx={centerX + depth * 0.4}
-          cy={bottomY + 22}
-          rx={bottomW * 0.62}
-          ry={14}
-          fill={shadeColor(base, -50)}
-          opacity={0.12}
+          cy={bottomY + 18}
+          rx={bottomW * 0.55}
+          ry={10}
+          fill={base}
+          opacity={0.08}
         />
 
         {/* Bloque inferior — Titulares + Marcas */}
-        <g filter="url(#mono-shadow)">
-          <Cuboid
-            x={bottomX}
-            y={bottomY}
-            width={bottomW}
-            height={bottomH}
-            depth={depth}
-            base={shadeColor(base, -8)}
-            stroke={stroke}
-          />
-        </g>
+        <Cuboid
+          x={bottomX}
+          y={bottomY}
+          width={bottomW}
+          height={bottomH}
+          depth={depth}
+          base={base}
+          stroke={stroke}
+        />
 
         {/* Bloque medio — Empresas (sub-cuboides) */}
-        <g filter="url(#mono-shadow)">
-          {Array.from({ length: numCompanies }).map((_, i) => {
-            const sx = middleX + i * (subW + subGap);
-            return (
-              <Cuboid
-                key={i}
-                x={sx}
-                y={middleY}
-                width={subW}
-                height={middleH}
-                depth={depth}
-                base={base}
-                stroke={stroke}
-              />
-            );
-          })}
-        </g>
+        {Array.from({ length: numCompanies }).map((_, i) => {
+          const sx = middleX + i * (subW + subGap);
+          return (
+            <Cuboid
+              key={i}
+              x={sx}
+              y={middleY}
+              width={subW}
+              height={middleH}
+              depth={depth}
+              base={base}
+              stroke={stroke}
+            />
+          );
+        })}
 
         {/* Bloque superior — Holding */}
-        <g filter="url(#mono-shadow)">
-          <Cuboid
-            x={topX}
-            y={topY}
-            width={topW}
-            height={topH}
-            depth={depth}
-            base={shadeColor(base, 10)}
-            stroke={stroke}
-          />
-        </g>
+        <Cuboid
+          x={topX}
+          y={topY}
+          width={topW}
+          height={topH}
+          depth={depth}
+          base={base}
+          stroke={stroke}
+        />
 
         {/* Líneas guía + numeración + labels */}
         <g

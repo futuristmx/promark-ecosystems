@@ -381,16 +381,17 @@ export function PortfolioSankey({
 
         {tooltip && (
           <div
-            className="pointer-events-none absolute z-10 rounded-md px-3 py-1.5 text-xs font-medium shadow-lg"
+            className="pointer-events-none absolute z-10 rounded-md px-3 py-1.5 text-xs font-medium shadow-lg whitespace-nowrap"
             style={{
-              left: tooltip.x + 12,
-              top: tooltip.y + 12,
+              left: Math.min(tooltip.x + 12, 760),
+              top: Math.max(tooltip.y - 40, 8),
               background: '#0B1F2A',
               color: '#FBF6EC',
               fontFamily: 'var(--font-manrope, Manrope, sans-serif)',
+              maxWidth: 260,
             }}
           >
-            <div>{tooltip.label}</div>
+            <div className="truncate">{tooltip.label}</div>
             <div style={{ color: '#8FB6C7' }}>{tooltip.value.toLocaleString('es-MX')} marca(s)</div>
           </div>
         )}

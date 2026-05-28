@@ -17,9 +17,11 @@ export default async function TenantPanelPage({ params }: PanelPageProps) {
 
   const tenant = await prisma.tenant.findUnique({
     where: { id: tenantId },
-    select: { id: true, name: true },
+    select: { id: true, name: true, config: true },
   });
   if (!tenant) notFound();
+  const cfg = (tenant.config ?? {}) as { branding?: { primary_color?: string } };
+  const primaryColor = cfg.branding?.primary_color ?? '#0F2E3D';
 
   const [aggregates, graph, holdings] = await Promise.all([
     computeTenantAggregates({
@@ -80,6 +82,7 @@ export default async function TenantPanelPage({ params }: PanelPageProps) {
         aggregates={aggregates}
         graph={graph}
         tree={treeData}
+        primaryColor={primaryColor}
       />
     </div>
   );
