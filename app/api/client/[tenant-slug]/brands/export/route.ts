@@ -16,6 +16,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ 'tenant-slug': string }> }
 ) {
+  try {
   const { 'tenant-slug': tenantSlug } = await params;
   const session = await requireClientApiAuth(request);
   if (isErrorResponse(session)) return session;
@@ -153,4 +154,9 @@ export async function GET(
       'Content-Disposition': `attachment; filename="${filenameBase}.pdf"`,
     },
   });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Error desconocido';
+    console.error('[brands/export] failed:', err);
+    return NextResponse.json({ error: `Error generando descarga: ${message}` }, { status: 500 });
+  }
 }

@@ -53,7 +53,23 @@ export function DownloadsView({
         { credentials: 'include' }
       );
       if (!res.ok) {
-        toast.error('No se pudo generar la descarga');
+        // Surfaceamos el error real del servidor para diagnosticar.
+        let detail = `status ${res.status}`;
+        try {
+          const data = await res.json();
+          if (data?.error) detail = data.error;
+        } catch {
+          /* respuesta no era JSON; quedarse con el status */
+        }
+        toast.error('No se pudo generar la descarga', detail);
+        return;
+      }
+      // El endpoint también puede devolver 200 JSON cuando no hay marcas
+      // asignadas (caso LEGAL_REP). Detecta y muestra el error.
+      const contentType = res.headers.get('content-type') ?? '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json().catch(() => ({}));
+        toast.error('Sin resultados', data.error ?? 'No hay marcas que descargar.');
         return;
       }
       const blob = await res.blob();
