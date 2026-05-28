@@ -217,7 +217,7 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverride
               style={{ background: '#FBF6EC', border: '1px solid #E2DED6' }}
             >
               <div className="flex-1">
-                <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#8FB6C7' }}>ID de tarjeta</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>ID de tarjeta</p>
                 <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm font-bold" style={{ color: '#0F2E3D' }}>
                   {selectedUser.card_id}
                   <CopyBtn text={selectedUser.card_id} />

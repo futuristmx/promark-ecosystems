@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Tag, Clock, AlertTriangle, Scroll, Bell } from 'lucide-react';
+import { Tag, Clock, AlertTriangle, Scroll, Bell, Network, Building2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { KpiCard, KpiGrid, DsCard } from '@/components/ds';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
@@ -88,6 +88,18 @@ export function TenantPanelView({
         <TabsContent value="overview" className="space-y-12 pt-6">
           <KpiGrid>
             <KpiCard
+              label="Holdings"
+              value={aggregates.totals.holdings}
+              icon={<Network className="size-4" />}
+              href={`/tenants/${tenantId}/structure`}
+            />
+            <KpiCard
+              label="Empresas"
+              value={aggregates.totals.companies}
+              icon={<Building2 className="size-4" />}
+              href={`/tenants/${tenantId}/structure`}
+            />
+            <KpiCard
               label="Total marcas"
               value={aggregates.totals.brands}
               icon={<Tag className="size-4" />}
@@ -144,7 +156,7 @@ export function TenantPanelView({
                     <details open className="group">
                       <summary className="cursor-pointer rounded px-2 py-1 text-sm font-semibold transition-colors" style={{ color: '#0F2E3D' }}>
                         Holding: {h.name}{' '}
-                        <span className="text-xs font-normal" style={{ color: '#8FB6C7' }}>
+                        <span className="text-xs font-normal" style={{ color: '#355B6F' }}>
                           ({h.companies.length} empresa
                           {h.companies.length === 1 ? '' : 's'})
                         </span>
@@ -155,7 +167,7 @@ export function TenantPanelView({
                             <details className="group">
                               <summary className="cursor-pointer rounded px-2 py-1 text-sm font-medium transition-colors" style={{ color: '#1C3F55' }}>
                                 Empresa: {c.name}{' '}
-                                <span className="text-xs font-normal" style={{ color: '#8FB6C7' }}>
+                                <span className="text-xs font-normal" style={{ color: '#355B6F' }}>
                                   ({c.brands.length} marca
                                   {c.brands.length === 1 ? '' : 's'})
                                 </span>
