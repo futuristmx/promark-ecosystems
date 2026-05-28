@@ -23,6 +23,34 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
     );
   }
 
+  // Configuración de alertas visibles al cliente (definida por SUPERADMIN
+  // en /tenants/[id]/configuracion > Notificaciones).
+  const tenantCfg = await prisma.tenant.findUnique({
+    where: { id: session.tenant_id },
+    select: { config: true },
+  });
+  const clientAlertsCfg = (tenantCfg?.config as {
+    client_alerts?: {
+      enabled?: boolean;
+      general_comment?: string;
+      types?: Record<string, { visible?: boolean; trigger_days?: number; comment?: string }>;
+    };
+  } | null)?.client_alerts ?? null;
+
+  // Master OFF → no se muestra ninguna alerta
+  if (clientAlertsCfg && clientAlertsCfg.enabled === false) {
+    return (
+      <div className="px-8 py-16 text-center">
+        <p className="text-sm font-medium" style={{ color: '#0F2E3D' }}>
+          Las alertas no están habilitadas en tu portal.
+        </p>
+        <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
+          Si necesitas activar este módulo, contacta a Promark.
+        </p>
+      </div>
+    );
+  }
+
   // Build query: LEGAL_REP only sees alerts for brands they're assigned to
   const where: Prisma.AlertWhereInput = {
     tenant_id: session.tenant_id,
@@ -50,11 +78,27 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
     }
   }
 
-  const alerts = await prisma.alert.findMany({
+  const allAlerts = await prisma.alert.findMany({
     where,
     orderBy: [{ status: 'asc' }, { expiry_date: 'asc' }],
     take: 100,
   });
+
+  // Filtrar por tipos visibles según config; si no hay config aún, deja
+  // pasar todo (comportamiento previo). Si hay types definidos, sólo dejan
+  // pasar los que tienen visible !== false.
+  const typeCfg = clientAlertsCfg?.types ?? {};
+  const hasTypeCfg = Object.keys(typeCfg).length > 0;
+  const alerts = hasTypeCfg
+    ? allAlerts.filter((a) => {
+        const key = `${a.entity_type}.${a.alert_type}`;
+        const t = typeCfg[key];
+        return t?.visible !== false;
+      })
+    : allAlerts;
+
+  // Comentario por tipo, embebido en cada alerta para que el view lo muestre.
+  const generalComment = clientAlertsCfg?.general_comment?.trim() || null;
 
   return (
     <div className="px-8 py-8">
@@ -74,12 +118,26 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
         />
       </div>
 
+      {generalComment && (
+        <div
+          className="mb-6 rounded-xl border px-4 py-3 text-sm"
+          style={{
+            borderColor: 'rgba(211,154,43,0.3)',
+            background: 'rgba(211,154,43,0.06)',
+            color: '#0F2E3D',
+          }}
+        >
+          {generalComment}
+        </div>
+      )}
+
       <ClientAlertsView
         tenantId={session.tenant_id}
         alerts={alerts.map((a: Alert) => ({
           ...a,
           expiry_date: a.expiry_date.toISOString(),
           created_at: a.created_at.toISOString(),
+          comment: typeCfg[`${a.entity_type}.${a.alert_type}`]?.comment ?? null,
         }))}
       />
     </div>
