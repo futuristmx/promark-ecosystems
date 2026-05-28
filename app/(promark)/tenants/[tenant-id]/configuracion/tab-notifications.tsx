@@ -14,6 +14,7 @@ interface Props {
   initialNotifications: {
     notify_email: string;
     expiry_alert_days: number;
+    email_alerts_enabled: boolean;
   };
   initialClientAlerts: ClientAlertsConfig;
 }
@@ -38,8 +39,13 @@ export function NotificationsTab({ tenantId, initialNotifications, initialClient
         body: JSON.stringify({
           config: {
             notifications: {
-              notify_email: notifications.notify_email || null,
+              // Si el toggle está apagado, nunca enviamos email — guardamos null
+              // explícito para evitar fugas si quedó un mail en el state local.
+              notify_email: notifications.email_alerts_enabled
+                ? (notifications.notify_email || null)
+                : null,
               expiry_alert_days: notifications.expiry_alert_days,
+              email_alerts_enabled: notifications.email_alerts_enabled,
             },
             client_alerts: clientAlerts,
           },
@@ -86,34 +92,88 @@ export function NotificationsTab({ tenantId, initialNotifications, initialClient
             onChange={setClientAlerts}
           />
 
-          {/* Email destinatario interno (a Promark, NO al cliente) */}
+          {/* Email destinatario interno (a Promark, NO al cliente).
+            Apagado por defecto por seguridad — el SUPERADMIN debe encender
+            explícitamente el envío y registrar el destinatario. */}
           <div
             className="rounded-2xl border p-6"
             style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
           >
-            <div className="flex items-center gap-2">
-              <Mail className="size-4" style={{ color: '#0F2E3D' }} />
-              <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
-                Email destinatario de alertas
-              </h3>
-              <HelpTip>
-                Recibe los correos internos de vencimiento generados por el
-                sistema (lado Promark). Independiente de las alertas mostradas
-                al cliente en su portal.
-              </HelpTip>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  style={{
+                    background: notifications.email_alerts_enabled
+                      ? 'rgba(47,107,79,0.1)'
+                      : 'rgba(200,196,185,0.3)',
+                    color: notifications.email_alerts_enabled ? '#2F6B4F' : '#C8C4B9',
+                  }}
+                >
+                  <Mail className="size-4" />
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
+                      Email destinatario de alertas
+                    </h3>
+                    <HelpTip>
+                      Por defecto apagado por seguridad. Enciende solo si
+                      quieres que Promark reciba correos de las alertas
+                      generadas. Independiente de las alertas mostradas en el
+                      portal del cliente.
+                    </HelpTip>
+                  </div>
+                  <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
+                    {notifications.email_alerts_enabled
+                      ? 'Las alertas se enviarán a la dirección configurada.'
+                      : 'Sin envío de correos. Las alertas solo viven en la base de datos.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={notifications.email_alerts_enabled}
+                aria-label="Activar envío de alertas por email"
+                onClick={() =>
+                  setNotifications({
+                    ...notifications,
+                    email_alerts_enabled: !notifications.email_alerts_enabled,
+                  })
+                }
+                className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus:outline-none"
+                style={{
+                  background: notifications.email_alerts_enabled ? '#2F6B4F' : '#C8C4B9',
+                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.08)',
+                }}
+              >
+                <span
+                  className="inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform"
+                  style={{
+                    transform: notifications.email_alerts_enabled
+                      ? 'translateX(22px)'
+                      : 'translateX(2px)',
+                  }}
+                />
+              </button>
             </div>
-            <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
-              Las alertas de vencimiento se envían a esta dirección. Si está vacío, las alertas
-              se crean en la base de datos pero no se envían por email.
-            </p>
-            <input
-              type="email"
-              value={notifications.notify_email}
-              onChange={(e) => setNotifications({ ...notifications, notify_email: e.target.value })}
-              placeholder="legal@tucliente.com"
-              className="mt-4 w-full rounded-xl border px-4 py-3 text-sm transition-all focus:outline-none"
-              style={{ background: '#FBF6EC', borderColor: '#E2DED6', color: '#1A1E23' }}
-            />
+
+            {notifications.email_alerts_enabled && (
+              <div className="mt-4">
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
+                  Dirección de correo
+                </label>
+                <input
+                  type="email"
+                  value={notifications.notify_email}
+                  onChange={(e) => setNotifications({ ...notifications, notify_email: e.target.value })}
+                  placeholder="legal@tucliente.com"
+                  className="w-full rounded-xl border px-4 py-3 text-sm transition-all focus:outline-none"
+                  style={{ background: '#FBF6EC', borderColor: '#E2DED6', color: '#1A1E23' }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Días default de anticipación (lado interno) */}
