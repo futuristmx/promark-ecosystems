@@ -113,6 +113,7 @@ interface BrandCatalogViewProps {
   basePath: string;
   exportEndpoint: string;
   count: number;
+  availableClasses?: number[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -127,6 +128,7 @@ export function BrandCatalogView({
   basePath,
   exportEndpoint,
   count,
+  availableClasses = [],
 }: BrandCatalogViewProps) {
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
   // B4: paginación cliente-side (24 cards por página)
@@ -166,7 +168,7 @@ export function BrandCatalogView({
 
       {/* Filters + view toggle */}
       <div className="mb-6 flex items-center justify-between gap-4">
-        <BrandFilters companies={companies} basePath={basePath} />
+        <BrandFilters companies={companies} basePath={basePath} availableClasses={availableClasses} />
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -195,11 +197,12 @@ export function BrandCatalogView({
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content container — unifica criterios con el portafolio del staff:
+       *   gris arena por fuera, cards marfil cálido dentro. */}
       {brands.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16"
-          style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+          style={{ borderColor: '#C8C4B9', background: '#E2DED6' }}
         >
           <p className="text-sm" style={{ color: '#355B6F' }}>
             No se encontraron marcas con los filtros actuales.
@@ -208,10 +211,17 @@ export function BrandCatalogView({
             Cuando se registren marcas a tu nombre aparecerán aquí.
           </p>
         </div>
-      ) : viewMode === 'cards' ? (
-        <CardsView brands={paginatedBrands} basePath={basePath} />
       ) : (
-        <ListView brands={paginatedBrands} basePath={basePath} />
+        <div
+          className="overflow-hidden rounded-2xl border p-4"
+          style={{ borderColor: '#C8C4B9', background: '#E2DED6', backgroundImage: 'none' }}
+        >
+          {viewMode === 'cards' ? (
+            <CardsView brands={paginatedBrands} basePath={basePath} />
+          ) : (
+            <ListView brands={paginatedBrands} basePath={basePath} />
+          )}
+        </div>
       )}
 
       {/* B4: Paginación */}
