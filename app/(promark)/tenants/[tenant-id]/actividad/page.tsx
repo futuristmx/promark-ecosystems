@@ -129,7 +129,7 @@ export default async function ActivityPage({ params, searchParams }: Props) {
       <Link
         href={`/tenants/${tenantId}/panel`}
         className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:opacity-80"
-        style={{ color: '#8FB6C7' }}
+        style={{ color: '#355B6F' }}
       >
         <ChevronLeft className="size-4" />
         Volver al panel

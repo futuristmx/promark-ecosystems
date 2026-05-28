@@ -7,6 +7,8 @@ export interface TenantAggregates {
     expired: number;
     activeContracts: number;
     criticalAlerts: number;
+    holdings: number;
+    companies: number;
   };
   statusDistribution: Array<{ label: string; value: number; status: string }>;
   impiClasses: Array<{ class_number: number; count: number }>;
@@ -71,6 +73,8 @@ export async function computeTenantAggregates(
     expirationRows,
     recentBrandHistory,
     recentContractHistory,
+    holdingsCount,
+    companiesCount,
   ] = await Promise.all([
     prisma.brand.count({ where: brandWhere }),
     prisma.brand.count({
@@ -138,6 +142,8 @@ export async function computeTenantAggregates(
         contract: { select: { id: true, title: true } },
       },
     }),
+    prisma.holding.count({ where: { tenant_id: tenantId } }),
+    prisma.company.count({ where: { tenant_id: tenantId } }),
   ]);
 
   const statusDistribution = statusGroups.map((g) => ({
@@ -200,6 +206,8 @@ export async function computeTenantAggregates(
       expired,
       activeContracts,
       criticalAlerts,
+      holdings: holdingsCount,
+      companies: companiesCount,
     },
     statusDistribution,
     impiClasses,

@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { DocumentsPanel } from '@/components/documents-panel';
+import { BrandObservations } from '@/components/brand/brand-observations';
 import { BRAND_CLASS_STATUS_LABELS } from '@/lib/i18n/status-labels';
 
 interface BrandDetailPageProps {
@@ -254,20 +255,7 @@ export default async function BrandDetailPage({
               )}
 
               {brand.observations && (
-                <div
-                  className="mt-4 rounded-xl border p-4"
-                  style={{
-                    borderColor: 'rgba(143,182,199,0.45)',
-                    background: 'linear-gradient(135deg, #DDEAF2 0%, #EFF4F8 100%)',
-                  }}
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#1C3F55' }}>
-                    Observaciones legales
-                  </p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed" style={{ color: '#0F2E3D' }}>
-                    {brand.observations}
-                  </p>
-                </div>
+                <BrandObservations text={brand.observations} />
               )}
             </CardContent>
           </Card>

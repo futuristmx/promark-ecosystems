@@ -272,7 +272,7 @@ function CardsView({ tenants, isSuperAdmin, selectedIds, onToggle, onDelete }: C
                   >
                     {t.name}
                   </h3>
-                  <p className="truncate font-mono text-xs" style={{ color: '#8FB6C7' }}>
+                  <p className="truncate font-mono text-xs" style={{ color: '#355B6F' }}>
                     {t.slug}
                   </p>
                 </div>
@@ -432,7 +432,7 @@ function ListView({ tenants, isSuperAdmin, selectedIds, onToggle, onSelectAll, o
       header: 'Slug',
       headerTooltip: 'Identificador unico del cliente en URLs y configuraciones internas',
       cell: (t) => (
-        <span className="font-mono text-xs" style={{ color: '#8FB6C7' }}>{t.slug}</span>
+        <span className="font-mono text-xs" style={{ color: '#355B6F' }}>{t.slug}</span>
       ),
     },
     {

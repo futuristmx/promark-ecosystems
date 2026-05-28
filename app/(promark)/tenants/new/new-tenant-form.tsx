@@ -128,7 +128,7 @@ function DropZone({
               <p className="truncate text-sm font-medium" style={{ color: '#0F2E3D' }}>
                 {file?.name}
               </p>
-              <p className="text-xs" style={{ color: '#8FB6C7' }}>
+              <p className="text-xs" style={{ color: '#355B6F' }}>
                 {file ? `${(file.size / 1024).toFixed(1)} KB` : ''}
               </p>
             </div>
@@ -406,7 +406,7 @@ export function NewTenantForm() {
                 onFocus={focusRing}
                 onBlur={blurRing}
               />
-              <p className="mt-1.5 text-xs" style={{ color: '#8FB6C7' }}>
+              <p className="mt-1.5 text-xs" style={{ color: '#355B6F' }}>
                 URL: /brand-ecosystem/<strong style={{ color: '#355B6F' }}>{slug || 'auto'}</strong>/...
               </p>
             </div>
@@ -463,7 +463,7 @@ export function NewTenantForm() {
 
           {/* Live preview */}
           <div className="lg:col-span-2">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8FB6C7' }}>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#355B6F' }}>
               Vista previa
             </p>
             <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#E2DED6', boxShadow: '0 8px 30px rgba(15,46,61,0.08)' }}>
@@ -629,7 +629,7 @@ export function NewTenantForm() {
             </div>
             <div>
               <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>Configuración avanzada</h3>
-              <p className="text-xs" style={{ color: '#8FB6C7' }}>Notificaciones, módulos del portal y permisos</p>
+              <p className="text-xs" style={{ color: '#355B6F' }}>Notificaciones, módulos del portal y permisos</p>
             </div>
           </div>
           {showAdvanced ? <ChevronUp className="size-5" style={{ color: '#C8C4B9' }} /> : <ChevronDown className="size-5" style={{ color: '#C8C4B9' }} />}
