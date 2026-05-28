@@ -29,6 +29,12 @@ interface ClientUser {
   pin_generated_at: string | null;
 }
 
+interface ClientAlertsState {
+  enabled: boolean;
+  general_comment?: string;
+  types?: Record<string, { visible: boolean; trigger_days?: number; comment?: string }>;
+}
+
 interface Props {
   tenantId: string;
   tenantName: string;
@@ -37,6 +43,7 @@ interface Props {
   initialNotifications: NotificationsState;
   clientUsers: ClientUser[];
   roleOverrides: Record<string, { label?: string; permissions?: Record<string, boolean> }>;
+  initialClientAlerts: ClientAlertsState;
 }
 
 const TABS = [
@@ -76,6 +83,7 @@ export function TenantConfigTabs({
   initialNotifications,
   clientUsers,
   roleOverrides,
+  initialClientAlerts,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('branding');
 
@@ -176,6 +184,7 @@ export function TenantConfigTabs({
           <NotificationsTab
             tenantId={tenantId}
             initialNotifications={initialNotifications}
+            initialClientAlerts={initialClientAlerts}
           />
         )}
       </div>

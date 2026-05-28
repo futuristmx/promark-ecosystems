@@ -25,6 +25,11 @@ interface TenantConfig {
     label?: string;
     permissions?: Record<string, boolean>;
   }>;
+  client_alerts?: {
+    enabled?: boolean;
+    general_comment?: string;
+    types?: Record<string, { visible?: boolean; trigger_days?: number; comment?: string }>;
+  };
 }
 
 export default async function TenantConfigPage({ params }: Props) {
@@ -98,6 +103,11 @@ export default async function TenantConfigPage({ params }: Props) {
         initialNotifications={{
           notify_email: cfg.notifications?.notify_email ?? '',
           expiry_alert_days: cfg.notifications?.expiry_alert_days ?? 90,
+        }}
+        initialClientAlerts={{
+          enabled: cfg.client_alerts?.enabled ?? true,
+          general_comment: cfg.client_alerts?.general_comment ?? '',
+          types: (cfg.client_alerts?.types ?? {}) as Record<string, { visible: boolean; trigger_days?: number; comment?: string }>,
         }}
         clientUsers={clientUsers.map((u) => ({
           id: u.id,

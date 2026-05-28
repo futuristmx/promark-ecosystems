@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Clock } from 'lucide-react';
 import { HelpTip } from '@/components/ds';
+import {
+  ClientAlertsConfigEditor,
+  type ClientAlertsConfig,
+} from './client-alerts-config';
 
 interface Props {
   tenantId: string;
@@ -11,11 +15,13 @@ interface Props {
     notify_email: string;
     expiry_alert_days: number;
   };
+  initialClientAlerts: ClientAlertsConfig;
 }
 
-export function NotificationsTab({ tenantId, initialNotifications }: Props) {
+export function NotificationsTab({ tenantId, initialNotifications, initialClientAlerts }: Props) {
   const router = useRouter();
   const [notifications, setNotifications] = useState(initialNotifications);
+  const [clientAlerts, setClientAlerts] = useState<ClientAlertsConfig>(initialClientAlerts);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -35,6 +41,7 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
               notify_email: notifications.notify_email || null,
               expiry_alert_days: notifications.expiry_alert_days,
             },
+            client_alerts: clientAlerts,
           },
         }),
       });
@@ -73,7 +80,13 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
 
       <div className="grid gap-10 lg:grid-cols-5">
         <div className="space-y-8 lg:col-span-3">
-          {/* Email */}
+          {/* Visibilidad de alertas en el portal cliente */}
+          <ClientAlertsConfigEditor
+            value={clientAlerts}
+            onChange={setClientAlerts}
+          />
+
+          {/* Email destinatario interno (a Promark, NO al cliente) */}
           <div
             className="rounded-2xl border p-6"
             style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
@@ -84,9 +97,9 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
                 Email destinatario de alertas
               </h3>
               <HelpTip>
-                Recibe los correos de vencimiento generados por el sistema.
-                Puede ser el legal del cliente o un buzón compartido. Si se
-                deja vacío, las alertas quedan solo en la app.
+                Recibe los correos internos de vencimiento generados por el
+                sistema (lado Promark). Independiente de las alertas mostradas
+                al cliente en su portal.
               </HelpTip>
             </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
@@ -100,18 +113,10 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
               placeholder="legal@tucliente.com"
               className="mt-4 w-full rounded-xl border px-4 py-3 text-sm transition-all focus:outline-none"
               style={{ background: '#FBF6EC', borderColor: '#E2DED6', color: '#1A1E23' }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#D39A2B';
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(211,154,43,0.12)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E2DED6';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
             />
           </div>
 
-          {/* Days */}
+          {/* Días default de anticipación (lado interno) */}
           <div
             className="rounded-2xl border p-6"
             style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
@@ -119,16 +124,17 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
             <div className="flex items-center gap-2">
               <Clock className="size-4" style={{ color: '#0F2E3D' }} />
               <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
-                Días de anticipación
+                Días de anticipación (interno)
               </h3>
               <HelpTip>
-                Cuántos días antes del vencimiento se dispara la primera
-                alerta. Las reglas adicionales (30 d, 90 d, al vencer) se
-                configuran en la sección Alertas del cliente.
+                Días por defecto para la generación interna de alertas en
+                Promark. Los días específicos por tipo de alerta del cliente
+                se configuran arriba.
               </HelpTip>
             </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
-              Cuántos días antes del vencimiento se generan las alertas.
+              Días por defecto para alertas internas. Cada tipo de alerta
+              visible al cliente tiene su propio valor configurable arriba.
             </p>
             <div className="mt-4 flex items-center gap-3">
               <input
@@ -142,16 +148,8 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
                     expiry_alert_days: Number(e.target.value) || 90,
                   })
                 }
-                className="w-24 rounded-xl border px-4 py-3 text-sm transition-all focus:outline-none"
+                className="w-24 rounded-xl border px-4 py-3 text-sm focus:outline-none"
                 style={{ background: '#FBF6EC', borderColor: '#E2DED6', color: '#1A1E23' }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#D39A2B';
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(211,154,43,0.12)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '#E2DED6';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
               />
               <span className="text-sm" style={{ color: '#355B6F' }}>días antes del vencimiento</span>
             </div>
@@ -172,16 +170,22 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
             </h4>
             <div className="mt-4 space-y-3 text-xs leading-relaxed" style={{ color: '#355B6F' }}>
               <p>
-                El sistema revisa diariamente las fechas de vencimiento de marcas y contratos.
+                El sistema revisa diariamente las fechas de vencimiento de
+                marcas, contratos, licencias y documentos.
               </p>
               <p>
-                Cuando una marca está a{' '}
-                <strong style={{ color: '#0F2E3D' }}>{notifications.expiry_alert_days} días</strong>{' '}
-                de vencer, se crea una alerta visible en el panel del cliente.
+                <strong style={{ color: '#0F2E3D' }}>Portal cliente:</strong>{' '}
+                el cliente ve solo los tipos de alerta marcados arriba.
+                Nunca se le envía correo desde este panel.
               </p>
               <p>
-                Si hay un email configurado, además se envía una notificación
-                por correo con los detalles de la marca próxima a vencer.
+                <strong style={{ color: '#0F2E3D' }}>Lado Promark:</strong>{' '}
+                las alertas internas siempre se generan y, si hay email
+                configurado, se envían por correo a Promark.
+              </p>
+              <p>
+                Los comentarios (general y por tipo) aparecen junto a la
+                alerta cuando el cliente la ve en su portal.
               </p>
             </div>
           </div>
@@ -198,16 +202,6 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
             background: 'linear-gradient(135deg, #D39A2B 0%, #E8B84A 100%)',
             color: '#0B1F2A',
             boxShadow: '0 4px 14px rgba(211,154,43,0.3)',
-          }}
-          onMouseEnter={(e) => {
-            if (!saving) {
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(211,154,43,0.4)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = '0 4px 14px rgba(211,154,43,0.3)';
-            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           {saving ? 'Guardando…' : 'Guardar notificaciones'}

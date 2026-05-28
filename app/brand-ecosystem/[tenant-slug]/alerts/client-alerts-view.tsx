@@ -13,6 +13,8 @@ interface ClientAlert {
   alert_type: string;
   expiry_date: string;
   status: string;
+  /** Comentario configurado por Promark para este tipo de alerta. */
+  comment?: string | null;
 }
 
 interface ClientAlertsViewProps {
@@ -274,6 +276,14 @@ function UrgencySection({
                 <p className="text-xs" style={{ color: '#355B6F' }}>
                   {ALERT_ENTITY_TYPE_LABELS[alert.entity_type] ?? alert.entity_type}
                 </p>
+                {alert.comment && (
+                  <p
+                    className="mt-1.5 rounded-md px-2 py-1 text-[11px] italic"
+                    style={{ background: 'rgba(211,154,43,0.08)', color: '#7a5d18' }}
+                  >
+                    💬 {alert.comment}
+                  </p>
+                )}
               </div>
               <button
                 type="button"

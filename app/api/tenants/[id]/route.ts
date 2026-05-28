@@ -21,6 +21,11 @@ interface PatchBody {
     notifications?: NotificationsPatch;
     features?: Record<string, boolean>;
     role_overrides?: Record<string, { label?: string; permissions?: Record<string, boolean> }>;
+    client_alerts?: {
+      enabled?: boolean;
+      general_comment?: string;
+      types?: Record<string, { visible?: boolean; trigger_days?: number; comment?: string }>;
+    };
   };
   name?: string;
   slug?: string;
@@ -106,12 +111,19 @@ export async function PATCH(
     ? { ...currentRoleOverrides, ...body.config.role_overrides }
     : currentRoleOverrides;
 
+  // client_alerts: replace completo si llega (incluye enabled, general_comment, types)
+  const currentClientAlerts = (currentConfig.client_alerts ?? {}) as Record<string, unknown>;
+  const nextClientAlerts = body.config?.client_alerts
+    ? { ...currentClientAlerts, ...body.config.client_alerts }
+    : currentClientAlerts;
+
   const nextConfig = {
     ...currentConfig,
     branding: nextBranding,
     notifications: nextNotifications,
     features: nextFeatures,
     role_overrides: nextRoleOverrides,
+    client_alerts: nextClientAlerts,
   };
 
   const updated = await prisma.$transaction(async (tx) => {
