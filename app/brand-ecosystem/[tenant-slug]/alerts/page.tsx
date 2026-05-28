@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import type { Prisma, Alert } from '@prisma/client';
 import prisma from '@/lib/prisma/client';
 import { requireClientSession } from '@/lib/auth/client-session';
@@ -37,18 +38,10 @@ export default async function ClientAlertsPage({ params }: ClientAlertsPageProps
     };
   } | null)?.client_alerts ?? null;
 
-  // Master OFF → no se muestra ninguna alerta
+  // Master OFF → el módulo está oculto del sidebar. Si alguien entra por
+  // URL directa, lo mandamos al panel en silencio (sin mensaje de error).
   if (clientAlertsCfg && clientAlertsCfg.enabled === false) {
-    return (
-      <div className="px-8 py-16 text-center">
-        <p className="text-sm font-medium" style={{ color: '#0F2E3D' }}>
-          Las alertas no están habilitadas en tu portal.
-        </p>
-        <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
-          Si necesitas activar este módulo, contacta a Promark.
-        </p>
-      </div>
-    );
+    redirect(`/brand-ecosystem/${tenantSlug}/panel`);
   }
 
   // Build query: LEGAL_REP only sees alerts for brands they're assigned to
