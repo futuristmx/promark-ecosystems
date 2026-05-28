@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { Users, Tag, Scroll, Bell } from 'lucide-react';
+import { Users, Tag } from 'lucide-react';
 import prisma from '@/lib/prisma/client';
 import { requirePromarkAuth } from '@/lib/auth/promark';
-import { PageTitle, KpiCard, KpiGrid, DsCard, EmptyState } from '@/components/ds';
+import { PageTitle, DsCard, EmptyState } from '@/components/ds';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { StatusDonut } from '@/components/dashboard/charts/status-donut';
-import { TopTenantsBar } from '@/components/dashboard/charts/top-tenants-bar';
+import { PortfolioSankey, type SankeyDatum } from '@/components/dashboard/charts/portfolio-sankey';
+import { ImpiClassHeatmap } from '@/components/dashboard/charts/impi-class-heatmap';
 
 const LEGAL_STATUS_LABELS_ES: Record<string, string> = {
   APPLIED: 'Solicitada',
@@ -16,17 +17,21 @@ const LEGAL_STATUS_LABELS_ES: Record<string, string> = {
   CANCELLED: 'Cancelada',
   OPPOSED: 'Opuesta',
   IN_LITIGATION: 'En litigio',
+  IN_PROGRESS: 'En trámite',
+  ABANDONED: 'Abandonada',
 };
 
 const STATUS_COLORS: Record<string, string> = {
   APPLIED: '#8FB6C7',       // azul niebla
   PUBLISHED: '#355B6F',     // azul pizarra
   REGISTERED: '#0F2E3D',    // azul marino profundo
-  RENEWED: '#1C3F55',       // indigo estratégico
+  RENEWED: '#2F6B4F',       // verde estratégico
   EXPIRED: '#B42318',       // estado crítico
   CANCELLED: '#C8C4B9',     // gris piedra cálido
   OPPOSED: '#D39A2B',       // ámbar sutil
   IN_LITIGATION: '#0B1F2A', // azul noche
+  IN_PROGRESS: '#355B6F',
+  ABANDONED: '#C8C4B9',
 };
 
 export default async function DashboardPage() {
@@ -41,8 +46,10 @@ export default async function DashboardPage() {
     totalBrands,
     activeContracts,
     pendingAlerts,
-    topTenantsRaw,
+    tenantStatusGroups,
     statusGroups,
+    classGroups,
+    statusClassRows,
     recentBrandHistory,
     recentContractHistory,
   ] = await Promise.all([
@@ -52,15 +59,27 @@ export default async function DashboardPage() {
     prisma.alert.count({
       where: { status: 'PENDING', expiry_date: { lte: in30Days } },
     }),
+    // Sankey level 1: tenant → status
     prisma.brand.groupBy({
-      by: ['tenant_id'],
+      by: ['tenant_id', 'legal_status'],
       _count: { _all: true },
-      orderBy: { _count: { tenant_id: 'desc' } },
-      take: 5,
     }),
+    // Donut
     prisma.brand.groupBy({
       by: ['legal_status'],
       _count: { _all: true },
+    }),
+    // Heatmap: all classes across all tenants
+    prisma.brandClass.groupBy({
+      by: ['class_number'],
+      _count: { _all: true },
+    }),
+    // Sankey level 2: status → class (via join Brand+BrandClass)
+    prisma.brandClass.findMany({
+      select: {
+        class_number: true,
+        brand: { select: { legal_status: true } },
+      },
     }),
     prisma.brandHistory.findMany({
       orderBy: { created_at: 'desc' },
@@ -80,24 +99,76 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const topTenantIds = topTenantsRaw.map((t) => t.tenant_id);
+  // Tenant names (top by total brands)
+  const tenantTotals = new Map<string, number>();
+  for (const g of tenantStatusGroups) {
+    tenantTotals.set(g.tenant_id, (tenantTotals.get(g.tenant_id) ?? 0) + g._count._all);
+  }
+  const topTenantIds = Array.from(tenantTotals.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([id]) => id);
+
   const tenants = await prisma.tenant.findMany({
     where: { id: { in: topTenantIds } },
     select: { id: true, name: true },
   });
   const tenantMap = new Map(tenants.map((t) => [t.id, t.name]));
-  const topTenants = topTenantsRaw
-    .map((t) => ({
-      tenant_id: t.tenant_id,
-      name: tenantMap.get(t.tenant_id) ?? 'Sin nombre',
-      count: t._count._all,
-    }))
-    .sort((a, b) => b.count - a.count);
+
+  // Build sankey data
+  const sankeyData: SankeyDatum[] = [];
+
+  // Level 1: tenant -> status (only for top tenants to keep it readable)
+  const topTenantSet = new Set(topTenantIds);
+  for (const g of tenantStatusGroups) {
+    if (!topTenantSet.has(g.tenant_id)) continue;
+    const tenantName = tenantMap.get(g.tenant_id) ?? 'Sin nombre';
+    sankeyData.push({
+      source: tenantName,
+      target: g.legal_status,
+      value: g._count._all,
+      sourceType: 'tenant',
+      targetType: 'status',
+    });
+  }
+
+  // Level 2: status -> class
+  const classCountsTotal = new Map<number, number>();
+  for (const row of statusClassRows) {
+    classCountsTotal.set(row.class_number, (classCountsTotal.get(row.class_number) ?? 0) + 1);
+  }
+  const topClasses = Array.from(classCountsTotal.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([c]) => c);
+  const topClassSet = new Set(topClasses);
+
+  const statusClassAgg = new Map<string, number>();
+  for (const row of statusClassRows) {
+    if (!topClassSet.has(row.class_number)) continue;
+    const key = `${row.brand.legal_status}|${row.class_number}`;
+    statusClassAgg.set(key, (statusClassAgg.get(key) ?? 0) + 1);
+  }
+  for (const [key, value] of statusClassAgg.entries()) {
+    const [status, classNumberStr] = key.split('|');
+    sankeyData.push({
+      source: status,
+      target: `Clase ${classNumberStr}`,
+      value,
+      sourceType: 'status',
+      targetType: 'class',
+    });
+  }
 
   const statusDistribution = statusGroups.map((g) => ({
     label: LEGAL_STATUS_LABELS_ES[g.legal_status] ?? g.legal_status,
     value: g._count._all,
     color: STATUS_COLORS[g.legal_status] ?? '#64748b',
+  }));
+
+  const heatmapData = classGroups.map((g) => ({
+    class_number: g.class_number,
+    count: g._count._all,
   }));
 
   const activity = [
@@ -181,33 +252,37 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <KpiGrid>
-        <KpiCard
+      {/* HERO DUAL — Clientes activos + Total de marcas */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <HeroCard
           label="Clientes activos"
           value={totalTenants}
-          icon={<Users className="size-4" />}
+          icon={<Users className="size-7" />}
           href="/tenants"
+          ctaLabel="Ver clientes"
         />
-        <KpiCard
+        <HeroCard
           label="Total de marcas"
           value={totalBrands}
-          icon={<Tag className="size-4" />}
+          icon={<Tag className="size-7" />}
           href="/tenants"
+          ctaLabel="Ver marcas"
         />
-        <KpiCard
-          label="Contratos vigentes"
-          value={activeContracts}
-          icon={<Scroll className="size-4" />}
-          href="/tenants"
-        />
-        <KpiCard
+      </div>
+
+      {/* FACT STRIP — Contratos vigentes · Alertas críticas */}
+      <div
+        className="flex items-center justify-center gap-8 rounded-xl border px-6 py-4"
+        style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
+      >
+        <FactStat label="Contratos vigentes" value={activeContracts} />
+        <span className="h-8 w-px" style={{ background: '#E2DED6' }} aria-hidden="true" />
+        <FactStat
           label="Alertas críticas"
           value={pendingAlerts}
-          icon={<Bell className="size-4" />}
-          tone={pendingAlerts > 0 ? 'danger' : 'default'}
-          href="/tenants"
+          valueColor={pendingAlerts > 0 ? '#B42318' : undefined}
         />
-      </KpiGrid>
+      </div>
 
       <DsCard variant="standard">
         <StatusDonut
@@ -217,13 +292,120 @@ export default async function DashboardPage() {
       </DsCard>
 
       <DsCard variant="standard">
-        <TopTenantsBar data={topTenants} />
+        {totalBrands < 5 ? (
+          <div>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
+              Flujo del portafolio: clientes → estatus → clases IMPI
+            </h3>
+            <div
+              className="flex h-72 items-center justify-center rounded-lg text-sm"
+              style={{ background: '#FBF6EC', color: '#8FB6C7', border: '1px dashed #E2DED6' }}
+            >
+              Necesitas al menos 5 marcas para ver el flujo del portafolio.
+            </div>
+          </div>
+        ) : (
+          <PortfolioSankey data={sankeyData} />
+        )}
+      </DsCard>
+
+      <DsCard variant="standard">
+        <ImpiClassHeatmap data={heatmapData} />
       </DsCard>
 
       <RecentActivity
         items={activity}
         hint={`Últimos ${activity.length} eventos`}
       />
+    </div>
+  );
+}
+
+// ─── Hero dual card ───────────────────────────────────────────────────────────
+
+interface HeroCardProps {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  href: string;
+  ctaLabel: string;
+}
+
+function HeroCard({ label, value, icon, href, ctaLabel }: HeroCardProps) {
+  return (
+    <Link
+      href={href}
+      className="group block rounded-2xl p-7 transition-shadow hover:shadow-md"
+      style={{
+        background: 'linear-gradient(135deg, #FBF6EC 0%, #F1EDE3 100%)',
+        border: '1.5px solid #E2DED6',
+      }}
+    >
+      <div className="flex items-start justify-between gap-6">
+        {/* Columna izquierda: datos */}
+        <div className="flex-1">
+          <p
+            className="text-[10px] font-semibold uppercase leading-tight tracking-[0.12em]"
+            style={{ color: '#355B6F' }}
+          >
+            {label}
+          </p>
+          <p
+            className="mt-3 font-extrabold leading-none tracking-tight tabular-nums text-5xl"
+            style={{ color: '#0F2E3D' }}
+          >
+            {value.toLocaleString('es-MX')}
+          </p>
+        </div>
+
+        {/* Columna derecha: icono + CTA */}
+        <div className="flex flex-col items-end justify-between gap-6 self-stretch">
+          <span
+            className="flex size-12 items-center justify-center rounded-xl"
+            style={{
+              background: 'linear-gradient(135deg, rgba(211,154,43,0.22) 0%, rgba(245,201,122,0.12) 100%)',
+              color: '#D39A2B',
+              border: '1px solid rgba(211,154,43,0.18)',
+            }}
+          >
+            {icon}
+          </span>
+          <span
+            className="inline-flex items-center gap-1 text-xs font-semibold transition-colors group-hover:underline"
+            style={{ color: '#355B6F' }}
+          >
+            {ctaLabel}
+            <span aria-hidden="true">→</span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ─── Fact strip stat ──────────────────────────────────────────────────────────
+
+interface FactStatProps {
+  label: string;
+  value: number;
+  valueColor?: string;
+}
+
+function FactStat({ label, value, valueColor }: FactStatProps) {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <span
+        className="text-[10px] font-semibold uppercase leading-tight tracking-[0.12em]"
+        style={{ color: '#355B6F' }}
+      >
+        {label}
+      </span>
+      <span
+        className="text-xl font-bold tabular-nums leading-none"
+        style={{ color: valueColor ?? '#0F2E3D' }}
+      >
+        {value.toLocaleString('es-MX')}
+      </span>
     </div>
   );
 }
