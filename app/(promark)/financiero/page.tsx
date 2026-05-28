@@ -23,6 +23,15 @@ export interface ProjectionBucket {
   useDeclarations: number;
 }
 
+export interface TenantSummary {
+  id: string;
+  name: string;
+  brands: number;     // marcas por vencer 365d
+  contracts: number;  // contratos por vencer 365d
+  licenses: number;
+  useDeclarations: number;
+}
+
 export default async function PromarkFinancialPage() {
   const session = await requirePromarkAuth();
   const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
@@ -103,6 +112,50 @@ export default async function PromarkFinancialPage() {
     order: c.order,
   }));
 
+  // Resumen por tenant para el filtro (ventana 365d)
+  const tenants = await prisma.tenant.findMany({
+    where: { status: 'ACTIVE' },
+    select: { id: true, name: true },
+    orderBy: { name: 'asc' },
+  });
+  const in365 = dateFor(365);
+  const tenantSummaries: TenantSummary[] = await Promise.all(
+    tenants.map(async (t) => {
+      const [b, c, l, u] = await Promise.all([
+        prisma.brand.count({
+          where: {
+            tenant_id: t.id,
+            expiration_date: { gte: now, lte: in365 },
+            legal_status: { in: ['REGISTERED', 'RENEWED'] },
+          },
+        }),
+        prisma.contract.count({
+          where: {
+            tenant_id: t.id,
+            expiration_date: { gte: now, lte: in365 },
+            status: 'ACTIVE',
+            deleted_at: null,
+          },
+        }),
+        prisma.license.count({
+          where: {
+            tenant_id: t.id,
+            expiration_date: { gte: now, lte: in365 },
+            status: 'ACTIVE',
+          },
+        }),
+        prisma.brand.count({
+          where: {
+            tenant_id: t.id,
+            use_declaration_date: { gte: now, lte: in365 },
+            legal_status: { in: ['REGISTERED', 'RENEWED'] },
+          },
+        }),
+      ]);
+      return { id: t.id, name: t.name, brands: b, contracts: c, licenses: l, useDeclarations: u };
+    }),
+  );
+
   return (
     <div className="space-y-8">
       <Breadcrumb items={[{ label: 'Workspace', href: '/dashboard' }, { label: 'Financiero' }]} />
@@ -119,6 +172,7 @@ export default async function PromarkFinancialPage() {
         totalLicenses={totalLicenses}
         projection={projection}
         billingConcepts={billingConcepts}
+        tenantSummaries={tenantSummaries}
       />
     </div>
   );
