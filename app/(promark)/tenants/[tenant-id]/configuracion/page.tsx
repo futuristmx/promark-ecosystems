@@ -21,6 +21,10 @@ interface TenantConfig {
     notify_email?: string | null;
     expiry_alert_days?: number;
   };
+  role_overrides?: Record<string, {
+    label?: string;
+    permissions?: Record<string, boolean>;
+  }>;
 }
 
 export default async function TenantConfigPage({ params }: Props) {
@@ -104,6 +108,7 @@ export default async function TenantConfigPage({ params }: Props) {
           status: u.status,
           pin_generated_at: u.pin_generated_at?.toISOString() ?? null,
         }))}
+        roleOverrides={cfg.role_overrides ?? {}}
       />
     </div>
   );

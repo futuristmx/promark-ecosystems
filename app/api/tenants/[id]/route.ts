@@ -20,6 +20,7 @@ interface PatchBody {
     branding?: BrandingPatch;
     notifications?: NotificationsPatch;
     features?: Record<string, boolean>;
+    role_overrides?: Record<string, { label?: string; permissions?: Record<string, boolean> }>;
   };
   name?: string;
   slug?: string;
@@ -88,6 +89,7 @@ export async function PATCH(
   const currentBranding = (currentConfig.branding ?? {}) as Record<string, unknown>;
   const currentNotifications = (currentConfig.notifications ?? {}) as Record<string, unknown>;
   const currentFeatures = (currentConfig.features ?? {}) as Record<string, unknown>;
+  const currentRoleOverrides = (currentConfig.role_overrides ?? {}) as Record<string, unknown>;
 
   const nextBranding = body.config?.branding
     ? { ...currentBranding, ...body.config.branding }
@@ -98,12 +100,18 @@ export async function PATCH(
   const nextFeatures = body.config?.features
     ? { ...currentFeatures, ...body.config.features }
     : currentFeatures;
+  // role_overrides: shallow merge por rol (sobrescribe el objeto completo
+  // del rol enviado; preserva los roles no incluidos en el patch).
+  const nextRoleOverrides = body.config?.role_overrides
+    ? { ...currentRoleOverrides, ...body.config.role_overrides }
+    : currentRoleOverrides;
 
   const nextConfig = {
     ...currentConfig,
     branding: nextBranding,
     notifications: nextNotifications,
     features: nextFeatures,
+    role_overrides: nextRoleOverrides,
   };
 
   const updated = await prisma.$transaction(async (tx) => {

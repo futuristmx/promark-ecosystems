@@ -36,6 +36,7 @@ interface Props {
   initialBranding: BrandingState;
   initialNotifications: NotificationsState;
   clientUsers: ClientUser[];
+  roleOverrides: Record<string, { label?: string; permissions?: Record<string, boolean> }>;
 }
 
 const TABS = [
@@ -54,6 +55,7 @@ export function TenantConfigTabs({
   initialBranding,
   initialNotifications,
   clientUsers,
+  roleOverrides,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('branding');
 
@@ -138,6 +140,7 @@ export function TenantConfigTabs({
             tenantId={tenantId}
             tenantName={tenantName}
             clientUsers={clientUsers}
+            roleOverrides={roleOverrides}
           />
         )}
         {activeTab === 'notifications' && (

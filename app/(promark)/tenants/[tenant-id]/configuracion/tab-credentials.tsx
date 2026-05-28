@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck, User, Copy, Check } from 'lucide-react';
+import { HelpTip } from '@/components/ds';
+import { RolesPermissionsEditor, type RoleOverrides } from './roles-permissions-editor';
 
 interface ClientUser {
   id: string;
@@ -17,9 +19,10 @@ interface Props {
   tenantId: string;
   tenantName: string;
   clientUsers: ClientUser[];
+  roleOverrides: RoleOverrides;
 }
 
-const ROLE_LABEL: Record<string, string> = {
+const ROLE_LABEL_DEFAULT: Record<string, string> = {
   CLIENT_ADMIN: 'Administrador',
   CLIENT_VIEWER: 'Visor',
   CLIENT_LEGAL_REP: 'Rep. Legal',
@@ -52,7 +55,12 @@ function CopyBtn({ text }: { text: string }) {
   );
 }
 
-export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
+export function CredentialsTab({ tenantId, tenantName, clientUsers, roleOverrides }: Props) {
+  const ROLE_LABEL: Record<string, string> = {
+    CLIENT_ADMIN: roleOverrides.CLIENT_ADMIN?.label || ROLE_LABEL_DEFAULT.CLIENT_ADMIN,
+    CLIENT_VIEWER: roleOverrides.CLIENT_VIEWER?.label || ROLE_LABEL_DEFAULT.CLIENT_VIEWER,
+    CLIENT_LEGAL_REP: roleOverrides.CLIENT_LEGAL_REP?.label || ROLE_LABEL_DEFAULT.CLIENT_LEGAL_REP,
+  };
   const [selectedUserId, setSelectedUserId] = useState<string | null>(
     clientUsers.find((u) => u.role === 'CLIENT_ADMIN')?.id ?? clientUsers[0]?.id ?? null,
   );
@@ -106,6 +114,10 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
             <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
               Usuarios del portal
             </h3>
+            <HelpTip>
+              Cada usuario tiene un ID de tarjeta (login) y un PIN (contraseña).
+              Para resetear el PIN selecciona el usuario aquí abajo.
+            </HelpTip>
           </div>
           <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
             Selecciona un usuario para administrar su acceso.
@@ -190,6 +202,10 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
               <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
                 Resetear PIN de {selectedUser.full_name}
               </h3>
+              <HelpTip>
+                Genera un PIN nuevo y reemplaza al actual. El PIN previo
+                queda inutilizado. Compártelo por canal seguro con el usuario.
+              </HelpTip>
             </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               Establece un nuevo PIN de acceso. El usuario deberá usar este nuevo PIN para ingresar.
@@ -289,40 +305,12 @@ export function CredentialsTab({ tenantId, tenantName, clientUsers }: Props) {
         )}
       </div>
 
-      {/* Info panel */}
+      {/* Info panel — Editable Roles & Permisos */}
       <div className="lg:col-span-2">
-        <div
-          className="rounded-2xl border p-6"
-          style={{
-            borderColor: '#E2DED6',
-            background: 'linear-gradient(135deg, #F1EDE3 0%, #FBF6EC 100%)',
-          }}
-        >
-          <h4
-            className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: '#355B6F' }}
-          >
-            Sobre las credenciales
-          </h4>
-          <div className="mt-4 space-y-3 text-xs leading-relaxed" style={{ color: '#355B6F' }}>
-            <p>
-              Los clientes acceden al portal usando su <strong style={{ color: '#0F2E3D' }}>ID de tarjeta</strong>{' '}
-              y un <strong style={{ color: '#0F2E3D' }}>PIN numérico</strong>.
-            </p>
-            <p>
-              No se usa contraseña de Supabase Auth. El PIN se almacena
-              como hash bcrypt y genera un JWT de sesión.
-            </p>
-            <p>
-              <strong style={{ color: '#0F2E3D' }}>Roles disponibles:</strong>
-            </p>
-            <ul className="ml-3 list-disc space-y-1">
-              <li><strong>Administrador:</strong> ve todo el portafolio.</li>
-              <li><strong>Rep. Legal:</strong> solo marcas asignadas.</li>
-              <li><strong>Visor:</strong> vista mínima de lectura.</li>
-            </ul>
-          </div>
-        </div>
+        <RolesPermissionsEditor
+          tenantId={tenantId}
+          initialOverrides={roleOverrides}
+        />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Clock } from 'lucide-react';
+import { HelpTip } from '@/components/ds';
 
 interface Props {
   tenantId: string;
@@ -82,6 +83,11 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
               <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
                 Email destinatario de alertas
               </h3>
+              <HelpTip>
+                Recibe los correos de vencimiento generados por el sistema.
+                Puede ser el legal del cliente o un buzón compartido. Si se
+                deja vacío, las alertas quedan solo en la app.
+              </HelpTip>
             </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               Las alertas de vencimiento se envían a esta dirección. Si está vacío, las alertas
@@ -115,6 +121,11 @@ export function NotificationsTab({ tenantId, initialNotifications }: Props) {
               <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
                 Días de anticipación
               </h3>
+              <HelpTip>
+                Cuántos días antes del vencimiento se dispara la primera
+                alerta. Las reglas adicionales (30 d, 90 d, al vencer) se
+                configuran en la sección Alertas del cliente.
+              </HelpTip>
             </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               Cuántos días antes del vencimiento se generan las alertas.
