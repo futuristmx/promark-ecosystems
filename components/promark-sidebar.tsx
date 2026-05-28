@@ -23,6 +23,13 @@ interface PromarkSidebarProps {
   userRole: string;
   userAvatar?: unknown;
   isSuperAdmin?: boolean;
+  /** Permisos efectivos del rol (merged config + defaults). */
+  permissions?: Partial<Record<
+    | 'view_clients' | 'view_brands' | 'view_contracts' | 'view_alerts'
+    | 'view_financiero' | 'view_activity' | 'export_data'
+    | 'manage_users' | 'manage_tenants',
+    boolean
+  >>;
 }
 
 function extractAvatarSrc(avatar: unknown): string | null {
@@ -59,7 +66,14 @@ const mainNav: NavItem[] = [
   },
 ];
 
-export function PromarkSidebar({ userName, userRole, userAvatar, isSuperAdmin = false }: PromarkSidebarProps) {
+export function PromarkSidebar({
+  userName,
+  userRole,
+  userAvatar,
+  isSuperAdmin = false,
+  permissions = {},
+}: PromarkSidebarProps) {
+  const can = (perm: keyof typeof permissions): boolean => permissions[perm] !== false;
   const avatarSrc = extractAvatarSrc(userAvatar);
   const pathname = usePathname();
 
@@ -96,7 +110,8 @@ export function PromarkSidebar({ userName, userRole, userAvatar, isSuperAdmin = 
   }, [tenantId, pathname]);
 
   // Orden solicitado: Vista General, Estructura, Portafolio, Financiero, Alertas,
-  // Actividad — y Configuración separada al final.
+  // Actividad — y Configuración separada al final. Cada item depende de un
+  // permiso efectivo del rol; si está apagado, el item no aparece.
   const tenantSubNav: NavItem[] = tenantId
     ? [
         {
@@ -104,12 +119,12 @@ export function PromarkSidebar({ userName, userRole, userAvatar, isSuperAdmin = 
           label: 'Vista general',
           icon: <LayoutDashboard className="h-4 w-4" />,
         },
-        {
+        ...(can('view_brands') ? [{
           href: `/tenants/${tenantId}/structure`,
           label: 'Estructura',
           icon: <Network className="h-4 w-4" />,
-        },
-        {
+        }] : []),
+        ...(can('view_brands') ? [{
           href: `/tenants/${tenantId}/portfolio`,
           label: 'Portafolio',
           icon: <Briefcase className="h-4 w-4" />,
@@ -119,22 +134,22 @@ export function PromarkSidebar({ userName, userRole, userAvatar, isSuperAdmin = 
             `/tenants/${tenantId}/contratos`,
             `/tenants/${tenantId}/licencias`,
           ],
-        },
-        {
+        }] : []),
+        ...(can('view_financiero') ? [{
           href: `/tenants/${tenantId}/financiero`,
           label: 'Financiero',
           icon: <DollarSign className="h-4 w-4" />,
-        },
-        {
+        }] : []),
+        ...(can('view_alerts') ? [{
           href: `/tenants/${tenantId}/alerts`,
           label: 'Alertas',
           icon: <Bell className="h-4 w-4" />,
-        },
-        {
+        }] : []),
+        ...(can('view_activity') ? [{
           href: `/tenants/${tenantId}/actividad`,
           label: 'Actividad',
           icon: <Activity className="h-4 w-4" />,
-        },
+        }] : []),
       ]
     : [];
 
@@ -211,7 +226,7 @@ export function PromarkSidebar({ userName, userRole, userAvatar, isSuperAdmin = 
             isActive={isItemActive(item)}
           />
         ))}
-        {isSuperAdmin && (
+        {(isSuperAdmin || can('manage_users')) && (
           <NavLinkItem
             href="/settings/users"
             icon={<Users className="h-4 w-4" />}

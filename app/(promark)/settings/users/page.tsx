@@ -7,10 +7,9 @@ import { PromarkRolesEditor } from './promark-roles-editor';
 
 export default async function UsersAdminPage() {
   const session = await requirePromarkAuth();
-  if (session.role !== 'SUPERADMIN') {
-    // Solo SUPERADMIN administra usuarios
-    redirect('/settings/profile');
-  }
+  const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
+  // manage_users autoriza a entrar; SUPERADMIN siempre lo tiene por defaults.
+  await assertPromarkPermission(session.role, 'manage_users', '/settings/profile');
 
   const roleConfigs = await prisma.promarkRoleConfig.findMany();
 

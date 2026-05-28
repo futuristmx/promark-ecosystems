@@ -12,6 +12,8 @@ interface AlertsPageProps {
 
 export default async function AlertsPage({ params }: AlertsPageProps) {
   const session = await requirePromarkAuth();
+  const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
+  await assertPromarkPermission(session.role, 'view_alerts');
   const { 'tenant-id': tenantId } = await params;
 
   const tenant = await prisma.tenant.findUnique({

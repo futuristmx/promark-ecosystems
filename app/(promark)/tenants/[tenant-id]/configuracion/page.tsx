@@ -35,9 +35,8 @@ interface TenantConfig {
 
 export default async function TenantConfigPage({ params }: Props) {
   const user = await requirePromarkAuth();
-  if (user.role !== 'SUPERADMIN') {
-    redirect('/tenants');
-  }
+  const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
+  await assertPromarkPermission(user.role, 'manage_tenants', '/tenants');
   const { 'tenant-id': tenantId } = await params;
 
   const tenant = await prisma.tenant.findUnique({

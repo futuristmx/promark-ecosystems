@@ -10,7 +10,9 @@ interface Props {
 }
 
 export default async function FinancialPage({ params }: Props) {
-  await requirePromarkAuth();
+  const session = await requirePromarkAuth();
+  const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
+  await assertPromarkPermission(session.role, 'view_financiero');
   const { 'tenant-id': tenantId } = await params;
 
   const tenant = await prisma.tenant.findUnique({
