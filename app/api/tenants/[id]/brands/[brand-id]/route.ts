@@ -186,8 +186,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
       expiration_date: existing.expiration_date,
       renewal_date: existing.renewal_date,
       use_declaration_date: existing.use_declaration_date,
+      application_type: existing.application_type,
+      country: existing.country,
       description: existing.description,
       disclaimers: existing.disclaimers,
+      observations: existing.observations,
     };
 
     // Determine event type
@@ -229,8 +232,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
         expiration_date: brand.expiration_date,
         renewal_date: brand.renewal_date,
         use_declaration_date: brand.use_declaration_date,
+        application_type: brand.application_type,
+        country: brand.country,
         description: brand.description,
         disclaimers: brand.disclaimers,
+        observations: brand.observations,
       };
 
       await tx.brandHistory.create({

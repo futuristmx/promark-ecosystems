@@ -39,13 +39,20 @@ export async function GET(
       include: { company: { select: { name: true } } },
       orderBy: { name: 'asc' },
     });
-    csv = 'id,nombre,empresa,tipo,estado_legal,numero_registro,fecha_vencimiento,declaracion_de_uso\n';
+    csv = 'id,nombre,empresa,tipo,tipo_solicitud,estado_legal,numero_registro,expediente,fecha_presentacion,fecha_concesion,fecha_vencimiento,declaracion_de_uso,pais,observaciones\n';
     for (const b of brands) {
       csv += [
-        b.id, esc(b.name), esc(b.company.name), b.brand_type, b.legal_status,
+        b.id, esc(b.name), esc(b.company.name), b.brand_type,
+        b.application_type ?? '',
+        b.legal_status,
         b.registration_number ?? '',
+        b.application_number ?? '',
+        b.application_date?.toISOString().slice(0, 10) ?? '',
+        b.registration_date?.toISOString().slice(0, 10) ?? '',
         b.expiration_date?.toISOString().slice(0, 10) ?? '',
         b.use_declaration_date?.toISOString().slice(0, 10) ?? '',
+        esc(b.country ?? ''),
+        esc(b.observations ?? ''),
       ].join(',') + '\n';
     }
   } else if (type === 'holdings') {
@@ -237,8 +244,9 @@ export async function POST(
     const companies = await prisma.company.findMany({ where: { tenant_id: tenantId }, select: { id: true, name: true } });
     const companyMap = new Map(companies.map((c) => [c.name.toLowerCase(), c.id]));
 
-    const VALID_LEGAL: Set<string> = new Set(['APPLIED','PUBLISHED','REGISTERED','RENEWED','EXPIRED','CANCELLED','OPPOSED','IN_LITIGATION']);
+    const VALID_LEGAL: Set<string> = new Set(['APPLIED','PUBLISHED','REGISTERED','RENEWED','EXPIRED','CANCELLED','OPPOSED','IN_LITIGATION','IN_PROGRESS','ABANDONED']);
     const VALID_TYPE: Set<string> = new Set(['WORDMARK','FIGURATIVE','MIXED','THREE_D','SOUND','OLFACTORY','HOLOGRAM','TRADE_DRESS','COMMERCIAL_NOTICE','TRADE_NAME','CERTIFICATION_MARK','COLLECTIVE_MARK','APPELLATION_OF_ORIGIN','GEOGRAPHICAL_INDICATION']);
+    const VALID_APP_TYPE: Set<string> = new Set(['TRADEMARK_REGISTRATION','COMMERCIAL_NOTICE_REGISTRATION','TRADE_NAME_REGISTRATION','APPELLATION_OF_ORIGIN_REQUEST','GEOGRAPHICAL_INDICATION_REQUEST','RENEWAL','ASSIGNMENT','OTHER']);
 
     for (let i = 0; i < dataRows.length; i++) {
       const row = dataRows[i];
@@ -262,17 +270,51 @@ export async function POST(
         const useDeclStr = useDeclIdx >= 0 ? row[useDeclIdx]?.trim() : '';
         const use_declaration_date = useDeclStr ? new Date(useDeclStr) : undefined;
 
+        // Campos nuevos (Sprint A): tipo_solicitud, expediente, fechas de presentación/concesión, país, observaciones
+        const appTypeIdx = headers.indexOf('tipo_solicitud');
+        const appTypeRaw = appTypeIdx >= 0 ? (row[appTypeIdx]?.trim() || '').toUpperCase() : '';
+        const application_type = VALID_APP_TYPE.has(appTypeRaw) ? appTypeRaw : undefined;
+
+        const expedienteIdx = headers.indexOf('expediente');
+        const application_number = expedienteIdx >= 0 ? row[expedienteIdx]?.trim() || undefined : undefined;
+
+        const presentIdx = headers.indexOf('fecha_presentacion');
+        const application_date = presentIdx >= 0 && row[presentIdx]?.trim()
+          ? new Date(row[presentIdx].trim()) : undefined;
+
+        const concesionIdx = headers.indexOf('fecha_concesion');
+        const registration_date = concesionIdx >= 0 && row[concesionIdx]?.trim()
+          ? new Date(row[concesionIdx].trim()) : undefined;
+
+        const paisIdx = headers.indexOf('pais');
+        const country = paisIdx >= 0 ? row[paisIdx]?.trim() || undefined : undefined;
+
+        const obsIdx = headers.indexOf('observaciones');
+        const observations = obsIdx >= 0 ? row[obsIdx]?.trim() || undefined : undefined;
+
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+        const commonData = {
+          name, slug,
+          brand_type: brand_type as import('@prisma/client').BrandType,
+          legal_status: legal_status as import('@prisma/client').LegalStatus,
+          application_type: application_type as import('@prisma/client').ApplicationType | undefined,
+          registration_number: regNum,
+          application_number,
+          application_date,
+          registration_date,
+          expiration_date,
+          use_declaration_date,
+          country,
+          observations,
+        };
+
         if (id) {
-          await prisma.brand.update({
-            where: { id },
-            data: { name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date, use_declaration_date },
-          });
+          await prisma.brand.update({ where: { id }, data: commonData });
           updated++;
         } else {
           await prisma.brand.create({
-            data: { tenant_id: tenantId, company_id: companyId!, name, slug, brand_type: brand_type as import('@prisma/client').BrandType, legal_status: legal_status as import('@prisma/client').LegalStatus, registration_number: regNum, expiration_date, use_declaration_date },
+            data: { tenant_id: tenantId, company_id: companyId!, ...commonData },
           });
           created++;
         }
