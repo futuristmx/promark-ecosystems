@@ -64,6 +64,11 @@ const mainNav: NavItem[] = [
     label: 'Clientes',
     icon: <Building2 className="h-4 w-4" />,
   },
+  {
+    href: '/financiero',
+    label: 'Financiero',
+    icon: <DollarSign className="h-4 w-4" />,
+  },
 ];
 
 export function PromarkSidebar({
@@ -134,11 +139,6 @@ export function PromarkSidebar({
             `/tenants/${tenantId}/contratos`,
             `/tenants/${tenantId}/licencias`,
           ],
-        }] : []),
-        ...(can('view_financiero') ? [{
-          href: `/tenants/${tenantId}/financiero`,
-          label: 'Financiero',
-          icon: <DollarSign className="h-4 w-4" />,
         }] : []),
         ...(can('view_alerts') ? [{
           href: `/tenants/${tenantId}/alerts`,
