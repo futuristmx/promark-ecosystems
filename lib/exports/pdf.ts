@@ -1,4 +1,21 @@
 import PDFDocument from 'pdfkit';
+import SVGtoPDF from 'svg-to-pdfkit';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/* ── Promark icon (SVG) cargado una sola vez en cold start ────────────────── */
+let promarkIconSvg: string | null = null;
+function getPromarkIconSvg(): string | null {
+  if (promarkIconSvg !== null) return promarkIconSvg;
+  try {
+    const path = join(process.cwd(), 'app', 'icon.svg');
+    promarkIconSvg = readFileSync(path, 'utf-8');
+    return promarkIconSvg;
+  } catch {
+    promarkIconSvg = '';
+    return null;
+  }
+}
 
 export interface PdfColumn {
   header: string;
@@ -168,18 +185,24 @@ export function buildPdfBuffer(args: BuildPdfArgs): Promise<Buffer> {
     function drawFooter(pageIdx: number, totalPages: number) {
       const fy = PAGE_H - 30;
 
-      // Marca Promark al pie derecho — pequeña, con icono circular
+      // Marca Promark al pie derecho — icono SVG oficial + label
       const promarkLabel = 'Promark®';
       doc.fillColor(DS.pizarra).fontSize(8).font('Helvetica');
       const labelW = doc.widthOfString(promarkLabel);
-      const iconSize = 10;
-      const iconX = PAGE_W - MARGIN_X - labelW - iconSize - 6;
-      // pequeño "logo" circular con la P
-      doc.circle(iconX + iconSize / 2, fy + 4, iconSize / 2).fill(accent);
-      doc.fillColor('#FFFFFF').fontSize(6).font('Helvetica-Bold')
-        .text('P', iconX + iconSize / 2 - 1.6, fy + 1);
+      const iconSize = 14;
+      const gap = 5;
+      const blockX = PAGE_W - MARGIN_X - labelW - iconSize - gap;
+      // Icono oficial (SVG → pdfkit). Si no se puede cargar, sólo va el texto.
+      const svg = getPromarkIconSvg();
+      if (svg) {
+        try {
+          SVGtoPDF(doc, svg, blockX, fy - 3, { width: iconSize, height: iconSize });
+        } catch {
+          /* si svg-to-pdfkit falla con este SVG, omitir el icono */
+        }
+      }
       doc.fillColor(DS.pizarra).fontSize(8).font('Helvetica')
-        .text(promarkLabel, iconX + iconSize + 4, fy);
+        .text(promarkLabel, blockX + iconSize + gap, fy);
 
       // Paginación al pie izquierdo
       doc.fillColor(DS.piedra).fontSize(8).font('Helvetica')

@@ -17,10 +17,14 @@ const nextConfig: NextConfig = {
    *
    * Cinturón + tirantes para no volver a caer en este bug.
    */
-  serverExternalPackages: ["pdfkit"],
+  serverExternalPackages: ["pdfkit", "svg-to-pdfkit"],
   outputFileTracingIncludes: {
     "/api/**/*": [
       "./node_modules/pdfkit/**/*",
+      "./node_modules/svg-to-pdfkit/**/*",
+      // El builder lee app/icon.svg vía fs; lo incluimos explícitamente
+      // por si Next.js decide no tracearlo (es referenciado por path string).
+      "./app/icon.svg",
     ],
   },
 };
