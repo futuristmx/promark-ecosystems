@@ -174,7 +174,7 @@ export function BrandCatalogView({
       {/* View toggle — high contrast segmented control */}
       <div className="mb-6 flex items-center justify-end">
         <div
-          className="inline-flex items-center gap-0.5 rounded-xl border-2 p-0.5"
+          className="inline-flex items-center gap-0.5 rounded-xl border-[1.5px] p-0.5"
           style={{ borderColor: '#355B6F', background: '#FBF6EC' }}
         >
           <button
