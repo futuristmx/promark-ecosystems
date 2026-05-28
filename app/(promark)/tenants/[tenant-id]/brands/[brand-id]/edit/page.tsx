@@ -90,6 +90,8 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const [logoDirty, setLogoDirty] = useState(false);
 
   const {
     register,
@@ -123,6 +125,18 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
 
         if (brandRes.ok) {
           const brand = await brandRes.json();
+          // Cargar logo existente (Json: string, array, u objeto)
+          const logos: unknown = brand.logos;
+          let src: string | null = null;
+          if (typeof logos === 'string' && logos.startsWith('data:')) src = logos;
+          else if (Array.isArray(logos) && logos.length > 0) {
+            const first = logos[0];
+            src = typeof first === 'string' ? first : first?.url ?? first?.data ?? null;
+          } else if (logos && typeof logos === 'object') {
+            const obj = logos as Record<string, unknown>;
+            src = (obj.url ?? obj.dataUrl ?? obj.data ?? obj.image) as string | null;
+          }
+          setLogoDataUrl(src);
           reset({
             name: brand.name || '',
             registration_number: brand.registration_number || '',
@@ -162,12 +176,16 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
     setSubmitting(true);
     setError('');
     try {
+      const payload: Record<string, unknown> = { ...data };
+      if (logoDirty) {
+        payload.logos = logoDataUrl ? { dataUrl: logoDataUrl } : null;
+      }
       const res = await fetch(
         `/api/tenants/${tenantId}/brands/${brandId}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload),
         }
       );
       if (!res.ok) {
@@ -317,6 +335,76 @@ export default function EditBrandPage({ params }: EditBrandPageProps) {
                     {errors.company_id.message}
                   </p>
                 )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Logo / Imagen de la marca */}
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle>Logo / Imagen</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4">
+              {logoDataUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={logoDataUrl}
+                  alt="Logo de la marca"
+                  className="size-20 rounded-xl border object-contain"
+                  style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+                />
+              ) : (
+                <div
+                  className="flex size-20 items-center justify-center rounded-xl border text-xs font-medium"
+                  style={{ borderColor: '#E2DED6', background: '#F1EDE3', color: '#355B6F' }}
+                >
+                  Sin logo
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-1.5 self-start rounded-lg border px-3 py-1.5 text-xs font-medium"
+                  style={{ borderColor: '#E2DED6', color: '#355B6F' }}>
+                  {logoDataUrl ? 'Cambiar logo' : 'Subir logo'}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                    className="sr-only"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 1 * 1024 * 1024) {
+                        setError('Logo muy grande: máximo 1 MB.');
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setLogoDataUrl(reader.result as string);
+                        setLogoDirty(true);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+                {logoDataUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLogoDataUrl(null);
+                      setLogoDirty(true);
+                    }}
+                    className="self-start text-xs font-medium transition-colors"
+                    style={{ color: '#B42318' }}
+                  >
+                    Quitar logo
+                  </button>
+                )}
+                <p className="text-[11px]" style={{ color: '#355B6F' }}>
+                  PNG, JPG, SVG o WebP · máximo 1 MB. Se guarda como Data URL
+                  en el campo <code>logos</code> de la marca y se muestra en
+                  el portal del cliente.
+                </p>
               </div>
             </div>
           </CardContent>

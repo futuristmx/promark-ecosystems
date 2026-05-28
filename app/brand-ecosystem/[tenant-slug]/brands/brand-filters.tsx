@@ -3,10 +3,13 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { Search } from 'lucide-react';
+import { BRAND_TYPE_LABELS, BRAND_TYPE_ORDER } from '@/lib/i18n/status-labels';
 
 interface BrandFiltersProps {
   companies: Array<{ id: string; name: string }>;
   basePath: string;
+  /** Clases de Niza con marcas en este tenant (para popular el filtro de clase). */
+  availableClasses?: number[];
 }
 
 const STATUS_OPTIONS = [
@@ -40,7 +43,7 @@ const selectStyle: React.CSSProperties = {
   outline: 'none',
 };
 
-export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
+export function BrandFilters({ companies, basePath, availableClasses = [] }: BrandFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -48,6 +51,8 @@ export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
   const currentCompany = searchParams.get('company') ?? '';
   const currentStatus = searchParams.get('status') ?? '';
   const currentVigency = searchParams.get('vigency') ?? '';
+  const currentType = searchParams.get('type') ?? '';
+  const currentClass = searchParams.get('class') ?? '';
 
   const updateParams = useCallback(
     (key: string, value: string) => {
@@ -132,6 +137,48 @@ export function BrandFilters({ companies, basePath }: BrandFiltersProps) {
           </option>
         ))}
       </select>
+
+      {/* Tipo de marca filter (IMPI) */}
+      <select
+        style={selectStyle}
+        value={currentType}
+        onChange={(e) => updateParams('type', e.target.value)}
+      >
+        <option value="">Todos los tipos</option>
+        {BRAND_TYPE_ORDER.map((t) => (
+          <option key={t} value={t}>
+            {BRAND_TYPE_LABELS[t] ?? t}
+          </option>
+        ))}
+      </select>
+
+      {/* Clase de Niza filter */}
+      {availableClasses.length > 0 && (
+        <select
+          style={selectStyle}
+          value={currentClass}
+          onChange={(e) => updateParams('class', e.target.value)}
+        >
+          <option value="">Todas las clases</option>
+          {availableClasses.map((n) => (
+            <option key={n} value={String(n)}>
+              Clase {n}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {/* Limpiar filtros (visible cuando hay alguno aplicado) */}
+      {(currentSearch || currentCompany || currentStatus || currentVigency || currentType || currentClass) && (
+        <button
+          type="button"
+          onClick={() => router.push(basePath)}
+          className="h-9 rounded-xl border px-3 text-xs font-medium transition-colors hover:bg-[#F1EDE3]"
+          style={{ borderColor: '#E2DED6', color: '#355B6F', background: '#FBF6EC' }}
+        >
+          Limpiar filtros
+        </button>
+      )}
     </div>
   );
 }

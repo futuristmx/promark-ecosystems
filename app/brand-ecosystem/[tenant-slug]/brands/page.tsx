@@ -10,6 +10,8 @@ interface BrandsPageProps {
     company?: string;
     status?: string;
     vigency?: string;
+    type?: string;
+    class?: string;
   }>;
 }
 
@@ -73,6 +75,15 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
   if (filters.status) {
     where.legal_status = filters.status;
   }
+  if (filters.type) {
+    where.brand_type = filters.type;
+  }
+  if (filters.class) {
+    const classNum = parseInt(filters.class, 10);
+    if (!Number.isNaN(classNum)) {
+      where.classes = { some: { class_number: classNum } };
+    }
+  }
 
   const brands = await prisma.brand.findMany({
     where,
@@ -96,6 +107,14 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
     orderBy: { name: 'asc' },
   });
 
+  // Clases disponibles en este tenant (para popular el filtro)
+  const classesInTenant = await prisma.brandClass.groupBy({
+    by: ['class_number'],
+    where: { brand: { tenant_id: session.tenant_id } },
+    orderBy: { class_number: 'asc' },
+  });
+  const availableClasses = classesInTenant.map((c) => c.class_number);
+
   const basePath = `/brand-ecosystem/${tenantSlug}/brands`;
 
   // Serialize brands for client component (dates → ISO strings)
@@ -117,6 +136,7 @@ export default async function BrandsPage({ params, searchParams }: BrandsPagePro
       basePath={basePath}
       exportEndpoint={`/api/client/${tenantSlug}/brands/export`}
       count={filteredBrands.length}
+      availableClasses={availableClasses}
     />
   );
 }
