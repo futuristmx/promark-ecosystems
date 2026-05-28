@@ -101,14 +101,14 @@ export default async function TenantConfigPage({ params }: Props) {
           favicon_url: cfg.branding?.favicon_url ?? null,
         }}
         initialNotifications={{
-          notify_email: cfg.notifications?.notify_email ?? '',
+          notify_email: cfg.notifications?.notify_email ?? 'mcadena@promark.mx',
           expiry_alert_days: cfg.notifications?.expiry_alert_days ?? 90,
           // Por defecto apagado: si nunca se ha configurado, no enviamos
           // correos. Se requiere encender explícitamente.
           email_alerts_enabled: cfg.notifications?.email_alerts_enabled ?? false,
         }}
         initialClientAlerts={{
-          enabled: cfg.client_alerts?.enabled ?? true,
+          enabled: cfg.client_alerts?.enabled ?? false,
           general_comment: cfg.client_alerts?.general_comment ?? '',
           types: (cfg.client_alerts?.types ?? {}) as Record<string, { visible: boolean; trigger_days?: number; comment?: string }>,
         }}

@@ -225,7 +225,7 @@ export function NewTenantForm() {
   // Notifications
   const [notifications, setNotifications] = useState<NotificationsState>({
     expiry_alert_days: 90,
-    notify_email: '',
+    notify_email: 'mcadena@promark.mx',
   });
 
   // Features

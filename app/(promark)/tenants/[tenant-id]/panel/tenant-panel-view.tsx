@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Tag, Clock, AlertTriangle, Scroll, Bell, Network, Building2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { KpiCard, KpiGrid, DsCard } from '@/components/ds';
@@ -86,25 +87,66 @@ export function TenantPanelView({
         </TabsList>
 
         <TabsContent value="overview" className="space-y-12 pt-6">
+          {/* Hero KPI — protagonista: total marcas */}
+          <Link
+            href={`/tenants/${tenantId}/portfolio`}
+            className="group block overflow-hidden rounded-2xl border transition-all"
+            style={{
+              borderColor: '#C9A14A',
+              background:
+                'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 55%, #355B6F 100%)',
+              boxShadow:
+                '0 12px 32px rgba(15,46,61,0.22), inset 0 1px 0 rgba(255,255,255,0.08)',
+            }}
+          >
+            <div className="flex items-center justify-between gap-6 p-6 md:p-7">
+              <div className="flex items-center gap-5">
+                <div
+                  className="flex size-14 shrink-0 items-center justify-center rounded-xl"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, rgba(211,154,43,0.25), rgba(211,154,43,0.08))',
+                    border: '1px solid rgba(211,154,43,0.35)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <Tag className="size-7" style={{ color: '#F5C97A' }} />
+                </div>
+                <div>
+                  <p
+                    className="text-[11px] font-bold uppercase tracking-[0.18em]"
+                    style={{ color: 'rgba(245,201,122,0.85)' }}
+                  >
+                    Total de marcas
+                  </p>
+                  <p
+                    className="mt-1 text-5xl font-bold tabular-nums leading-none md:text-6xl"
+                    style={{ color: '#FBF6EC', letterSpacing: '-0.02em' }}
+                  >
+                    {aggregates.totals.brands}
+                  </p>
+                  <p
+                    className="mt-2 text-xs"
+                    style={{ color: 'rgba(251,246,236,0.7)' }}
+                  >
+                    Portafolio activo bajo gestión
+                  </p>
+                </div>
+              </div>
+              <div
+                className="hidden items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-semibold transition-all group-hover:translate-x-0.5 md:inline-flex"
+                style={{
+                  background: 'rgba(245,201,122,0.14)',
+                  color: '#F5C97A',
+                  border: '1px solid rgba(245,201,122,0.25)',
+                }}
+              >
+                Ver portafolio →
+              </div>
+            </div>
+          </Link>
+
           <KpiGrid>
-            <KpiCard
-              label="Holdings"
-              value={aggregates.totals.holdings}
-              icon={<Network className="size-4" />}
-              href={`/tenants/${tenantId}/structure`}
-            />
-            <KpiCard
-              label="Empresas"
-              value={aggregates.totals.companies}
-              icon={<Building2 className="size-4" />}
-              href={`/tenants/${tenantId}/structure`}
-            />
-            <KpiCard
-              label="Total marcas"
-              value={aggregates.totals.brands}
-              icon={<Tag className="size-4" />}
-              href={`/tenants/${tenantId}/portfolio`}
-            />
             <KpiCard
               label="Por vencer (90d)"
               value={aggregates.totals.expiringSoon}
@@ -131,6 +173,18 @@ export function TenantPanelView({
               icon={<Bell className="size-4" />}
               tone={aggregates.totals.criticalAlerts > 0 ? 'danger' : 'default'}
               href={`/tenants/${tenantId}/alertas`}
+            />
+            <KpiCard
+              label="Holdings"
+              value={aggregates.totals.holdings}
+              icon={<Network className="size-4" />}
+              href={`/tenants/${tenantId}/structure`}
+            />
+            <KpiCard
+              label="Empresas"
+              value={aggregates.totals.companies}
+              icon={<Building2 className="size-4" />}
+              href={`/tenants/${tenantId}/structure`}
             />
           </KpiGrid>
 
