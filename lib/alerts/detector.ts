@@ -196,15 +196,18 @@ export async function runAlertDetector(): Promise<DetectorResult> {
           result.alertsCreated++;
 
           if (rule.notify_email) {
-            // Resolve notify_email recipient from tenant config
+            // Resolve notify_email recipient from tenant config.
+            // El SUPERADMIN debe encender `email_alerts_enabled` explícitamente
+            // (default false) además de tener un destinatario configurado.
             const tenantConfig = await prisma.tenant.findUnique({
               where: { id: rule.tenant_id },
               select: { config: true, slug: true, name: true },
             });
             const cfg = tenantConfig?.config as
-              | { notifications?: { notify_email?: string | null } }
+              | { notifications?: { notify_email?: string | null; email_alerts_enabled?: boolean } }
               | undefined;
-            const recipient = cfg?.notifications?.notify_email;
+            const emailEnabled = cfg?.notifications?.email_alerts_enabled === true;
+            const recipient = emailEnabled ? cfg?.notifications?.notify_email : null;
             const slug = tenantConfig?.slug ?? '';
             const tenantName = tenantConfig?.name ?? undefined;
 

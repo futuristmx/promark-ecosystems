@@ -20,6 +20,7 @@ interface TenantConfig {
   notifications?: {
     notify_email?: string | null;
     expiry_alert_days?: number;
+    email_alerts_enabled?: boolean;
   };
   role_overrides?: Record<string, {
     label?: string;
@@ -103,6 +104,9 @@ export default async function TenantConfigPage({ params }: Props) {
         initialNotifications={{
           notify_email: cfg.notifications?.notify_email ?? '',
           expiry_alert_days: cfg.notifications?.expiry_alert_days ?? 90,
+          // Por defecto apagado: si nunca se ha configurado, no enviamos
+          // correos. Se requiere encender explícitamente.
+          email_alerts_enabled: cfg.notifications?.email_alerts_enabled ?? false,
         }}
         initialClientAlerts={{
           enabled: cfg.client_alerts?.enabled ?? true,

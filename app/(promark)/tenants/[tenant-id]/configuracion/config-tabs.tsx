@@ -17,6 +17,7 @@ interface BrandingState {
 interface NotificationsState {
   notify_email: string;
   expiry_alert_days: number;
+  email_alerts_enabled: boolean;
 }
 
 interface ClientUser {
