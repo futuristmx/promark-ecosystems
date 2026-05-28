@@ -26,7 +26,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { KpiCard, KpiGrid } from '@/components/ds';
 import { SmartFilterBar, type ActiveFilters } from '@/components/portfolio/smart-filter-bar';
 import type { BillingConcept, ProjectionBucket, TenantSummary } from './page';
 
@@ -352,33 +351,44 @@ export function PromarkFinancialDashboard({
       </TabsList>
 
       <TabsContent value="dashboard" className="space-y-8 pt-6">
-        <KpiGrid>
-          <KpiCard
-            label="Clientes activos"
-            value={activeTenants}
-            icon={<Users className="size-4" />}
+        {/* HERO — los 2 KPIs más importantes */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <HeroKpi
+            eyebrow="Ingresos proyectados · 90 días"
+            value={formatCurrency(revenue90)}
+            sub="Eventos facturables proyectados al cierre del trimestre"
+            icon={<DollarSign className="size-6" style={{ color: '#F5C97A' }} />}
           />
-          <KpiCard
+          <HeroKpi
+            eyebrow="Recurrente mensual"
+            value={formatCurrency(monthlyRecurring)}
+            sub="Iguala mensual base + porción anual de auditorías"
+            icon={<TrendingUp className="size-6" style={{ color: '#F5C97A' }} />}
+          />
+        </div>
+
+        {/* Fact strip secundario */}
+        <div
+          className="flex flex-wrap items-center justify-around gap-6 rounded-2xl border-[1.5px] px-6 py-4"
+          style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
+        >
+          <FactStat
+            icon={<Users className="size-4" style={{ color: '#355B6F' }} />}
+            label="Clientes activos"
+            value={String(activeTenants)}
+          />
+          <div className="h-8 w-px" style={{ background: '#E2DED6' }} />
+          <FactStat
+            icon={<Calendar className="size-4" style={{ color: '#355B6F' }} />}
             label="Eventos facturables (90d)"
-            value={totalEvents90}
-            icon={<Calendar className="size-4" />}
+            value={String(totalEvents90)}
             tone={totalEvents90 > 10 ? 'warning' : 'default'}
           />
-          <KpiCard
-            label="Ingresos proyectados (90d)"
-            value={formatCurrency(revenue90)}
-            icon={<DollarSign className="size-4" />}
-          />
-          <KpiCard
-            label="Recurrente mensual"
-            value={formatCurrency(monthlyRecurring)}
-            icon={<TrendingUp className="size-4" />}
-          />
-        </KpiGrid>
+        </div>
 
         {/* Breakdown por categoría (eventos) — refleja filtros */}
         <div
-          className="grid gap-4 rounded-2xl border p-5 md:grid-cols-4"
+          className="grid gap-4 rounded-2xl border-[1.5px] p-5 md:grid-cols-4"
           style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
         >
           <BreakdownStat
@@ -623,7 +633,7 @@ export function PromarkFinancialDashboard({
 
       <TabsContent value="config" className="space-y-4 pt-6">
         <div
-          className="rounded-2xl border p-5"
+          className="rounded-2xl border-[1.5px] p-5"
           style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
         >
           <div className="flex items-start justify-between gap-3">
@@ -666,7 +676,7 @@ export function PromarkFinancialDashboard({
 
           {showNewForm && (
             <div
-              className="mt-4 rounded-xl border p-4"
+              className="mt-4 rounded-xl border-[1.5px] p-4"
               style={{ borderColor: 'rgba(211,154,43,0.4)', background: 'rgba(211,154,43,0.06)' }}
             >
               <div className="grid gap-3 md:grid-cols-[1fr_180px_160px_auto]">
@@ -679,7 +689,7 @@ export function PromarkFinancialDashboard({
                     value={newDraft.label}
                     onChange={(e) => setNewDraft({ ...newDraft, label: e.target.value })}
                     placeholder="Ej. Estudio de viabilidad"
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                    className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-sm focus:outline-none"
                     style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                   />
                 </div>
@@ -690,7 +700,7 @@ export function PromarkFinancialDashboard({
                   <select
                     value={newDraft.category}
                     onChange={(e) => setNewDraft({ ...newDraft, category: e.target.value })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                    className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-sm focus:outline-none"
                     style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                   >
                     <option value="OPERATIVO">Operativo</option>
@@ -708,7 +718,7 @@ export function PromarkFinancialDashboard({
                     step={100}
                     value={newDraft.amount}
                     onChange={(e) => setNewDraft({ ...newDraft, amount: Number(e.target.value) || 0 })}
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-right text-sm font-semibold tabular-nums focus:outline-none"
+                    className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-right text-sm font-semibold tabular-nums focus:outline-none"
                     style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                   />
                 </div>
@@ -741,7 +751,7 @@ export function PromarkFinancialDashboard({
                   value={newDraft.description}
                   onChange={(e) => setNewDraft({ ...newDraft, description: e.target.value })}
                   placeholder="Detalle del concepto"
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                  className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-sm focus:outline-none"
                   style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                 />
               </div>
@@ -769,7 +779,7 @@ export function PromarkFinancialDashboard({
                           type="text"
                           value={editDraft.label}
                           onChange={(e) => setEditDraft({ ...editDraft, label: e.target.value })}
-                          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                          className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-sm focus:outline-none"
                           style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                         />
                       </div>
@@ -780,7 +790,7 @@ export function PromarkFinancialDashboard({
                         <select
                           value={editDraft.category}
                           onChange={(e) => setEditDraft({ ...editDraft, category: e.target.value })}
-                          className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                          className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-sm focus:outline-none"
                           style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                         >
                           <option value="OPERATIVO">Operativo</option>
@@ -797,7 +807,7 @@ export function PromarkFinancialDashboard({
                         type="text"
                         value={editDraft.description}
                         onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })}
-                        className="mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                        className="mt-1 w-full rounded-lg border-[1.5px] px-3 py-2 text-sm focus:outline-none"
                         style={{ borderColor: '#E2DED6', background: '#FFFFFF', color: '#0F2E3D' }}
                       />
                     </div>
@@ -831,7 +841,7 @@ export function PromarkFinancialDashboard({
               return (
                 <div
                   key={c.key}
-                  className="flex flex-wrap items-center gap-3 rounded-xl border p-4"
+                  className="flex flex-wrap items-center gap-3 rounded-xl border-[1.5px] p-4"
                   style={{ borderColor: '#E2DED6', background: '#FFFFFF' }}
                 >
                   <div className="min-w-[220px] flex-1">
@@ -865,7 +875,7 @@ export function PromarkFinancialDashboard({
                           prev.map((p) => (p.key === c.key ? { ...p, amount: v } : p)),
                         );
                       }}
-                      className="w-32 rounded-lg border px-3 py-2 text-right text-sm font-semibold tabular-nums focus:outline-none"
+                      className="w-32 rounded-lg border-[1.5px] px-3 py-2 text-right text-sm font-semibold tabular-nums focus:outline-none"
                       style={{ borderColor: '#E2DED6', color: '#0F2E3D' }}
                     />
                     <span className="text-[10px] font-semibold" style={{ color: '#8FB6C7' }}>
@@ -924,7 +934,7 @@ export function PromarkFinancialDashboard({
             })}
             {concepts.length === 0 && (
               <div
-                className="rounded-xl border border-dashed py-8 text-center text-sm"
+                className="rounded-xl border-[1.5px] border-dashed py-8 text-center text-sm"
                 style={{ borderColor: '#E2DED6', color: '#355B6F' }}
               >
                 Sin conceptos. Crea el primero con el botón &quot;Nuevo concepto&quot;.
@@ -934,6 +944,90 @@ export function PromarkFinancialDashboard({
         </div>
       </TabsContent>
     </Tabs>
+  );
+}
+
+function HeroKpi({
+  eyebrow,
+  value,
+  sub,
+  icon,
+}: {
+  eyebrow: string;
+  value: string;
+  sub: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div
+      className="overflow-hidden rounded-2xl border-[1.5px] p-5"
+      style={{
+        borderColor: '#0F2E3D',
+        background: 'linear-gradient(135deg, #FBF6EC 0%, #F1EDE3 100%)',
+        boxShadow: '0 4px 14px rgba(15,46,61,0.08)',
+      }}
+    >
+      <div className="flex items-start gap-4">
+        <div
+          className="flex size-12 shrink-0 items-center justify-center rounded-xl border"
+          style={{
+            background: 'linear-gradient(135deg, rgba(245,201,122,0.18), rgba(245,201,122,0.04))',
+            borderColor: 'rgba(211,154,43,0.35)',
+          }}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p
+            className="text-[10px] font-bold uppercase tracking-[0.16em]"
+            style={{ color: '#7A5A14' }}
+          >
+            {eyebrow}
+          </p>
+          <p
+            className="mt-1 text-4xl font-bold tabular-nums leading-none"
+            style={{ color: '#0F2E3D', letterSpacing: '-0.02em' }}
+          >
+            {value}
+          </p>
+          <p className="mt-2 text-xs" style={{ color: '#355B6F' }}>
+            {sub}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FactStat({
+  icon,
+  label,
+  value,
+  tone = 'default',
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  tone?: 'default' | 'warning';
+}) {
+  const valueColor = tone === 'warning' ? '#A87614' : '#0F2E3D';
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className="flex size-9 shrink-0 items-center justify-center rounded-lg"
+        style={{ background: 'rgba(15,46,61,0.06)' }}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: '#355B6F' }}>
+          {label}
+        </p>
+        <p className="text-xl font-bold tabular-nums leading-none" style={{ color: valueColor }}>
+          {value}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -969,7 +1063,7 @@ function BreakdownStat({
 function Stat({ label, value, hint }: { label: string; value: number; hint: string }) {
   return (
     <div
-      className="rounded-xl border px-4 py-3"
+      className="rounded-xl border-[1.5px] px-4 py-3"
       style={{ borderColor: '#E2DED6', background: '#FBF6EC' }}
     >
       <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#355B6F' }}>
