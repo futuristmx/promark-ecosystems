@@ -5,6 +5,8 @@ import { useState } from 'react';
 interface ImpiClassHeatmapProps {
   data: Array<{ class_number: number; count: number }>;
   title?: string;
+  /** Color de acento para los buckets más altos. Default: azul marino DS. */
+  accentColor?: string;
 }
 
 // Etiquetas cortas en español para las 45 clases del catálogo de Niza.
@@ -58,17 +60,18 @@ const NICE_CLASS_LABELS: Record<number, string> = {
 };
 
 // Escala de azul marino: low → high
-function colorForCount(count: number): { fill: string; opacity: number; textColor: string } {
-  if (count === 0) return { fill: '#E2DED6', opacity: 0.4, textColor: '#8FB6C7' };
-  if (count <= 5) return { fill: '#DDEAF2', opacity: 1, textColor: '#0F2E3D' };
-  if (count <= 20) return { fill: '#8FB6C7', opacity: 1, textColor: '#0F2E3D' };
-  if (count <= 50) return { fill: '#355B6F', opacity: 1, textColor: '#FBF6EC' };
-  return { fill: '#0F2E3D', opacity: 1, textColor: '#FBF6EC' };
+function colorForCount(count: number, accent?: string): { fill: string; opacity: number; textColor: string } {
+  if (count === 0) return { fill: '#E2DED6', opacity: 0.55, textColor: '#A8A39B' };
+  if (count <= 5) return { fill: '#BFD8E3', opacity: 1, textColor: '#0F2E3D' };
+  if (count <= 20) return { fill: '#5C8195', opacity: 1, textColor: '#FBF6EC' };
+  if (count <= 50) return { fill: accent ?? '#1C3F55', opacity: 1, textColor: '#FBF6EC' };
+  return { fill: accent ?? '#0F2E3D', opacity: 1, textColor: '#FBF6EC' };
 }
 
 export function ImpiClassHeatmap({
   data,
   title = 'Cobertura por clase IMPI (Niza)',
+  accentColor,
 }: ImpiClassHeatmapProps) {
   const [hover, setHover] = useState<number | null>(null);
 
@@ -86,21 +89,24 @@ export function ImpiClassHeatmap({
         </span>
       </div>
 
-      <div className="grid grid-cols-9 gap-1.5">
+      <div
+        className="mx-auto grid gap-1"
+        style={{ gridTemplateColumns: 'repeat(9, minmax(0, 1fr))', maxWidth: 480 }}
+      >
         {Array.from({ length: 45 }, (_, i) => i + 1).map((classNumber) => {
           const count = counts.get(classNumber) ?? 0;
-          const { fill, opacity, textColor } = colorForCount(count);
+          const { fill, opacity, textColor } = colorForCount(count, accentColor);
           const isHover = hover === classNumber;
           const label = NICE_CLASS_LABELS[classNumber] ?? '';
           return (
             <div
               key={classNumber}
-              className="group relative aspect-square rounded-md transition-transform duration-150"
+              className="group relative aspect-square rounded transition-transform duration-150"
               style={{
                 background: fill,
                 opacity,
-                transform: isHover ? 'scale(1.1)' : 'scale(1)',
-                boxShadow: isHover ? '0 0 0 2px #D39A2B, 0 8px 24px rgba(15,46,61,0.2)' : 'none',
+                transform: isHover ? 'scale(1.18)' : 'scale(1)',
+                boxShadow: isHover ? '0 0 0 1.5px #D39A2B, 0 6px 16px rgba(15,46,61,0.18)' : 'none',
                 cursor: 'pointer',
                 zIndex: isHover ? 5 : 1,
               }}
@@ -111,9 +117,9 @@ export function ImpiClassHeatmap({
                 className="flex h-full w-full flex-col items-center justify-center"
                 style={{ color: textColor, fontFamily: 'var(--font-manrope, Manrope, sans-serif)' }}
               >
-                <span className="text-[11px] font-bold leading-none">{classNumber}</span>
+                <span className="text-[9px] font-bold leading-none">{classNumber}</span>
                 {count > 0 && (
-                  <span className="mt-0.5 text-[9px] font-medium leading-none" style={{ opacity: 0.85 }}>
+                  <span className="mt-0.5 text-[7.5px] font-semibold leading-none" style={{ opacity: 0.9 }}>
                     {count}
                   </span>
                 )}
@@ -139,22 +145,22 @@ export function ImpiClassHeatmap({
       </div>
 
       {/* Leyenda */}
-      <div className="mt-4 flex items-center gap-3 text-[10px] uppercase tracking-wider" style={{ color: '#355B6F' }}>
+      <div className="mt-3 flex items-center justify-center gap-3 text-[10px] uppercase tracking-wider" style={{ color: '#355B6F' }}>
         <span className="font-semibold">Intensidad</span>
         <div className="flex items-center gap-1.5">
-          <div className="size-3 rounded" style={{ background: '#E2DED6', opacity: 0.4 }} />
+          <div className="size-2.5 rounded" style={{ background: '#E2DED6', opacity: 0.55 }} />
           <span>0</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="size-3 rounded" style={{ background: '#DDEAF2' }} />
+          <div className="size-2.5 rounded" style={{ background: '#BFD8E3' }} />
           <span>1–5</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="size-3 rounded" style={{ background: '#8FB6C7' }} />
+          <div className="size-2.5 rounded" style={{ background: '#5C8195' }} />
           <span>6–20</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="size-3 rounded" style={{ background: '#0F2E3D' }} />
+          <div className="size-2.5 rounded" style={{ background: accentColor ?? '#0F2E3D' }} />
           <span>20+</span>
         </div>
       </div>

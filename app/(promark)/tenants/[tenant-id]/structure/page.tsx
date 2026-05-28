@@ -167,18 +167,18 @@ export default async function StructurePage({ params }: StructurePageProps) {
 
             return (
               <section key={holding.id} className="space-y-6">
-                {/* Visualización monolítica 3D */}
+                {/* Visualización monolítica 3D — full width hero */}
                 <DsCard variant="standard" padding="lg">
-                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+                  <div className="mb-4 flex items-baseline justify-between gap-4">
                     <div>
-                      <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[#355B6F]">
+                      <div className="mb-1 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#355B6F]">
                         Visión jerárquica
                         <HelpTip>
                           Bloques apilados que muestran cómo se compone el holding:
                           empresas en el medio, titulares y marcas en la base.
                         </HelpTip>
                       </div>
-                      <h3 className="text-xl font-semibold text-[#0F2E3D]">
+                      <h3 className="text-2xl font-bold text-[#0F2E3D]">
                         {holding.name}
                       </h3>
                       <p className="mt-1 text-sm text-[#355B6F]">
@@ -187,23 +187,23 @@ export default async function StructurePage({ params }: StructurePageProps) {
                         · {brandsBucket.total}{' '}
                         {brandsBucket.total === 1 ? 'marca' : 'marcas'}
                         {' '}· {holdersCount}{' '}
-                        {holdersCount === 1 ? 'titular' : 'titulares (tenant)'}
+                        {holdersCount === 1 ? 'titular' : 'titulares'}
                       </p>
                     </div>
-                    <div className="-mx-2 lg:mx-0 lg:max-w-[720px]">
-                      <MonolithicStructure
-                        primaryColor={primaryColor}
-                        holding={{ id: holding.id, name: holding.name }}
-                        companies={holding.companies.map((c) => ({
-                          id: c.id,
-                          name: c.name,
-                          brandCount: c._count.brands,
-                        }))}
-                        holdersCount={holdersCount}
-                        brandsCount={brandsBucket.total}
-                        brandsByStatus={brandsByStatus}
-                      />
-                    </div>
+                  </div>
+                  <div className="w-full">
+                    <MonolithicStructure
+                      primaryColor={primaryColor}
+                      holding={{ id: holding.id, name: holding.name }}
+                      companies={holding.companies.map((c) => ({
+                        id: c.id,
+                        name: c.name,
+                        brandCount: c._count.brands,
+                      }))}
+                      holdersCount={holdersCount}
+                      brandsCount={brandsBucket.total}
+                      brandsByStatus={brandsByStatus}
+                    />
                   </div>
                 </DsCard>
 
@@ -298,9 +298,10 @@ export default async function StructurePage({ params }: StructurePageProps) {
                         {holding.companies.map((company) => (
                           <div
                             key={company.id}
-                            className="group relative rounded-xl bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,46,61,0.05)] transition-shadow hover:shadow-[0_4px_12px_rgba(15,46,61,0.08)]"
+                            className="group relative rounded-xl px-4 py-3 shadow-[0_1px_2px_rgba(15,46,61,0.05)] transition-all hover:shadow-[0_4px_12px_rgba(15,46,61,0.08)] hover:-translate-y-0.5"
                             style={{
                               borderLeft: `4px solid ${primaryColor}`,
+                              background: `linear-gradient(135deg, #FFFFFF 0%, ${primaryColor}06 100%)`,
                             }}
                           >
                             <div className="flex items-start justify-between gap-3">
@@ -313,8 +314,8 @@ export default async function StructurePage({ params }: StructurePageProps) {
                                   <span
                                     className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em]"
                                     style={{
-                                      background: '#F1EDE3',
-                                      color: '#355B6F',
+                                      background: `${primaryColor}14`,
+                                      color: primaryColor,
                                     }}
                                   >
                                     Empresa
@@ -357,8 +358,15 @@ export default async function StructurePage({ params }: StructurePageProps) {
                       </div>
                     )}
 
-                    {/* Pie: titulares (informativo) */}
-                    <div className="mt-5 flex items-center gap-2 rounded-lg border border-[#E2DED6] bg-white px-4 py-2.5">
+                    {/* Pie: titulares (informativo) — más sutil, jerarquía visual abajo */}
+                    <div
+                      className="mt-5 flex items-center gap-2 rounded-lg border px-4 py-2.5"
+                      style={{
+                        borderColor: '#E2DED6',
+                        background: 'linear-gradient(135deg, #F1EDE3 0%, #E2DED6 100%)',
+                        opacity: 0.95,
+                      }}
+                    >
                       <Users className="h-3.5 w-3.5 text-[#355B6F]" />
                       <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#355B6F]">
                         Titulares

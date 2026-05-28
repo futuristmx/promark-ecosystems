@@ -707,11 +707,11 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
         aria-label="Acciones de selección"
         style={{
           position: 'fixed',
-          bottom: 16,
+          top: 16,
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 55,
-          padding: '8px 12px 12px',
+          padding: '12px 12px 8px',
           minWidth: 480,
           borderRadius: 18,
           background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
@@ -721,8 +721,8 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
         }}
       >
         <div className="flex flex-col items-center">
-          <GripHorizontal className="h-3.5 w-3.5 opacity-50 mb-1.5" aria-hidden />
           <div className="flex w-full items-center gap-3">
+            <GripHorizontal className="h-3.5 w-3.5 opacity-50" aria-hidden />
             <div
               className="rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wider"
               style={{ background: 'rgba(211,154,43,0.18)', color: '#FBF6EC' }}

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Tag, Clock, AlertTriangle, Scroll, Bell, Network, Building2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -8,7 +7,7 @@ import { KpiCard, KpiGrid, DsCard } from '@/components/ds';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { StatusDonut } from '@/components/dashboard/charts/status-donut';
 import { VigencyTimeline } from '@/components/dashboard/charts/vigency-timeline';
-import { ImpiClassBar } from '@/components/dashboard/charts/impi-class-bar';
+import { ImpiClassHeatmap } from '@/components/dashboard/charts/impi-class-heatmap';
 import { TenantGraph } from '@/components/dashboard/graph/tenant-graph';
 import type { TenantAggregates } from '@/lib/dashboard/tenant-aggregates';
 import type { GraphPayload } from '@/lib/dashboard/tenant-graph';
@@ -56,6 +55,7 @@ interface TenantPanelViewProps {
   aggregates: TenantAggregates;
   graph: GraphPayload;
   tree: HoldingNode[];
+  primaryColor?: string;
 }
 
 export function TenantPanelView({
@@ -63,6 +63,7 @@ export function TenantPanelView({
   aggregates,
   graph,
   tree,
+  primaryColor = '#0F2E3D',
 }: TenantPanelViewProps) {
   const donutData = aggregates.statusDistribution.map((s) => ({
     label: s.label,
@@ -70,12 +71,6 @@ export function TenantPanelView({
     color: STATUS_COLORS[s.status] ?? '#64748b',
   }));
 
-  const [impiFilter, setImpiFilter] = useState<'top10' | 'all'>('top10');
-
-  const filteredImpiData =
-    impiFilter === 'top10'
-      ? aggregates.impiClasses.slice(0, 10)
-      : aggregates.impiClasses;
 
   return (
     <div className="space-y-12">
@@ -269,30 +264,11 @@ export function TenantPanelView({
       </DsCard>
 
       <DsCard variant="standard">
-        {/* IMPI filter bar */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#355B6F' }}>
-            Marcas por clase IMPI
-          </h3>
-          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: '#F1EDE3' }}>
-            {([['top10', 'Top 10'], ['all', 'Todas']] as const).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setImpiFilter(key)}
-                className="rounded-md px-3 py-1 text-xs font-medium transition-colors"
-                style={
-                  impiFilter === key
-                    ? { background: '#0F2E3D', color: '#ffffff' }
-                    : { color: '#355B6F' }
-                }
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <ImpiClassBar data={filteredImpiData} title="" />
+        <ImpiClassHeatmap
+          data={aggregates.impiClasses}
+          title="Cobertura por clase IMPI"
+          accentColor={primaryColor}
+        />
       </DsCard>
 
       <RecentActivity items={aggregates.recentActivity} />
