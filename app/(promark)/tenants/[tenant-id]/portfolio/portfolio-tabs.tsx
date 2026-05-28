@@ -360,16 +360,26 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
                 <button
                   type="button"
                   onClick={() => setSelectionMode((v) => !v)}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] px-3 py-1.5 text-xs font-bold transition-all"
                   style={
                     selectionMode
-                      ? { background: '#D39A2B', color: '#fff' }
-                      : { background: '#F1EDE3', color: '#355B6F' }
+                      ? {
+                          background: 'linear-gradient(135deg, #D39A2B 0%, #E0A847 100%)',
+                          color: '#FBF6EC',
+                          borderColor: '#A87614',
+                          boxShadow: '0 2px 6px rgba(211,154,43,0.35)',
+                        }
+                      : {
+                          background: '#FBF6EC',
+                          color: '#0F2E3D',
+                          borderColor: '#355B6F',
+                        }
                   }
                   aria-pressed={selectionMode}
+                  title="Activa para seleccionar varias marcas y moverlas entre Empresa, Holding o Titular"
                 >
                   {selectionMode ? <CheckSquare className="size-3.5" /> : <Square className="size-3.5" />}
-                  Selección múltiple
+                  {selectionMode ? 'Selección activa' : 'Seleccionar marcas'}
                 </button>
               )}
               <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: '#F1EDE3' }}>
@@ -393,7 +403,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
             </div>
           }
         />
-        {selectionMode && (
+        {selectionMode && selectedBrandIds.size === 0 && (
           <div
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
             style={{
@@ -404,8 +414,70 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
           >
             <span style={{ fontSize: 14 }}>💡</span>
             <span>
-              Arrastra marcas hacia el panel lateral para reasignarlas a Holding, Empresa o Titular.
+              Haz clic en una o más marcas para seleccionarlas. Luego puedes moverlas a Holding, Empresa o Titular.
             </span>
+          </div>
+        )}
+        {selectionMode && selectedBrandIds.size > 0 && (
+          <div
+            role="toolbar"
+            aria-label="Acciones de selección"
+            className="sticky"
+            style={{
+              top: 8,
+              zIndex: 35,
+              padding: '10px 14px',
+              borderRadius: 14,
+              background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
+              boxShadow: '0 8px 24px rgba(15,46,61,0.22)',
+              color: '#fff',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <div className="flex w-full items-center gap-3">
+              <GripHorizontal className="h-4 w-4 opacity-60" aria-hidden />
+              <div
+                className="rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wider"
+                style={{ background: 'rgba(211,154,43,0.18)', color: '#FBF6EC' }}
+              >
+                {selectedBrandIds.size} marca{selectedBrandIds.size === 1 ? '' : 's'} seleccionada{selectedBrandIds.size === 1 ? '' : 's'}
+              </div>
+              <div className="ml-auto flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => openReassignWith('company')}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
+                >
+                  <Building2 className="h-3.5 w-3.5" /> Empresa…
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openReassignWith('holding')}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
+                >
+                  <Network className="h-3.5 w-3.5" /> Holding…
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openReassignWith('holder')}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
+                  style={{ background: '#D39A2B', color: '#0F2E3D' }}
+                >
+                  <UserIcon className="h-3.5 w-3.5" /> Titular…
+                </button>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
+                  style={{ background: 'transparent', color: 'rgba(255,255,255,0.7)' }}
+                  aria-label="Cancelar selección"
+                >
+                  <X className="h-3.5 w-3.5" /> Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         )}
         <div
@@ -700,74 +772,6 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
         </div>
       </TabsContent>
     </Tabs>
-
-    {selectionMode && selectedBrandIds.size > 0 && (
-      <div
-        role="toolbar"
-        aria-label="Acciones de selección"
-        style={{
-          position: 'fixed',
-          top: 16,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 55,
-          padding: '12px 12px 8px',
-          minWidth: 480,
-          borderRadius: 18,
-          background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
-          boxShadow: '0 16px 40px rgba(15,46,61,0.32)',
-          color: '#fff',
-          border: '1px solid rgba(255,255,255,0.08)',
-        }}
-      >
-        <div className="flex flex-col items-center">
-          <div className="flex w-full items-center gap-3">
-            <GripHorizontal className="h-3.5 w-3.5 opacity-50" aria-hidden />
-            <div
-              className="rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wider"
-              style={{ background: 'rgba(211,154,43,0.18)', color: '#FBF6EC' }}
-            >
-              {selectedBrandIds.size} marca{selectedBrandIds.size === 1 ? '' : 's'} seleccionada{selectedBrandIds.size === 1 ? '' : 's'}
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => openReassignWith('company')}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
-              >
-                <Building2 className="h-3.5 w-3.5" /> Mover a Empresa…
-              </button>
-              <button
-                type="button"
-                onClick={() => openReassignWith('holding')}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
-              >
-                <Network className="h-3.5 w-3.5" /> Mover a Holding…
-              </button>
-              <button
-                type="button"
-                onClick={() => openReassignWith('holder')}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors"
-                style={{ background: '#D39A2B', color: '#0F2E3D' }}
-              >
-                <UserIcon className="h-3.5 w-3.5" /> Mover a Titular…
-              </button>
-              <button
-                type="button"
-                onClick={clearSelection}
-                className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors"
-                style={{ background: 'transparent', color: 'rgba(255,255,255,0.7)' }}
-                aria-label="Cancelar selección"
-              >
-                <X className="h-3.5 w-3.5" /> Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
 
     {canManagePortfolio && (
       <ReassignSheet
