@@ -3,6 +3,7 @@ import { requirePromarkAuth } from '@/lib/auth/promark';
 import prisma from '@/lib/prisma/client';
 import { PageTitle } from '@/components/ds';
 import { UsersAdminView } from './users-admin-view';
+import { PromarkRolesEditor } from './promark-roles-editor';
 
 export default async function UsersAdminPage() {
   const session = await requirePromarkAuth();
@@ -10,6 +11,8 @@ export default async function UsersAdminPage() {
     // Solo SUPERADMIN administra usuarios
     redirect('/settings/profile');
   }
+
+  const roleConfigs = await prisma.promarkRoleConfig.findMany();
 
   const users = await prisma.userPromark.findMany({
     orderBy: { created_at: 'desc' },
@@ -43,7 +46,19 @@ export default async function UsersAdminPage() {
         title="Usuarios Promark"
         subtitle="Gestiona empleados con acceso al staff: nombre, rol, foto, contraseña y estado."
       />
-      <UsersAdminView users={rows} currentUserId={session.id} />
+      <PromarkRolesEditor
+        initial={roleConfigs.map((c) => ({
+          role: c.role,
+          label: c.label,
+          permissions: (c.permissions ?? {}) as Record<string, boolean>,
+        }))}
+      />
+
+      <UsersAdminView
+        users={rows}
+        currentUserId={session.id}
+        customRoleLabels={Object.fromEntries(roleConfigs.map((c) => [c.role, c.label]))}
+      />
     </div>
   );
 }

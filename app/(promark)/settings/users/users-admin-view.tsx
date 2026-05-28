@@ -29,6 +29,8 @@ interface UserRow {
 interface UsersAdminViewProps {
   users: UserRow[];
   currentUserId: string;
+  /** Labels custom por rol provenientes de promark_role_configs. Sobrescriben los defaults. */
+  customRoleLabels?: Record<string, string | null>;
 }
 
 function extractAvatarSrc(avatar: UserRow['avatar']): string | null {
@@ -40,7 +42,9 @@ function extractAvatarSrc(avatar: UserRow['avatar']): string | null {
   return null;
 }
 
-export function UsersAdminView({ users, currentUserId }: UsersAdminViewProps) {
+export function UsersAdminView({ users, currentUserId, customRoleLabels = {} }: UsersAdminViewProps) {
+  const labelFor = (role: string): string =>
+    customRoleLabels[role] || ROLE_LABELS[role] || role;
   const router = useRouter();
   const toast = useToast();
   const [creating, setCreating] = useState(false);
@@ -129,7 +133,7 @@ export function UsersAdminView({ users, currentUserId }: UsersAdminViewProps) {
       header: 'Rol',
       cell: (u) => (
         <span style={{ color: '#0F2E3D' }} className="text-sm font-medium">
-          {ROLE_LABELS[u.role] ?? u.role}
+          {labelFor(u.role)}
         </span>
       ),
     },
