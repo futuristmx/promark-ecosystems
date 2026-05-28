@@ -35,8 +35,23 @@ export async function GET(
   });
   if (!tenant) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
 
-  // LEGAL_REP: solo marcas asignadas por holder
+  // Filtros opcionales (?status=, ?type=, ?class=, ?company=)
   const where: Prisma.BrandWhereInput = { tenant_id: tenant.id };
+  const statusFilter = url.searchParams.get('status');
+  const typeFilter = url.searchParams.get('type');
+  const classFilter = url.searchParams.get('class');
+  const companyFilter = url.searchParams.get('company');
+  if (statusFilter) (where as Record<string, unknown>).legal_status = statusFilter;
+  if (typeFilter) (where as Record<string, unknown>).brand_type = typeFilter;
+  if (companyFilter) (where as Record<string, unknown>).company_id = companyFilter;
+  if (classFilter) {
+    const n = parseInt(classFilter, 10);
+    if (!Number.isNaN(n)) {
+      (where as Record<string, unknown>).classes = { some: { class_number: n } };
+    }
+  }
+
+  // LEGAL_REP: solo marcas asignadas por holder
   if (session.role === 'CLIENT_LEGAL_REP') {
     const assignments = await prisma.userClientHolder.findMany({
       where: { user_client_id: session.user_id, tenant_id: tenant.id, removed_at: null },
