@@ -47,8 +47,11 @@ function CopyBtn({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium transition-colors"
-      style={{ color: copied ? '#2F6B4F' : '#8FB6C7', background: copied ? 'rgba(47,107,79,0.08)' : 'transparent' }}
+      className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold transition-colors"
+      style={{
+        color: copied ? '#2F6B4F' : '#0F2E3D',
+        background: copied ? 'rgba(47,107,79,0.10)' : 'rgba(15,46,61,0.08)',
+      }}
       title="Copiar"
     >
       {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
