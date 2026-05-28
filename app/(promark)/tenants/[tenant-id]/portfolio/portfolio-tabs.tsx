@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, Tag, Users, Scroll, KeyRound } from 'lucide-react';
+import { Plus, Tag, Users, Scroll, KeyRound } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VigencyDot } from '@/components/vigency-badge';
 import {
   BRAND_STATUS_LABELS,
+  BRAND_TYPE_LABELS,
   HOLDER_STATUS_LABELS,
   CONTRACT_TYPE_LABELS,
   CONTRACT_STATUS_LABELS,
@@ -22,6 +22,13 @@ import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
 } from '@/components/ui/table';
 import { PortfolioCsvBar } from './portfolio-csv-bar';
+import {
+  SmartFilterBar,
+  buildOptions,
+  vigencyBucket,
+  VIGENCY_LABELS,
+  type ActiveFilters,
+} from '@/components/portfolio/smart-filter-bar';
 
 const BRAND_STATUS_TONE: Record<string, StatusTone> = {
   REGISTERED: 'success', RENEWED: 'success', APPLIED: 'info', PUBLISHED: 'info',
@@ -96,6 +103,7 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [brandsLoading, setBrandsLoading] = useState(true);
   const [brandSearch, setBrandSearch] = useState('');
+  const [brandFilters, setBrandFilters] = useState<ActiveFilters>({});
   const [brandsView, setBrandsView] = useState<'table' | 'cards'>('cards');
 
   const fetchBrands = useCallback(async () => {
@@ -107,14 +115,39 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
   useEffect(() => { fetchBrands(); }, [fetchBrands]);
 
-  const filteredBrands = brands.filter((b) =>
-    !brandSearch || b.name.toLowerCase().includes(brandSearch.toLowerCase())
+  const filteredBrands = useMemo(() => {
+    return brands.filter((b) => {
+      if (brandSearch) {
+        const q = brandSearch.toLowerCase();
+        const hay = `${b.name} ${b.company.name} ${b.registration_number ?? ''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (brandFilters.status && !brandFilters.status.includes(b.legal_status)) return false;
+      if (brandFilters.type && !brandFilters.type.includes(b.brand_type)) return false;
+      if (brandFilters.company && !brandFilters.company.includes(b.company.id)) return false;
+      if (brandFilters.vigency) {
+        const bucket = vigencyBucket(b.expiration_date) ?? '';
+        if (!brandFilters.vigency.includes(bucket)) return false;
+      }
+      return true;
+    });
+  }, [brands, brandSearch, brandFilters]);
+
+  const brandFilterFields = useMemo(
+    () => [
+      { key: 'status', label: 'Estado', options: buildOptions(brands, (b) => b.legal_status, BRAND_STATUS_LABELS) },
+      { key: 'type', label: 'Tipo', options: buildOptions(brands, (b) => b.brand_type, BRAND_TYPE_LABELS) },
+      { key: 'company', label: 'Empresa', options: buildOptions(brands, (b) => b.company.id, Object.fromEntries(brands.map((b) => [b.company.id, b.company.name]))) },
+      { key: 'vigency', label: 'Vigencia', options: buildOptions(brands, (b) => vigencyBucket(b.expiration_date), VIGENCY_LABELS) },
+    ],
+    [brands],
   );
 
   /* ── Holders ── */
   const [holders, setHolders] = useState<HolderItem[]>([]);
   const [holdersLoading, setHoldersLoading] = useState(true);
   const [holderSearch, setHolderSearch] = useState('');
+  const [holderFilters, setHolderFilters] = useState<ActiveFilters>({});
 
   const fetchHolders = useCallback(async () => {
     setHoldersLoading(true);
@@ -125,14 +158,32 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
   useEffect(() => { fetchHolders(); }, [fetchHolders]);
 
-  const filteredHolders = holders.filter((h) =>
-    !holderSearch || h.name.toLowerCase().includes(holderSearch.toLowerCase())
+  const filteredHolders = useMemo(() => {
+    return holders.filter((h) => {
+      if (holderSearch) {
+        const q = holderSearch.toLowerCase();
+        const hay = `${h.name} ${h.rfc ?? ''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (holderFilters.type && !holderFilters.type.includes(h.holder_type)) return false;
+      if (holderFilters.status && !holderFilters.status.includes(h.status)) return false;
+      return true;
+    });
+  }, [holders, holderSearch, holderFilters]);
+
+  const holderFilterFields = useMemo(
+    () => [
+      { key: 'type', label: 'Tipo', options: buildOptions(holders, (h) => h.holder_type) },
+      { key: 'status', label: 'Estado', options: buildOptions(holders, (h) => h.status, HOLDER_STATUS_LABELS) },
+    ],
+    [holders],
   );
 
   /* ── Contracts ── */
   const [contracts, setContracts] = useState<ContractItem[]>([]);
   const [contractsLoading, setContractsLoading] = useState(true);
   const [contractSearch, setContractSearch] = useState('');
+  const [contractFilters, setContractFilters] = useState<ActiveFilters>({});
 
   const fetchContracts = useCallback(async () => {
     setContractsLoading(true);
@@ -143,14 +194,33 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
   useEffect(() => { fetchContracts(); }, [fetchContracts]);
 
-  const filteredContracts = contracts.filter((c) =>
-    !contractSearch || c.title.toLowerCase().includes(contractSearch.toLowerCase())
+  const filteredContracts = useMemo(() => {
+    return contracts.filter((c) => {
+      if (contractSearch && !c.title.toLowerCase().includes(contractSearch.toLowerCase())) return false;
+      if (contractFilters.type && !contractFilters.type.includes(c.contract_type)) return false;
+      if (contractFilters.status && !contractFilters.status.includes(c.status)) return false;
+      if (contractFilters.vigency) {
+        const bucket = vigencyBucket(c.expiration_date) ?? '';
+        if (!contractFilters.vigency.includes(bucket)) return false;
+      }
+      return true;
+    });
+  }, [contracts, contractSearch, contractFilters]);
+
+  const contractFilterFields = useMemo(
+    () => [
+      { key: 'type', label: 'Tipo', options: buildOptions(contracts, (c) => c.contract_type, CONTRACT_TYPE_LABELS) },
+      { key: 'status', label: 'Estado', options: buildOptions(contracts, (c) => c.status, CONTRACT_STATUS_LABELS) },
+      { key: 'vigency', label: 'Vigencia', options: buildOptions(contracts, (c) => vigencyBucket(c.expiration_date), VIGENCY_LABELS) },
+    ],
+    [contracts],
   );
 
   /* ── Licenses ── */
   const [licenses, setLicenses] = useState<LicenseItem[]>([]);
   const [licensesLoading, setLicensesLoading] = useState(true);
   const [licenseSearch, setLicenseSearch] = useState('');
+  const [licenseFilters, setLicenseFilters] = useState<ActiveFilters>({});
 
   const fetchLicenses = useCallback(async () => {
     setLicensesLoading(true);
@@ -161,8 +231,30 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
   useEffect(() => { fetchLicenses(); }, [fetchLicenses]);
 
-  const filteredLicenses = licenses.filter((l) =>
-    !licenseSearch || l.licensee_name.toLowerCase().includes(licenseSearch.toLowerCase())
+  const filteredLicenses = useMemo(() => {
+    return licenses.filter((l) => {
+      if (licenseSearch) {
+        const q = licenseSearch.toLowerCase();
+        const hay = `${l.licensee_name} ${l.brand.name}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (licenseFilters.type && !licenseFilters.type.includes(l.license_type)) return false;
+      if (licenseFilters.status && !licenseFilters.status.includes(l.status)) return false;
+      if (licenseFilters.vigency) {
+        const bucket = vigencyBucket(l.expiration_date) ?? '';
+        if (!licenseFilters.vigency.includes(bucket)) return false;
+      }
+      return true;
+    });
+  }, [licenses, licenseSearch, licenseFilters]);
+
+  const licenseFilterFields = useMemo(
+    () => [
+      { key: 'type', label: 'Tipo', options: buildOptions(licenses, (l) => l.license_type, LICENSE_TYPE_LABELS) },
+      { key: 'status', label: 'Estado', options: buildOptions(licenses, (l) => l.status, LICENSE_STATUS_LABELS) },
+      { key: 'vigency', label: 'Vigencia', options: buildOptions(licenses, (l) => vigencyBucket(l.expiration_date), VIGENCY_LABELS) },
+    ],
+    [licenses],
   );
 
   const refetchAll = useCallback(() => {
@@ -196,31 +288,38 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
       {/* ── MARCAS ── */}
       <TabsContent value="brands" className="space-y-4 pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input placeholder="Buscar marcas..." value={brandSearch}
-              onChange={(e) => setBrandSearch(e.target.value)} className="pl-9" />
-          </div>
-          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: '#F1EDE3' }}>
-            <button type="button" onClick={() => setBrandsView('table')}
-              className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-              style={brandsView === 'table' ? { background: '#0F2E3D', color: '#fff' } : { color: '#355B6F' }}>
-              Tabla
-            </button>
-            <button type="button" onClick={() => setBrandsView('cards')}
-              className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-              style={brandsView === 'cards' ? { background: '#0F2E3D', color: '#fff' } : { color: '#355B6F' }}>
-              Cards
-            </button>
-          </div>
-          {canCreate && (
-            <Link href={`/tenants/${tenantId}/brands/new`}
-              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
-              <Plus className="size-4" /> Nueva Marca
-            </Link>
-          )}
-        </div>
+        <SmartFilterBar
+          searchValue={brandSearch}
+          onSearchChange={setBrandSearch}
+          searchPlaceholder="Buscar marcas por nombre, empresa o N° de registro…"
+          fields={brandFilterFields}
+          active={brandFilters}
+          onActiveChange={setBrandFilters}
+          totalResults={filteredBrands.length}
+          totalUnfiltered={brands.length}
+          rightSlot={
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: '#F1EDE3' }}>
+                <button type="button" onClick={() => setBrandsView('table')}
+                  className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+                  style={brandsView === 'table' ? { background: '#0F2E3D', color: '#fff' } : { color: '#355B6F' }}>
+                  Tabla
+                </button>
+                <button type="button" onClick={() => setBrandsView('cards')}
+                  className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+                  style={brandsView === 'cards' ? { background: '#0F2E3D', color: '#fff' } : { color: '#355B6F' }}>
+                  Cards
+                </button>
+              </div>
+              {canCreate && (
+                <Link href={`/tenants/${tenantId}/brands/new`}
+                  className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium">
+                  <Plus className="size-3.5" /> Nueva
+                </Link>
+              )}
+            </div>
+          }
+        />
         <div
           className="overflow-hidden rounded-2xl border"
           style={{
@@ -318,19 +417,24 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
       {/* ── TITULARES ── */}
       <TabsContent value="holders" className="space-y-4 pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input placeholder="Buscar titulares..." value={holderSearch}
-              onChange={(e) => setHolderSearch(e.target.value)} className="pl-9" />
-          </div>
-          {canCreate && (
-            <Link href={`/tenants/${tenantId}/holders/new`}
-              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
-              <Plus className="size-4" /> Nuevo Titular
-            </Link>
-          )}
-        </div>
+        <SmartFilterBar
+          searchValue={holderSearch}
+          onSearchChange={setHolderSearch}
+          searchPlaceholder="Buscar titulares por nombre o RFC…"
+          fields={holderFilterFields}
+          active={holderFilters}
+          onActiveChange={setHolderFilters}
+          totalResults={filteredHolders.length}
+          totalUnfiltered={holders.length}
+          rightSlot={
+            canCreate ? (
+              <Link href={`/tenants/${tenantId}/holders/new`}
+                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium">
+                <Plus className="size-3.5" /> Nuevo
+              </Link>
+            ) : null
+          }
+        />
         <DsDataTable<HolderItem>
           columns={[
             { key: 'name', header: 'Nombre', sortable: true,
@@ -352,19 +456,24 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
       {/* ── CONTRATOS ── */}
       <TabsContent value="contracts" className="space-y-4 pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input placeholder="Buscar contratos..." value={contractSearch}
-              onChange={(e) => setContractSearch(e.target.value)} className="pl-9" />
-          </div>
-          {canCreate && (
-            <Link href={`/tenants/${tenantId}/contratos/nuevo`}
-              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
-              <Plus className="size-4" /> Nuevo Contrato
-            </Link>
-          )}
-        </div>
+        <SmartFilterBar
+          searchValue={contractSearch}
+          onSearchChange={setContractSearch}
+          searchPlaceholder="Buscar contratos por título…"
+          fields={contractFilterFields}
+          active={contractFilters}
+          onActiveChange={setContractFilters}
+          totalResults={filteredContracts.length}
+          totalUnfiltered={contracts.length}
+          rightSlot={
+            canCreate ? (
+              <Link href={`/tenants/${tenantId}/contratos/nuevo`}
+                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium">
+                <Plus className="size-3.5" /> Nuevo
+              </Link>
+            ) : null
+          }
+        />
         <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#C8C4B9', background: '#E2DED6', backgroundImage: 'none' }}>
           {contractsLoading ? (
             <div className="flex items-center justify-center py-16">
@@ -411,19 +520,24 @@ export function PortfolioTabs({ tenantId, userRole }: PortfolioTabsProps) {
 
       {/* ── LICENCIAS ── */}
       <TabsContent value="licenses" className="space-y-4 pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input placeholder="Buscar licencias..." value={licenseSearch}
-              onChange={(e) => setLicenseSearch(e.target.value)} className="pl-9" />
-          </div>
-          {canCreate && (
-            <Link href={`/tenants/${tenantId}/licencias/nueva`}
-              className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium">
-              <Plus className="size-4" /> Nueva Licencia
-            </Link>
-          )}
-        </div>
+        <SmartFilterBar
+          searchValue={licenseSearch}
+          onSearchChange={setLicenseSearch}
+          searchPlaceholder="Buscar licencias por licenciatario o marca…"
+          fields={licenseFilterFields}
+          active={licenseFilters}
+          onActiveChange={setLicenseFilters}
+          totalResults={filteredLicenses.length}
+          totalUnfiltered={licenses.length}
+          rightSlot={
+            canCreate ? (
+              <Link href={`/tenants/${tenantId}/licencias/nueva`}
+                className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium">
+                <Plus className="size-3.5" /> Nueva
+              </Link>
+            ) : null
+          }
+        />
         <div className="overflow-hidden rounded-2xl border" style={{ borderColor: '#C8C4B9', background: '#E2DED6', backgroundImage: 'none' }}>
           {licensesLoading ? (
             <div className="flex items-center justify-center py-16">
