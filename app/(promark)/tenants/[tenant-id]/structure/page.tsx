@@ -53,6 +53,9 @@ export default async function StructurePage({ params }: StructurePageProps) {
   });
 
   const canEdit = session.role !== 'ASSISTANT';
+  const { getPromarkPermissions } = await import('@/lib/auth/promark-permissions');
+  const perms = await getPromarkPermissions(session.role);
+  const canExport = perms.export_data === true;
 
   return (
     <div>
@@ -81,7 +84,7 @@ export default async function StructurePage({ params }: StructurePageProps) {
         }
       />
 
-      {canEdit && (
+      {canEdit && canExport && (
         <StructureCsvBar tenantId={tenantId} className="mt-4" />
       )}
 

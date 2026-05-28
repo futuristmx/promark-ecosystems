@@ -1,5 +1,9 @@
 import Link from 'next/link';
 import { requirePromarkAuth } from '@/lib/auth/promark';
+import {
+  assertPromarkPermission,
+  getPromarkPermissions,
+} from '@/lib/auth/promark-permissions';
 import prisma from '@/lib/prisma/client';
 import { Plus, Building2 } from 'lucide-react';
 import { PageTitle, EmptyState, CsvToolbar } from '@/components/ds';
@@ -7,6 +11,12 @@ import { TenantsView } from './tenants-view';
 
 export default async function TenantsPage() {
   const user = await requirePromarkAuth();
+  // view_clients controla el acceso al listado de clientes. Si no lo
+  // tiene, lo mandamos al dashboard.
+  await assertPromarkPermission(user.role, 'view_clients');
+  const perms = await getPromarkPermissions(user.role);
+  const canManageTenants = perms.manage_tenants === true;
+  const canExport = perms.export_data === true;
 
   const tenants = await prisma.tenant.findMany({
     orderBy: { created_at: 'desc' },
@@ -52,8 +62,9 @@ export default async function TenantsPage() {
     };
   });
 
-  const isSuperAdmin = user.role === 'SUPERADMIN';
-
+  // Permitir crear/editar tenants y administrar CSV: manage_tenants.
+  // El bulk delete del TenantsView también requiere manage_tenants (la API
+  // ya lo valida server-side; aquí ocultamos los controles).
   return (
     <div className="space-y-6">
       <PageTitle
@@ -61,7 +72,7 @@ export default async function TenantsPage() {
         title="Clientes"
         subtitle="Gestiona los clientes y sus configuraciones."
         actions={
-          isSuperAdmin ? (
+          canManageTenants ? (
             <Link
               href="/tenants/new"
               className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
@@ -73,7 +84,7 @@ export default async function TenantsPage() {
         }
       />
 
-      {isSuperAdmin && (
+      {canManageTenants && canExport && (
         <CsvToolbar
           endpoint="/api/tenants/csv"
           templateColumns={['nombre', 'slug', 'estado']}
@@ -88,7 +99,7 @@ export default async function TenantsPage() {
           title="No hay clientes registrados"
           description="Crea tu primer cliente para empezar a gestionar su cartera de marcas."
           action={
-            isSuperAdmin ? (
+            canManageTenants ? (
               <Link
                 href="/tenants/new"
                 className="ds-btn-primary inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
@@ -102,7 +113,7 @@ export default async function TenantsPage() {
       ) : (
         <TenantsView
           tenants={tenantRows}
-          isSuperAdmin={isSuperAdmin}
+          isSuperAdmin={canManageTenants}
         />
       )}
     </div>
