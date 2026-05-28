@@ -61,9 +61,9 @@ const NICE_CLASS_LABELS: Record<number, string> = {
 
 // Escala de azul marino: low → high
 function colorForCount(count: number, accent?: string): { fill: string; opacity: number; textColor: string } {
-  if (count === 0) return { fill: '#E2DED6', opacity: 0.55, textColor: '#A8A39B' };
-  if (count <= 5) return { fill: '#BFD8E3', opacity: 1, textColor: '#0F2E3D' };
-  if (count <= 20) return { fill: '#5C8195', opacity: 1, textColor: '#FBF6EC' };
+  if (count === 0) return { fill: '#FBF6EC', opacity: 1, textColor: '#C8C4B9' };
+  if (count <= 5) return { fill: '#A8C8D6', opacity: 1, textColor: '#0F2E3D' };
+  if (count <= 20) return { fill: '#3E6478', opacity: 1, textColor: '#FBF6EC' };
   if (count <= 50) return { fill: accent ?? '#1C3F55', opacity: 1, textColor: '#FBF6EC' };
   return { fill: accent ?? '#0F2E3D', opacity: 1, textColor: '#FBF6EC' };
 }
@@ -101,12 +101,13 @@ export function ImpiClassHeatmap({
           return (
             <div
               key={classNumber}
-              className="group relative aspect-square rounded transition-transform duration-150"
+              className="group relative aspect-square rounded border transition-transform duration-150"
               style={{
                 background: fill,
                 opacity,
-                transform: isHover ? 'scale(1.18)' : 'scale(1)',
-                boxShadow: isHover ? '0 0 0 1.5px #D39A2B, 0 6px 16px rgba(15,46,61,0.18)' : 'none',
+                borderColor: count === 0 ? '#E2DED6' : 'transparent',
+                transform: isHover ? 'scale(1.22)' : 'scale(1)',
+                boxShadow: isHover ? '0 0 0 2px #D39A2B, 0 8px 20px rgba(15,46,61,0.22)' : 'none',
                 cursor: 'pointer',
                 zIndex: isHover ? 5 : 1,
               }}
@@ -148,15 +149,15 @@ export function ImpiClassHeatmap({
       <div className="mt-3 flex items-center justify-center gap-3 text-[10px] uppercase tracking-wider" style={{ color: '#355B6F' }}>
         <span className="font-semibold">Intensidad</span>
         <div className="flex items-center gap-1.5">
-          <div className="size-2.5 rounded" style={{ background: '#E2DED6', opacity: 0.55 }} />
+          <div className="size-2.5 rounded border" style={{ background: '#FBF6EC', borderColor: '#E2DED6' }} />
           <span>0</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="size-2.5 rounded" style={{ background: '#BFD8E3' }} />
+          <div className="size-2.5 rounded" style={{ background: '#A8C8D6' }} />
           <span>1–5</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="size-2.5 rounded" style={{ background: '#5C8195' }} />
+          <div className="size-2.5 rounded" style={{ background: '#3E6478' }} />
           <span>6–20</span>
         </div>
         <div className="flex items-center gap-1.5">

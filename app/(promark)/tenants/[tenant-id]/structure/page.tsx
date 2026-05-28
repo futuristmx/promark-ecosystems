@@ -378,8 +378,8 @@ export default async function StructurePage({ params }: StructurePageProps) {
                       <span className="text-xs text-[#0F2E3D]">
                         {holdersCount}{' '}
                         {holdersCount === 1
-                          ? 'titular en el tenant'
-                          : 'titulares en el tenant'}
+                          ? 'titular del cliente'
+                          : 'titulares del cliente'}
                       </span>
                       <Link
                         href={`/tenants/${tenantId}/holders`}
