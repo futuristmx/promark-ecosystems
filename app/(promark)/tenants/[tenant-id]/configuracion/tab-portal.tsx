@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Globe, AlertTriangle } from 'lucide-react';
+import { Globe, AlertTriangle, Copy, Check } from 'lucide-react';
+import { HelpTip, useToast } from '@/components/ds';
 
 interface Props {
   tenantId: string;
@@ -12,10 +13,12 @@ interface Props {
 
 export function PortalTab({ tenantId, tenantName, currentSlug }: Props) {
   const router = useRouter();
+  const toast = useToast();
   const [slug, setSlug] = useState(currentSlug);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const slugChanged = slug !== currentSlug;
   const slugValid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) && slug.length >= 3;
@@ -79,6 +82,10 @@ export function PortalTab({ tenantId, tenantName, currentSlug }: Props) {
               <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
                 URL del portal
               </h3>
+              <HelpTip>
+                El slug forma parte de la URL pública del portal. Cambiarlo
+                invalida los enlaces anteriores y las sesiones activas.
+              </HelpTip>
             </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               El slug define la dirección web del portal del cliente.
@@ -123,12 +130,34 @@ export function PortalTab({ tenantId, tenantName, currentSlug }: Props) {
               <p className="text-[11px] font-medium" style={{ color: '#355B6F' }}>
                 URL completa del portal:
               </p>
-              <code
-                className="mt-1 block rounded-lg px-3 py-2 text-xs"
-                style={{ background: 'rgba(15,46,61,0.05)', color: '#0F2E3D' }}
-              >
-                {baseUrl}/brand-ecosystem/<strong>{slug || '...'}</strong>/login
-              </code>
+              <div className="mt-1 flex items-stretch gap-2">
+                <code
+                  className="flex-1 rounded-lg px-3 py-2 text-xs"
+                  style={{ background: 'rgba(15,46,61,0.05)', color: '#0F2E3D' }}
+                >
+                  {baseUrl}/brand-ecosystem/<strong>{slug || '...'}</strong>/login
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = `${baseUrl}/brand-ecosystem/${slug}/login`;
+                    navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    toast.success('URL copiada al portapapeles');
+                    setTimeout(() => setCopied(false), 1500);
+                  }}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all"
+                  style={{
+                    borderColor: copied ? 'rgba(47,107,79,0.3)' : '#E2DED6',
+                    background: copied ? 'rgba(47,107,79,0.08)' : '#FBF6EC',
+                    color: copied ? '#2F6B4F' : '#355B6F',
+                  }}
+                  title="Copiar URL"
+                >
+                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                  {copied ? 'Copiado' : 'Copiar'}
+                </button>
+              </div>
             </div>
           </div>
 

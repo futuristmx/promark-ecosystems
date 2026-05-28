@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, X, LayoutDashboard, Tag, Bell, FileText } from 'lucide-react';
+import { HelpTip } from '@/components/ds';
 
 interface BrandingState {
   primary_color: string;
@@ -113,9 +114,15 @@ export function BrandingTab({ tenantId, tenantName, tenantSlug, initialBranding 
             className="rounded-2xl border p-6"
             style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
           >
-            <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
-              Nombre del portal
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
+                Nombre del portal
+              </h3>
+              <HelpTip>
+                Nombre comercial que aparece en el header del portal del cliente,
+                el login y los correos. Por defecto usa el nombre fiscal del cliente.
+              </HelpTip>
+            </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               Aparece en el encabezado y sidebar del portal del cliente.
             </p>
@@ -135,9 +142,15 @@ export function BrandingTab({ tenantId, tenantName, tenantSlug, initialBranding 
             className="rounded-2xl border p-6"
             style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
           >
-            <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
-              Color primario
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
+                Color primario
+              </h3>
+              <HelpTip>
+                Color de acento del portal del cliente: stripe de selección en
+                el sidebar, botones primarios, foco de inputs y chips de marca.
+              </HelpTip>
+            </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               Define el acento visual del portal del cliente.
             </p>
@@ -186,9 +199,16 @@ export function BrandingTab({ tenantId, tenantName, tenantSlug, initialBranding 
             className="rounded-2xl border p-6"
             style={{ borderColor: '#E2DED6', background: '#F1EDE3' }}
           >
-            <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
-              Logo del portal
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold" style={{ color: '#0F2E3D' }}>
+                Logo del portal
+              </h3>
+              <HelpTip>
+                Logo que aparece en el header y footer del sidebar del portal,
+                en el PDF exportado y en el header del login. Recomendado: PNG
+                con fondo transparente, alto 80px.
+              </HelpTip>
+            </div>
             <p className="mt-1 text-xs" style={{ color: '#355B6F' }}>
               PNG, JPG o SVG. Máximo 200 KB. Se muestra en el sidebar del portal.
             </p>
