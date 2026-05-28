@@ -5,9 +5,8 @@ import { NewTenantForm } from './new-tenant-form';
 
 export default async function NewTenantPage() {
   const user = await requirePromarkAuth();
-  if (user.role !== 'SUPERADMIN') {
-    redirect('/tenants');
-  }
+  const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
+  await assertPromarkPermission(user.role, 'manage_tenants', '/tenants');
 
   return (
     <div className="mx-auto max-w-4xl">

@@ -17,7 +17,9 @@ interface Props {
 }
 
 export default async function ActivityPage({ params, searchParams }: Props) {
-  await requirePromarkAuth();
+  const session = await requirePromarkAuth();
+  const { assertPromarkPermission } = await import('@/lib/auth/promark-permissions');
+  await assertPromarkPermission(session.role, 'view_activity');
   const { 'tenant-id': tenantId } = await params;
   const sp = await searchParams;
 
