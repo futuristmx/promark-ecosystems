@@ -113,12 +113,10 @@ export default async function BrandEcosystemLayout({
           primaryColor={primaryColor}
           userName={userName}
           userRoleLabel={userRole ? (roleLabels[userRole] ?? userRole) : null}
-          showContracts={config?.features?.show_contracts === true && userRole !== 'CLIENT_VIEWER'}
           showAlerts={
             userRole !== 'CLIENT_VIEWER' &&
-            // Si el SUPERADMIN apagó client_alerts.enabled, no mostrar el item.
-            // Default: si nunca se ha configurado, asumir habilitado (true).
-            config?.client_alerts?.enabled !== false
+            // Default: alertas APAGADAS hasta que el SUPERADMIN las active.
+            config?.client_alerts?.enabled === true
           }
         />
       )}

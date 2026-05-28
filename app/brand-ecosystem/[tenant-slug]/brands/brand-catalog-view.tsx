@@ -166,33 +166,52 @@ export function BrandCatalogView({
         <ExportMenu endpoint={exportEndpoint} hint="Descarga el catálogo completo según tus permisos." />
       </div>
 
-      {/* Filters + view toggle */}
-      <div className="mb-6 flex items-center justify-between gap-4">
+      {/* Filters bar (full width) */}
+      <div className="mb-4">
         <BrandFilters companies={companies} basePath={basePath} availableClasses={availableClasses} />
-        <div className="flex items-center gap-1">
+      </div>
+
+      {/* View toggle — high contrast segmented control */}
+      <div className="mb-6 flex items-center justify-end">
+        <div
+          className="inline-flex items-center gap-0.5 rounded-xl border-2 p-0.5"
+          style={{ borderColor: '#355B6F', background: '#FBF6EC' }}
+        >
           <button
             type="button"
             onClick={() => setViewMode('cards')}
-            className="rounded-lg p-2 transition-colors"
-            style={{
-              background: viewMode === 'cards' ? 'rgba(211,154,43,0.12)' : 'transparent',
-              color: viewMode === 'cards' ? '#D39A2B' : '#C8C4B9',
-            }}
-            title="Vista de tarjetas"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all"
+            style={
+              viewMode === 'cards'
+                ? {
+                    background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
+                    color: '#FBF6EC',
+                    boxShadow: '0 2px 6px rgba(15,46,61,0.25)',
+                  }
+                : { color: '#355B6F' }
+            }
+            title="Vista de tarjetas — muestra cada marca como una card con logo"
           >
-            <LayoutGrid className="size-4" />
+            <LayoutGrid className="size-3.5" />
+            Tarjetas
           </button>
           <button
             type="button"
             onClick={() => setViewMode('list')}
-            className="rounded-lg p-2 transition-colors"
-            style={{
-              background: viewMode === 'list' ? 'rgba(211,154,43,0.12)' : 'transparent',
-              color: viewMode === 'list' ? '#D39A2B' : '#C8C4B9',
-            }}
-            title="Vista de lista"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all"
+            style={
+              viewMode === 'list'
+                ? {
+                    background: 'linear-gradient(135deg, #0F2E3D 0%, #1C3F55 100%)',
+                    color: '#FBF6EC',
+                    boxShadow: '0 2px 6px rgba(15,46,61,0.25)',
+                  }
+                : { color: '#355B6F' }
+            }
+            title="Vista de lista — tabla compacta con todas las columnas"
           >
-            <List className="size-4" />
+            <List className="size-3.5" />
+            Lista
           </button>
         </div>
       </div>
