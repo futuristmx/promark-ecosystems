@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { Tag, FileText, ScrollText, Bell, LayoutDashboard, LogOut } from 'lucide-react';
+import { Tag, FileText, ScrollText, Bell, LayoutDashboard, LogOut, MessageCircle, Download } from 'lucide-react';
 
 interface ClientSidebarProps {
   tenantSlug: string;
@@ -73,6 +73,8 @@ export function ClientSidebar({
     ...(showAlerts ? [{ label: 'Alertas', href: `${basePath}/alerts`, icon: Bell, tooltip: 'Vigencias por vencer y eventos detectados' }] : []),
     { label: 'Documentos', href: `${basePath}/documents`, icon: FileText, tooltip: 'Contratos, certificados y comunicaciones' },
     ...(showContracts ? [{ label: 'Contratos', href: `${basePath}/contratos`, icon: ScrollText, tooltip: 'Contratos y licencias vinculadas a marcas' }] : []),
+    { label: 'Descargas', href: `${basePath}/descargas`, icon: Download, tooltip: 'Exporta el catálogo en PDF o Excel con filtros' },
+    { label: 'Contacto', href: `${basePath}/contacto`, icon: MessageCircle, tooltip: 'WhatsApp, email o mensaje directo a Promark' },
   ];
 
   function isActive(href: string) {
@@ -184,18 +186,29 @@ export function ClientSidebar({
         </ul>
       </nav>
 
-      {/* User info footer + logout */}
+      {/* User info footer + logout — la "foto" es el logo del tenant
+        cuando existe; si no, fallback a iniciales del usuario. */}
       <div className="border-t px-4 py-4" style={{ borderColor: '#E2DED6' }}>
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-            style={{
-              background: 'linear-gradient(135deg, #0F2E3D, #1C3F55)',
-              color: '#FBF6EC',
-            }}
-          >
-            {userName.slice(0, 2).toUpperCase()}
-          </div>
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoUrl}
+              alt={displayName}
+              className="size-9 shrink-0 rounded-full object-contain"
+              style={{ background: '#FBF6EC', padding: 2, border: `1px solid ${primaryColor}40` }}
+            />
+          ) : (
+            <div
+              className="flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+              style={{
+                background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}cc)`,
+                color: '#FBF6EC',
+              }}
+            >
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold" style={{ color: '#0F2E3D' }}>
               {userName}
@@ -223,28 +236,6 @@ export function ClientSidebar({
             <LogOut className="size-4" />
           </button>
         </div>
-      </div>
-
-      {/* Brand mark — logo del tenant también al pie (mismo del header) */}
-      <div
-        className="flex items-center justify-center border-t px-4 py-3"
-        style={{ borderColor: '#E2DED6', background: 'rgba(226,222,214,0.35)' }}
-      >
-        {logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logoUrl}
-            alt={displayName}
-            className="h-6 max-w-[140px] object-contain opacity-60 transition-opacity hover:opacity-100"
-          />
-        ) : (
-          <span
-            className="text-[10px] font-semibold uppercase tracking-[0.15em]"
-            style={{ color: primaryColor, opacity: 0.7 }}
-          >
-            {displayName}
-          </span>
-        )}
       </div>
     </aside>
   );

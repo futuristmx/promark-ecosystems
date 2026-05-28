@@ -119,8 +119,8 @@ export default async function BrandEcosystemLayout({
       <main className="flex flex-1 flex-col" style={{ background: '#FBF6EC' }}>
         <div className="flex-1">{children}</div>
         <footer
-          className="border-t px-6 py-4 text-center text-xs"
-          style={{ borderColor: '#E2DED6', background: '#F1EDE3', color: '#C8C4B9' }}
+          className="border-t px-6 py-4 text-center text-xs font-medium"
+          style={{ borderColor: '#E2DED6', background: '#F1EDE3', color: '#355B6F' }}
         >
           Promark® — Inteligencia Marcaria {new Date().getFullYear()}
         </footer>
