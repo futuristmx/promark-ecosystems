@@ -450,9 +450,7 @@ export function PromarkFinancialDashboard({
 
         {/* Filtros inteligentes para la gráfica */}
         <SmartFilterBar
-          searchValue=""
-          onSearchChange={() => {}}
-          searchPlaceholder=""
+          hideSearch
           fields={filterFields}
           active={chartFilters}
           onActiveChange={setChartFilters}

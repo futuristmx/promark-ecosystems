@@ -18,9 +18,11 @@ export interface FilterField {
 export type ActiveFilters = Record<string, string[]>;
 
 interface Props {
-  searchValue: string;
-  onSearchChange: (v: string) => void;
+  searchValue?: string;
+  onSearchChange?: (v: string) => void;
   searchPlaceholder?: string;
+  /** Oculta el input de búsqueda (útil cuando los filtros son suficientes). */
+  hideSearch?: boolean;
   fields: FilterField[];
   active: ActiveFilters;
   onActiveChange: (next: ActiveFilters) => void;
@@ -41,9 +43,10 @@ interface Props {
  * - Live result counter
  */
 export function SmartFilterBar({
-  searchValue,
+  searchValue = '',
   onSearchChange,
   searchPlaceholder = 'Buscar…',
+  hideSearch = false,
   fields,
   active,
   onActiveChange,
@@ -95,7 +98,7 @@ export function SmartFilterBar({
 
   function clearAll() {
     onActiveChange({});
-    onSearchChange('');
+    onSearchChange?.('');
   }
 
   const activeCount = Object.values(active).reduce((sum, arr) => sum + arr.length, 0);
@@ -116,43 +119,45 @@ export function SmartFilterBar({
     >
       {/* Top row: search + chips + actions */}
       <div className="flex flex-wrap items-center gap-2 p-2.5">
-        {/* Search */}
-        <div className="relative flex min-w-[220px] flex-1 items-center">
-          <Search
-            className="absolute left-3 size-4"
-            style={{ color: '#8FB6C7' }}
-          />
-          <input
-            type="text"
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="w-full rounded-xl border bg-transparent py-2 pl-9 pr-3 text-sm focus:outline-none"
-            style={{
-              borderColor: '#E2DED6',
-              color: '#1A1E23',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#D39A2B';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(211,154,43,0.12)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = '#E2DED6';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          />
-          {searchValue && (
-            <button
-              type="button"
-              onClick={() => onSearchChange('')}
-              className="absolute right-2 rounded p-0.5"
-              style={{ color: '#355B6F' }}
-              aria-label="Limpiar búsqueda"
-            >
-              <X className="size-3.5" />
-            </button>
-          )}
-        </div>
+        {/* Search (opcional) */}
+        {!hideSearch && (
+          <div className="relative flex min-w-[220px] flex-1 items-center">
+            <Search
+              className="absolute left-3 size-4"
+              style={{ color: '#8FB6C7' }}
+            />
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-full rounded-xl border bg-transparent py-2 pl-9 pr-3 text-sm focus:outline-none"
+              style={{
+                borderColor: '#E2DED6',
+                color: '#1A1E23',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = '#D39A2B';
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(211,154,43,0.12)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = '#E2DED6';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            />
+            {searchValue && (
+              <button
+                type="button"
+                onClick={() => onSearchChange?.('')}
+                className="absolute right-2 rounded p-0.5"
+                style={{ color: '#355B6F' }}
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Filter dropdowns */}
         {fields.map((field) => {
