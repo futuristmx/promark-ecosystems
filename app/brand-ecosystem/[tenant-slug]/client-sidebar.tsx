@@ -40,13 +40,12 @@ export function ClientSidebar({
   const basePath = `/brand-ecosystem/${tenantSlug}`;
 
   async function handleLogout() {
+    // El cookie es HttpOnly: solo el servidor puede limpiarlo.
     try {
       await fetch('/api/auth/client-pin/logout', { method: 'POST' });
     } catch {
-      /* aún sin red, limpia cookie manualmente abajo */
+      /* si la petición falla, el cookie expira por TTL */
     }
-    // Borrar cookie del lado cliente por si el endpoint falla.
-    document.cookie = 'promark-client-token=; path=/; max-age=0; SameSite=Lax';
     router.push(`/brand-ecosystem/${tenantSlug}/login`);
     router.refresh();
   }
