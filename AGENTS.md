@@ -21,6 +21,17 @@ El session pooler tiene un límite duro de 15 conexiones en plan Free. Si Prisma
 - Branches `sprint-N/...`, `fix/...`, `feat/...`, `docs/...`: trabajo normal. Cada `git push origin <branch-name>`, NUNCA `git push origin HEAD:main`.
 - Worktrees (`git worktree add ...`): excepción. Ahí sí aplica push directo a main según la regla global de `~/.claude/CLAUDE.md`.
 
+## Política de commits
+
+- **NO** agregar `Co-Authored-By:` con asistentes (Claude / GPT / etc.) en commits ni PRs.
+- Mensajes concisos: describir el **qué** y **por qué** sin firmas externas.
+
+## Seguridad — reglas duras
+
+- **NUNCA** commitear `DATABASE_URL`, contraseñas, JWTs, API keys, PINs ni secretos en archivos markdown, docs, código o ejemplos. Usar siempre `<placeholder>` o referencia a `.env`.
+- Cookies de sesión: `httpOnly: true`, `secure: NODE_ENV === 'production'`, `sameSite: 'lax'`. **NO** setear desde `document.cookie`.
+- Si un secreto se filtra al repo: **rotar inmediatamente** la credencial, aunque se borre del HEAD (la historia git sigue exponiéndola).
+
 ## Bug conocido — Turbopack y `®` en path local
 
 Next.js 16.2.6 con Turbopack hace panic cuando el path del proyecto contiene caracteres multibyte como `®`:

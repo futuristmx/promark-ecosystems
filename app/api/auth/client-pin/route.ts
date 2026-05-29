@@ -35,9 +35,10 @@ export async function POST(request: Request) {
       { id: result.user.tenant_id, slug: result.user.tenant_slug }
     );
 
-    return NextResponse.json({
+    // Cookie HttpOnly + Secure: el cliente NO puede leer el token via JS,
+    // mitigando robo por XSS. El cookie viaja automáticamente en peticiones same-site.
+    const res = NextResponse.json({
       success: true,
-      token,
       user: {
         id: result.user.id,
         full_name: result.user.full_name,
@@ -45,6 +46,14 @@ export async function POST(request: Request) {
         tenant_slug: result.user.tenant_slug,
       },
     });
+    res.cookies.set('promark-client-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 8 * 60 * 60, // 8h
+    });
+    return res;
   } catch (error) {
     console.error('Client auth error:', error);
     return NextResponse.json(

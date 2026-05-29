@@ -58,8 +58,8 @@ export function ClientLoginForm({
         return;
       }
 
-      // Store JWT in cookie (set via response, but also manually for immediate use)
-      document.cookie = `promark-client-token=${data.token}; path=/; max-age=${8 * 60 * 60}; SameSite=Lax`;
+      // El cookie HttpOnly + Secure ya fue seteado por el endpoint /api/auth/client-pin.
+      // No tocamos document.cookie (XSS vector si fuera readable).
 
       // G2: redirect direct to /panel (dashboard), not /portal redirect chain.
       router.push(`/brand-ecosystem/${tenantSlug}/panel`);

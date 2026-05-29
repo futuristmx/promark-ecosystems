@@ -10,7 +10,8 @@ export async function POST() {
     path: '/',
     maxAge: 0,
     sameSite: 'lax',
-    httpOnly: false,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
   });
   return res;
 }

@@ -47,15 +47,14 @@ Base: `main` post-Sprint 5 + hotfix pooler (`55fc362`)
 ### 6. ✅ Seed limpio (NO aplicado todavía)
 - `prisma/seed.ts` actualizado:
   - Limpia slugs viejos: `grupo-test-norte`, `alimentos-demo-sa`
-  - **Tenant 1** `grupo-norteno` — "Grupo Norteño S.A. de C.V." — 8 marcas (5 activas + 1 a 45d + 1 a 15d + 1 vencida -45d), clases IMPI 29/30/35, usuarios GTN-001/002/003 con PINs 1234/5678/9012
-  - **Tenant 2** `alimentos-pacifico` — "Alimentos del Pacífico" — 5 marcas (4 activas + 1 a 30d), clases IMPI 29/43, usuarios ADS-001/002 con PINs 1111/2222
+  - **Tenant 1** `grupo-norteno` — "Grupo Norteño S.A. de C.V." — 8 marcas (5 activas + 1 a 45d + 1 a 15d + 1 vencida -45d), clases IMPI 29/30/35, 3 usuarios cliente (PINs en seed local, NO commiteados)
+  - **Tenant 2** `alimentos-pacifico` — "Alimentos del Pacífico" — 5 marcas (4 activas + 1 a 30d), clases IMPI 29/43, 2 usuarios cliente (PINs en seed local, NO commiteados)
   - Promark superadmin `mcadena@promark.mx` preservado vía upsert
 - Commit: `896eb03`
 
 **⚠️ Aplicar manualmente post-merge:**
 ```bash
-DATABASE_URL="postgresql://postgres.atvgvoclcecowochfavy:Promark_2026@aws-1-us-west-2.pooler.supabase.com:6543/postgres" \
-DIRECT_DATABASE_URL="postgresql://postgres.atvgvoclcecowochfavy:Promark_2026@aws-1-us-west-2.pooler.supabase.com:5432/postgres" \
+# Usa las credenciales reales desde tu .env local (NUNCA hardcodear).
 npx prisma db seed
 ```
 
